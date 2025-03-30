@@ -18,7 +18,7 @@ const MenuManagement: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       <SidebarProvider>
-        <Sidebar defaultCollapsed={false} className="border-r border-gray-200">
+        <Sidebar className="border-r border-gray-200">
           <SidebarHeader className="px-4 py-6 border-b border-gray-200">
             <h2 className="text-lg font-bold">Restaurant Dashboard</h2>
           </SidebarHeader>
