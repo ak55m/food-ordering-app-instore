@@ -64,9 +64,9 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				// Custom colors for our app
-				"brand-orange": "#F97316",
-				"brand-light": "#F6F6F7",
-				"brand-dark": "#333333",
+				"brand-cyan": "#00c2e8",
+				"brand-light": "#ebf7fd",
+				"brand-white": "#ffffff",
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
