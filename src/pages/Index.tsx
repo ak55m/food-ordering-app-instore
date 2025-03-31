@@ -44,8 +44,8 @@ const Index: React.FC = () => {
           <>
             <section className="py-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold text-gray-900 font-omnes">Why don't we just...</h2>
-                <a href="#" className="text-brand-cyan font-medium font-omnes">See all</a>
+                <h2 className="text-lg font-semibold text-gray-900 font-omnes">New on MunchMap</h2>
+                <a href="#" className="text-brand-cyan font-medium text-sm font-omnes">See all</a>
               </div>
               
               {isLoading.restaurants ? (
@@ -53,16 +53,14 @@ const Index: React.FC = () => {
                   <p className="text-gray-500 font-omnes">Finding restaurants near you...</p>
                 </div>
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="w-full">
-                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: isMobile ? 1 : 3 }}>
-                    <CarouselContent className="-ml-4">
-                      {nearbyRestaurants.map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-4 md:basis-1/3 lg:basis-1/4">
-                          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                  </Carousel>
+                <div className="w-full overflow-visible">
+                  <div className="flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+                    {nearbyRestaurants.map(restaurant => (
+                      <div key={restaurant.id} className="flex-shrink-0 w-[160px] snap-start">
+                        <RestaurantCard restaurant={restaurant} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-10">
@@ -73,21 +71,19 @@ const Index: React.FC = () => {
             
             <section className="py-6">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-semibold text-gray-900 font-omnes">Dinner near you</h2>
-                <a href="#" className="text-brand-cyan font-medium font-omnes">See all</a>
+                <h2 className="text-lg font-semibold text-gray-900 font-omnes">Dinner near you</h2>
+                <a href="#" className="text-brand-cyan font-medium text-sm font-omnes">See all</a>
               </div>
               
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="w-full">
-                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: isMobile ? 1 : 3 }}>
-                    <CarouselContent className="-ml-4">
-                      {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-4 md:basis-1/3 lg:basis-1/4">
-                          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                  </Carousel>
+                <div className="w-full overflow-visible">
+                  <div className="flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+                    {nearbyRestaurants.slice(0).reverse().map(restaurant => (
+                      <div key={restaurant.id} className="flex-shrink-0 w-[160px] snap-start">
+                        <RestaurantCard restaurant={restaurant} />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : null}
             </section>

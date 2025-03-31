@@ -22,27 +22,27 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   return (
     <div 
-      className="overflow-hidden cursor-pointer rounded-lg shadow-sm border border-gray-200 bg-white w-full" 
+      className="overflow-hidden cursor-pointer rounded-lg shadow-sm border border-gray-200 bg-white" 
       onClick={handleClick}
     >
-      <div className="aspect-video relative overflow-hidden">
+      <div className="relative overflow-hidden">
         <img 
           src={restaurant.image} 
           alt={restaurant.name}
-          className="w-full h-full object-cover"
+          className="w-full aspect-[4/3] object-cover"
         />
       </div>
       <div className="p-3">
-        <h3 className="font-bold text-lg line-clamp-1 font-omnes">{restaurant.name}</h3>
-        <p className="text-gray-500 text-sm line-clamp-1 mb-4 font-omnes">
-          {restaurant.categories?.slice(0, 1).join(', ')}
+        <h3 className="font-bold text-base line-clamp-1 font-omnes">{restaurant.name}</h3>
+        <p className="text-gray-500 text-xs line-clamp-1 mb-2 font-omnes">
+          {restaurant.categories?.slice(0, 3).join(' • ')}
         </p>
         
-        <div className="flex items-center text-brand-cyan border-t border-gray-100 pt-3">
-          <Bike className="h-5 w-5 mr-1" />
+        <div className="flex items-center text-sm text-brand-cyan">
+          <Bike className="h-4 w-4 mr-1" />
           <span className="font-medium">{deliveryFee}</span>
           <span className="mx-1">•</span>
-          <span className="text-gray-500">{deliveryTime}</span>
+          <span className="text-gray-500 text-xs">{deliveryTime}</span>
         </div>
       </div>
     </div>
