@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
@@ -23,7 +22,6 @@ const Index: React.FC = () => {
   const isMobile = useIsMobile();
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   
-  // Ad banners data with improved images
   const adBanners = [
     {
       id: 1,
@@ -80,7 +78,6 @@ const Index: React.FC = () => {
         {locationEnabled ? (
           <>
             <section className={`${isMobile ? 'py-4' : 'py-6'}`}>
-              {/* Mobile Ad Banner */}
               {isMobile && (
                 <div className="mb-3 relative rounded-lg overflow-hidden">
                   <img 
@@ -94,7 +91,6 @@ const Index: React.FC = () => {
                     <p className="text-sm">{adBanners[currentAdIndex].description}</p>
                   </div>
                   
-                  {/* Ad navigation arrows */}
                   <Button 
                     onClick={prevAd}
                     className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/50 hover:bg-white/80 p-1 h-8 w-8"
@@ -115,7 +111,6 @@ const Index: React.FC = () => {
                     <ChevronRight className="h-5 w-5" />
                   </Button>
                   
-                  {/* Ad indicators */}
                   <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
                     {adBanners.map((_, index) => (
                       <div 
@@ -129,11 +124,9 @@ const Index: React.FC = () => {
                 </div>
               )}
               
-              {/* Desktop Ad Banners - Two at a time */}
               {!isMobile && (
                 <div className="mb-6 relative">
                   <div className="grid grid-cols-2 gap-4">
-                    {/* First banner */}
                     <div className="relative rounded-lg overflow-hidden">
                       <img 
                         src={adBanners[currentAdIndex].image} 
@@ -147,7 +140,6 @@ const Index: React.FC = () => {
                       </div>
                     </div>
                     
-                    {/* Second banner */}
                     <div className="relative rounded-lg overflow-hidden">
                       <img 
                         src={adBanners[(currentAdIndex + 1) % adBanners.length].image} 
@@ -162,28 +154,25 @@ const Index: React.FC = () => {
                     </div>
                   </div>
                   
-                  {/* Ad navigation arrows for desktop - side by side */}
-                  <div className="absolute -bottom-12 right-0 flex gap-2">
-                    <Button 
-                      onClick={prevAd}
-                      className="rounded-full bg-white border border-gray-300 shadow-sm h-10 w-10"
-                      size="icon"
-                      variant="outline"
-                      aria-label="Previous advertisement"
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </Button>
-                    
-                    <Button 
-                      onClick={nextAd}
-                      className="rounded-full bg-white border border-gray-300 shadow-sm h-10 w-10"
-                      size="icon"
-                      variant="outline"
-                      aria-label="Next advertisement"
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </Button>
-                  </div>
+                  <Button 
+                    onClick={prevAd}
+                    className="absolute top-1/2 -left-5 -translate-y-1/2 rounded-full bg-white border border-gray-300 shadow-sm h-10 w-10"
+                    size="icon"
+                    variant="outline"
+                    aria-label="Previous advertisement"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button 
+                    onClick={nextAd}
+                    className="absolute top-1/2 -right-5 -translate-y-1/2 rounded-full bg-white border border-gray-300 shadow-sm h-10 w-10"
+                    size="icon"
+                    variant="outline"
+                    aria-label="Next advertisement"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
                 </div>
               )}
               
