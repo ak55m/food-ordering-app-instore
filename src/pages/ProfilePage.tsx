@@ -14,7 +14,7 @@ const ProfilePage: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/home'); // Changed from '/login' to '/home'
   };
 
   const profileOptions = [

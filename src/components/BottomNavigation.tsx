@@ -15,7 +15,7 @@ const BottomNavigation = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/home'); // Changed from '/login' to '/home'
   };
 
   const isActive = (path: string) => {
