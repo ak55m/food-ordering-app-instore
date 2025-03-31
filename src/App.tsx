@@ -12,6 +12,7 @@ import RestaurantDetail from "./pages/RestaurantDetail";
 import OrdersPage from "./pages/OrdersPage";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import MenuManagement from "./pages/MenuManagement";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/restaurant/:id" element={<RestaurantDetail />} />
             <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
             <Route path="/menu-management" element={<MenuManagement />} />
             <Route path="*" element={<NotFound />} />

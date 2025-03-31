@@ -5,6 +5,7 @@ import { useAppContext } from '@/context/AppContext';
 import LocationButton from '@/components/LocationButton';
 import RestaurantCard from '@/components/RestaurantCard';
 import OrderTracker from '@/components/OrderTracker';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const Index: React.FC = () => {
   const { nearbyRestaurants, locationEnabled, userLocation, orders } = useAppContext();
@@ -14,10 +15,10 @@ const Index: React.FC = () => {
   const hasActiveOrder = orders.some(order => order.status !== 'completed');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold text-brand-orange">MunchMap</h1>
+          <h1 className="text-xl font-bold text-brand-cyan">MunchMap</h1>
           <div>
             <LocationButton />
           </div>
@@ -63,6 +64,8 @@ const Index: React.FC = () => {
           </div>
         )}
       </main>
+      
+      <BottomNavigation />
     </div>
   );
 };

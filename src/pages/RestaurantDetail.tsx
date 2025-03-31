@@ -7,6 +7,7 @@ import MenuItem from '@/components/MenuItem';
 import Cart from '@/components/Cart';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const RestaurantDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,7 +47,7 @@ const RestaurantDetail: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       {/* Restaurant Header */}
       <div className="relative h-48 md:h-64 bg-gray-800 overflow-hidden">
         <img 
@@ -113,6 +114,8 @@ const RestaurantDetail: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      <BottomNavigation />
     </div>
   );
 };

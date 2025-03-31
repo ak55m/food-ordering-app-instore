@@ -6,6 +6,7 @@ import { useAppContext, Order } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const OrdersPage: React.FC = () => {
   const { orders } = useAppContext();
@@ -36,17 +37,9 @@ const OrdersPage: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            className="mr-2"
-            onClick={() => navigate('/')}
-          >
-            <ArrowLeft className="h-4 w-4 mr-1" /> Back
-          </Button>
           <h1 className="text-xl font-semibold">Your Orders</h1>
         </div>
       </header>
@@ -113,6 +106,8 @@ const OrdersPage: React.FC = () => {
           </div>
         )}
       </main>
+      
+      <BottomNavigation />
     </div>
   );
 };
