@@ -39,15 +39,15 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
         )}
       </div>
       <div className={`${isMobile ? 'px-2 py-2' : 'p-3'}`}>
-        <h3 className={`font-bold ${isMobile ? 'text-sm' : 'text-base'} line-clamp-1 font-omnes`}>{restaurant.name}</h3>
+        <h3 className={`font-bold ${isMobile ? 'text-xs' : 'text-base'} line-clamp-1 font-omnes`}>{restaurant.name}</h3>
         <p className="text-gray-500 text-xs line-clamp-1 mb-1 font-omnes">
           {restaurant.categories?.slice(0, 3).join(' • ')}
         </p>
         
         <div className="flex items-center text-sm">
-          <span className="font-medium text-brand-cyan">{deliveryFee}</span>
+          <span className={`font-medium text-brand-cyan ${isMobile ? 'text-xs' : ''}`}>{deliveryFee}</span>
           <span className="mx-1 text-gray-500">•</span>
-          <span className="text-gray-500 text-xs">{deliveryTime}</span>
+          <span className={`text-gray-500 ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{deliveryTime}</span>
         </div>
       </div>
     </div>
