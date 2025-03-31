@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
 import { useAppContext } from "@/context/AppContext";
 import { UserRole } from "@/types";
 import { supabase } from "@/lib/supabase";
@@ -52,9 +51,6 @@ const LoginPage = () => {
       await login(email, password);
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Login failed", {
-        description: "An unexpected error occurred. Please try again."
-      });
     } finally {
       setIsLoading(false);
     }

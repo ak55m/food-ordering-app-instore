@@ -1,6 +1,4 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { toast } from 'sonner';
 import { geocodeCoordinates } from '@/lib/geocoding';
 import { 
   Restaurant, MenuItem, CartItem, Order, User, Category, 
@@ -99,7 +97,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      // Simulate loading
       await new Promise(resolve => setTimeout(resolve, 500));
       
       if (email === 'customer@example.com' && password === 'password123') {
@@ -112,7 +109,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setUser(user);
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(user));
-        toast.success('Logged in successfully!');
       } else if (email === 'owner@example.com' && password === 'password123') {
         const user: User = {
           id: 'owner-123',
@@ -124,14 +120,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setUser(user);
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(user));
-        toast.success('Logged in successfully!');
-      } else {
-        toast.error('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      toast.error('Failed to login');
-      throw error; // Rethrow to be caught in LoginPage
+      throw error;
     }
   };
   
@@ -140,7 +132,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsAuthenticated(false);
     localStorage.removeItem('user');
     setCart([]);
-    toast.success('Logged out successfully');
   };
   
   const requestLocation = async (): Promise<void> => {
@@ -168,14 +159,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setUserLocation(newUserLocation);
       setLocationEnabled(true);
       
-      // Store in local storage
       localStorage.setItem(USER_LOCATION_KEY, JSON.stringify(newUserLocation));
       
       await fetchNearbyRestaurants(latitude, longitude);
       
     } catch (error) {
       console.error('Error getting location:', error);
-      toast.error('Could not access your location');
       throw error;
     } finally {
       setIsLoading({ ...isLoading, location: false });
@@ -191,7 +180,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setNearbyRestaurants(mockRestaurants);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
-      toast.error('Failed to fetch nearby restaurants');
     } finally {
       setIsLoading({ ...isLoading, restaurants: false });
     }
@@ -215,7 +203,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       r.id === restaurant.id ? restaurant : r
     );
     setRestaurants(updatedRestaurants);
-    toast.success('Restaurant updated successfully');
   };
   
   const fetchMenuItems = async (restaurantId: string): Promise<void> => {
@@ -228,7 +215,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setMenuItems(items);
     } catch (error) {
       console.error('Error fetching menu items:', error);
-      toast.error('Failed to fetch menu items');
     } finally {
       setIsLoading({ ...isLoading, menuItems: false });
     }
@@ -265,7 +251,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const category = categories.find(cat => cat.id === menuItem.categoryId);
     
     if (!category) {
-      toast.error('Category not found');
       return;
     }
     
@@ -297,7 +282,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (firstItemDetails && firstItemDetails.restaurantId !== menuItem.restaurantId) {
         if (window.confirm('Adding items from a different restaurant will clear your current cart. Continue?')) {
           setCart([{ menuItem, quantity: 1 }]);
-          toast.success(`Added ${menuItem.name} to cart`);
         }
         return;
       }
@@ -312,8 +296,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } else {
       setCart([...cart, { menuItem, quantity: 1 }]);
     }
-    
-    toast.success(`Added ${menuItem.name} to cart`);
   };
   
   const updateCartItemQuantity = (menuItemId: string, quantity: number): void => {
@@ -332,7 +314,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const removeFromCart = (menuItemId: string): void => {
     const updatedCart = cart.filter(item => item.menuItem.id !== menuItemId);
     setCart(updatedCart);
-    toast.success('Item removed from cart');
   };
   
   const clearCart = (): void => {
@@ -341,12 +322,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
   const placeOrder = async (restaurantId: string, paymentMethod: 'credit_card' | 'cash'): Promise<void> => {
     if (!user) {
-      toast.error('You must be logged in to place an order');
       return;
     }
     
     if (cart.length === 0) {
-      toast.error('Your cart is empty');
       return;
     }
     
@@ -373,11 +352,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setOrders([newOrder, ...orders]);
       
       clearCart();
-      
-      toast.success('Order placed successfully!');
     } catch (error) {
       console.error('Error placing order:', error);
-      toast.error('Failed to place order');
     } finally {
       setIsLoading({ ...isLoading, orders: false });
     }
@@ -389,11 +365,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     );
     
     setOrders(updatedOrders);
-    toast.success(`Order status updated to ${newStatus}`);
   };
   
   useEffect(() => {
-    // Try to get saved user from local storage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -406,7 +380,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     }
 
-    // Try to get saved user location from local storage
     const storedLocation = localStorage.getItem(USER_LOCATION_KEY);
     if (storedLocation) {
       try {
@@ -414,7 +387,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         setUserLocation(parsedLocation);
         setLocationEnabled(true);
         
-        // Fetch restaurants using the stored location
         fetchNearbyRestaurants(parsedLocation.latitude, parsedLocation.longitude);
       } catch (error) {
         console.error('Error parsing stored location:', error);
