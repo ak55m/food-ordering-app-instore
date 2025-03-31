@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
@@ -78,11 +77,10 @@ const Index: React.FC = () => {
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <>
                   <div className="md:hidden mx-[-16px]">
-                    <div className="overflow-x-auto pl-4 pb-3 flex gap-1 scrollbar-hide">
+                    <div className="overflow-x-auto pl-4 pr-4 pb-3 flex gap-1 scrollbar-hide">
                       {nearbyRestaurants.map((restaurant, index) => (
                         <div key={restaurant.id} className="flex-shrink-0 w-[230px]">
                           <RestaurantCard restaurant={restaurant} />
-                          {index === nearbyRestaurants.length - 1 && <div className="w-4 inline-block"></div>}
                         </div>
                       ))}
                     </div>
@@ -132,11 +130,10 @@ const Index: React.FC = () => {
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <>
                   <div className="md:hidden mx-[-16px]">
-                    <div className="overflow-x-auto pl-4 pb-3 flex gap-1 scrollbar-hide">
-                      {nearbyRestaurants.slice(0).reverse().map((restaurant, index, arr) => (
+                    <div className="overflow-x-auto pl-4 pr-4 pb-3 flex gap-1 scrollbar-hide">
+                      {nearbyRestaurants.slice(0).reverse().map((restaurant, index) => (
                         <div key={restaurant.id} className="flex-shrink-0 w-[230px]">
                           <RestaurantCard restaurant={restaurant} />
-                          {index === arr.length - 1 && <div className="w-4 inline-block"></div>}
                         </div>
                       ))}
                     </div>
