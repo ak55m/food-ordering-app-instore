@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
@@ -79,7 +80,7 @@ const Index: React.FC = () => {
                   <div className="md:hidden mx-[-16px]">
                     <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
                       {nearbyRestaurants.map(restaurant => (
-                        <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
+                        <div key={restaurant.id} className="flex-shrink-0 w-[200px]">
                           <RestaurantCard restaurant={restaurant} />
                         </div>
                       ))}
@@ -132,7 +133,7 @@ const Index: React.FC = () => {
                   <div className="md:hidden mx-[-16px]">
                     <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
                       {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                        <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
+                        <div key={restaurant.id} className="flex-shrink-0 w-[200px]">
                           <RestaurantCard restaurant={restaurant} />
                         </div>
                       ))}
