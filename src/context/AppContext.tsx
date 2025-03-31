@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { geocodeCoordinates } from '@/lib/geocoding';
@@ -121,23 +122,23 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock authentication logic
-      if (email === 'user@example.com' && password === 'password') {
+      // Mock authentication logic - using the test credentials from LoginPage.tsx
+      if (email === 'customer@example.com' && password === 'password123') {
         const user: User = {
-          id: '1',
-          email: 'user@example.com',
-          name: 'John Doe',
+          id: 'cust-123',
+          email: 'customer@example.com',
+          name: 'Test Customer',
           role: 'customer',
         };
         setUser(user);
         setIsAuthenticated(true);
         localStorage.setItem('user', JSON.stringify(user));
         toast.success('Logged in successfully!');
-      } else if (email === 'restaurant@example.com' && password === 'password') {
+      } else if (email === 'owner@example.com' && password === 'password123') {
         const user: User = {
-          id: '2',
-          email: 'restaurant@example.com',
-          name: 'Restaurant Owner',
+          id: 'owner-123',
+          email: 'owner@example.com',
+          name: 'Test Restaurant Owner',
           role: 'restaurant_owner',
           restaurantId: 'rest1',
         };
@@ -312,8 +313,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
   
   const updateMenuItem = (updatedItem: MenuItem): void => {
+    // Fix: Don't try to access 'quantity' on MenuItem type
     const newItems = menuItems.map(item => 
-      item.id === updatedItem.id ? { ...item, quantity: updatedItem.quantity } : item
+      item.id === updatedItem.id ? updatedItem : item
     );
     setMenuItems(newItems);
   };

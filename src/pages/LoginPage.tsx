@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { useAppContext, UserRole } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
+import { UserRole } from "@/types";
 import { supabase } from "@/lib/supabase";
 
 const LoginPage = () => {
@@ -16,7 +17,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  const { setUser } = useAppContext();
+  const { user, setUser, isAuthenticated } = useAppContext();
 
   // Test user credentials
   const testCustomer = {
@@ -30,6 +31,17 @@ const LoginPage = () => {
     password: "password123",
     role: "restaurant_owner" as UserRole
   };
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (user?.role === 'restaurant_owner') {
+        navigate('/restaurant');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,21 +57,18 @@ const LoginPage = () => {
         //   password
         // });
         
-        setUser({
+        const customerUser = {
           id: "cust-123",
           name: "Test Customer",
           email: testCustomer.email,
           role: testCustomer.role
-        });
+        };
+        
+        setUser(customerUser);
         
         if (rememberMe) {
           // Save user info to localStorage for "remember me" functionality
-          localStorage.setItem('user', JSON.stringify({
-            id: "cust-123",
-            name: "Test Customer",
-            email: testCustomer.email,
-            role: testCustomer.role
-          }));
+          localStorage.setItem('user', JSON.stringify(customerUser));
         }
         
         toast.success("Login successful", {
@@ -70,20 +79,18 @@ const LoginPage = () => {
       } 
       // Check if credentials match test restaurant owner
       else if (email === testRestaurantOwner.email && password === testRestaurantOwner.password) {
-        setUser({
+        const ownerUser = {
           id: "owner-123",
           name: "Test Restaurant Owner",
           email: testRestaurantOwner.email,
-          role: testRestaurantOwner.role
-        });
+          role: testRestaurantOwner.role,
+          restaurantId: "rest1"
+        };
+        
+        setUser(ownerUser);
         
         if (rememberMe) {
-          localStorage.setItem('user', JSON.stringify({
-            id: "owner-123",
-            name: "Test Restaurant Owner",
-            email: testRestaurantOwner.email,
-            role: testRestaurantOwner.role
-          }));
+          localStorage.setItem('user', JSON.stringify(ownerUser));
         }
         
         toast.success("Login successful", {

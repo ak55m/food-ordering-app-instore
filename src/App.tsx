@@ -12,7 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import Index from "./pages/Index";
 import RestaurantDetail from "./pages/RestaurantDetail";
 import OrdersPage from "./pages/OrdersPage";
-import CartPage from "./pages/CartPage";  // Import the CartPage component
+import CartPage from "./pages/CartPage";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
@@ -22,7 +22,14 @@ import RestaurantMenuManagement from "./pages/RestaurantMenuManagement";
 import RestaurantAnalytics from "./pages/RestaurantAnalytics";
 import RestaurantSettings from "./pages/RestaurantSettings";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
 
 // Protected route for customers
 const CustomerRoute = ({ children }: { children: React.ReactNode }) => {
@@ -47,10 +54,16 @@ const RestaurantRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRoutes = () => {
+  const { isAuthenticated, user } = useAppContext();
+
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={
+        isAuthenticated ? 
+          (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/" />) 
+          : <LoginPage />
+      } />
       
       {/* Customer Routes */}
       <Route path="/" element={
