@@ -146,7 +146,7 @@ const LoginPage = () => {
 
             <Button 
               type="submit" 
-              className="w-full bg-brand-light hover:bg-brand-light/90 text-gray-800" 
+              className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}
