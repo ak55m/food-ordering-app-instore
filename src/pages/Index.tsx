@@ -53,8 +53,8 @@ const Index: React.FC = () => {
                   <p className="text-gray-500 font-omnes">Finding restaurants near you...</p>
                 </div>
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="w-full overflow-visible">
-                  <div className="flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+                <div className="w-full overflow-visible pl-4 -ml-4">
+                  <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide">
                     {nearbyRestaurants.map(restaurant => (
                       <div key={restaurant.id} className="flex-shrink-0 w-[160px] snap-start">
                         <RestaurantCard restaurant={restaurant} />
@@ -76,8 +76,8 @@ const Index: React.FC = () => {
               </div>
               
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="w-full overflow-visible">
-                  <div className="flex overflow-x-auto gap-4 pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
+                <div className="w-full overflow-visible pl-4 -ml-4">
+                  <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide">
                     {nearbyRestaurants.slice(0).reverse().map(restaurant => (
                       <div key={restaurant.id} className="flex-shrink-0 w-[160px] snap-start">
                         <RestaurantCard restaurant={restaurant} />
