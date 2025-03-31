@@ -56,14 +56,9 @@ const Index: React.FC = () => {
         ) : (
           <div className="py-10 text-center">
             <h2 className="text-2xl font-semibold mb-2">Find Restaurants Near You</h2>
-            <p className="text-gray-500 mb-6">
+            <p className="text-gray-500">
               Click the location button above to discover restaurants in your area
             </p>
-            <img 
-              src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&h=600&fit=crop" 
-              alt="Food" 
-              className="max-w-md mx-auto rounded-lg shadow-md" 
-            />
           </div>
         )}
       </main>
