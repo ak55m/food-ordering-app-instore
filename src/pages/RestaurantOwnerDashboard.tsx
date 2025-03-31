@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { useAppContext, Order } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,15 +85,15 @@ const RestaurantOwnerDashboard: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="flex h-screen w-full overflow-hidden">
       <RestaurantSidebar activePage="dashboard" />
       
-      <main className="flex-1 p-6">
-        <div className="max-w-6xl mx-auto">
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-6xl mx-auto p-6">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Orders Dashboard</h1>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate('/restaurant-analytics')}>
+              <Button variant="outline" onClick={() => navigate('/restaurant/analytics')}>
                 <BarChart3 className="h-4 w-4 mr-2" /> View Analytics
               </Button>
             </div>
