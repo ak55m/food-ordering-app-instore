@@ -21,6 +21,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'wolt': ['Wolt Fonts', 'Roboto', 'system-ui', 'sans-serif'],
+				'omnes': ['Omnes', 'Roboto', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
