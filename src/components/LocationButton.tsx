@@ -36,7 +36,7 @@ const LocationButton: React.FC = () => {
       )}
       <span className="text-sm text-gray-700 truncate max-w-[150px] md:max-w-[200px]">
         {locationEnabled 
-          ? "Your location"
+          ? userLocation.address || "Your location"
           : "Find restaurants near you"}
       </span>
     </Button>

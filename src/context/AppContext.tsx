@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { geocodeCoordinates } from '@/lib/geocoding';
@@ -62,6 +63,8 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+
+const USER_LOCATION_KEY = 'munchmap_user_location';
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -164,6 +167,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       
       setUserLocation(newUserLocation);
       setLocationEnabled(true);
+      
+      // Store in local storage
+      localStorage.setItem(USER_LOCATION_KEY, JSON.stringify(newUserLocation));
       
       await fetchNearbyRestaurants(latitude, longitude);
       
@@ -387,6 +393,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
   
   useEffect(() => {
+    // Try to get saved user from local storage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -396,6 +403,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('user');
+      }
+    }
+
+    // Try to get saved user location from local storage
+    const storedLocation = localStorage.getItem(USER_LOCATION_KEY);
+    if (storedLocation) {
+      try {
+        const parsedLocation = JSON.parse(storedLocation);
+        setUserLocation(parsedLocation);
+        setLocationEnabled(true);
+        
+        // Fetch restaurants using the stored location
+        fetchNearbyRestaurants(parsedLocation.latitude, parsedLocation.longitude);
+      } catch (error) {
+        console.error('Error parsing stored location:', error);
+        localStorage.removeItem(USER_LOCATION_KEY);
       }
     }
   }, []);
