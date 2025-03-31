@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Clock } from 'lucide-react';
-import { useAppContext, Order } from '@/context/AppContext';
+import { useAppContext, OrderStatus } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
@@ -17,7 +17,7 @@ const OrderTracker: React.FC = () => {
     return null;
   }
   
-  const getProgress = (status: Order['status']) => {
+  const getProgress = (status: OrderStatus) => {
     switch (status) {
       case 'pending': return 25;
       case 'preparing': return 50;
@@ -27,7 +27,7 @@ const OrderTracker: React.FC = () => {
     }
   };
   
-  const getStatusText = (status: Order['status']) => {
+  const getStatusText = (status: OrderStatus) => {
     switch (status) {
       case 'pending': return 'Order received';
       case 'preparing': return 'Preparing your food';

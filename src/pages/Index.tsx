@@ -12,7 +12,8 @@ const Index: React.FC = () => {
   const navigate = useNavigate();
   
   // Check if there's an active order
-  const hasActiveOrder = orders.some(order => order.status !== 'completed');
+  const hasActiveOrder = orders && orders.length > 0 && 
+    orders.some(order => order.status !== 'completed');
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -38,7 +39,7 @@ const Index: React.FC = () => {
               Restaurants near {userLocation.address}
             </h2>
             
-            {nearbyRestaurants.length > 0 ? (
+            {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {nearbyRestaurants.map(restaurant => (
                   <RestaurantCard key={restaurant.id} restaurant={restaurant} />

@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock } from 'lucide-react';
-import { useAppContext, Order } from '@/context/AppContext';
+import { useAppContext, OrderStatus } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -12,7 +12,7 @@ const OrdersPage: React.FC = () => {
   const { orders } = useAppContext();
   const navigate = useNavigate();
   
-  const getStatusText = (status: Order['status']) => {
+  const getStatusText = (status: OrderStatus) => {
     switch (status) {
       case 'pending': return 'Order received';
       case 'preparing': return 'Preparing your food';
@@ -22,7 +22,7 @@ const OrdersPage: React.FC = () => {
     }
   };
   
-  const getProgress = (status: Order['status']) => {
+  const getProgress = (status: OrderStatus) => {
     switch (status) {
       case 'pending': return 25;
       case 'preparing': return 50;
@@ -32,9 +32,9 @@ const OrdersPage: React.FC = () => {
     }
   };
 
-  const sortedOrders = [...orders].sort((a, b) => 
+  const sortedOrders = orders && orders.length ? [...orders].sort((a, b) => 
     b.timestamp.getTime() - a.timestamp.getTime()
-  );
+  ) : [];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
