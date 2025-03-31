@@ -25,6 +25,17 @@ export type Restaurant = {
   };
   distance?: string;
   isOpen?: boolean;
+  // Additional properties needed by RestaurantSettings
+  latitude: number;
+  longitude: number;
+  phone: string;
+  email: string;
+  logo: string;
+  coverImage: string;
+  openingHours: RestaurantOpeningHours;
+  socialMedia: SocialMedia;
+  isActive: boolean;
+  acceptsOnlineOrders: boolean;
 };
 
 export type Category = {

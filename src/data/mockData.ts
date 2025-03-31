@@ -1,4 +1,3 @@
-
 import { Restaurant, MenuItem, Category } from '@/types';
 
 // Mock Restaurant Data
@@ -15,7 +14,29 @@ export const mockRestaurants: Restaurant[] = [
       latitude: 40.712776,
       longitude: -74.005974
     },
-    isOpen: true
+    isOpen: true,
+    latitude: 40.712776,
+    longitude: -74.005974,
+    phone: '(555) 123-4567',
+    email: 'contact@burgerpalace.com',
+    logo: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&h=300&fit=crop',
+    coverImage: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=400&fit=crop',
+    openingHours: {
+      monday: { isOpen: true, open: '09:00', close: '22:00' },
+      tuesday: { isOpen: true, open: '09:00', close: '22:00' },
+      wednesday: { isOpen: true, open: '09:00', close: '22:00' },
+      thursday: { isOpen: true, open: '09:00', close: '22:00' },
+      friday: { isOpen: true, open: '09:00', close: '23:00' },
+      saturday: { isOpen: true, open: '10:00', close: '23:00' },
+      sunday: { isOpen: true, open: '10:00', close: '22:00' }
+    },
+    socialMedia: {
+      facebook: 'https://facebook.com/burgerpalace',
+      instagram: 'https://instagram.com/burgerpalace',
+      twitter: 'https://twitter.com/burgerpalace'
+    },
+    isActive: true,
+    acceptsOnlineOrders: true
   },
   {
     id: 'rest2',
@@ -29,7 +50,29 @@ export const mockRestaurants: Restaurant[] = [
       latitude: 40.714976,
       longitude: -74.007004
     },
-    isOpen: true
+    isOpen: true,
+    latitude: 40.714976,
+    longitude: -74.007004,
+    phone: '(555) 234-5678',
+    email: 'contact@pizzahaven.com',
+    logo: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=300&fit=crop',
+    coverImage: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&h=400&fit=crop',
+    openingHours: {
+      monday: { isOpen: true, open: '11:00', close: '22:00' },
+      tuesday: { isOpen: true, open: '11:00', close: '22:00' },
+      wednesday: { isOpen: true, open: '11:00', close: '22:00' },
+      thursday: { isOpen: true, open: '11:00', close: '22:00' },
+      friday: { isOpen: true, open: '11:00', close: '23:00' },
+      saturday: { isOpen: true, open: '11:00', close: '23:00' },
+      sunday: { isOpen: true, open: '12:00', close: '22:00' }
+    },
+    socialMedia: {
+      facebook: 'https://facebook.com/pizzahaven',
+      instagram: 'https://instagram.com/pizzahaven',
+      twitter: 'https://twitter.com/pizzahaven'
+    },
+    isActive: true,
+    acceptsOnlineOrders: true
   },
   {
     id: 'rest3',
@@ -43,7 +86,29 @@ export const mockRestaurants: Restaurant[] = [
       latitude: 40.709676,
       longitude: -74.000974
     },
-    isOpen: true
+    isOpen: true,
+    latitude: 40.709676,
+    longitude: -74.000974,
+    phone: '(555) 345-6789',
+    email: 'contact@sushidelight.com',
+    logo: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500&h=300&fit=crop',
+    coverImage: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&h=400&fit=crop',
+    openingHours: {
+      monday: { isOpen: true, open: '12:00', close: '22:00' },
+      tuesday: { isOpen: true, open: '12:00', close: '22:00' },
+      wednesday: { isOpen: true, open: '12:00', close: '22:00' },
+      thursday: { isOpen: true, open: '12:00', close: '22:00' },
+      friday: { isOpen: true, open: '12:00', close: '23:00' },
+      saturday: { isOpen: true, open: '13:00', close: '23:00' },
+      sunday: { isOpen: true, open: '13:00', close: '22:00' }
+    },
+    socialMedia: {
+      facebook: 'https://facebook.com/sushidelight',
+      instagram: 'https://instagram.com/sushidelight',
+      twitter: 'https://twitter.com/sushidelight'
+    },
+    isActive: true,
+    acceptsOnlineOrders: true
   },
   {
     id: 'rest4',
@@ -57,7 +122,29 @@ export const mockRestaurants: Restaurant[] = [
       latitude: 40.718276,
       longitude: -74.012974
     },
-    isOpen: true
+    isOpen: true,
+    latitude: 40.718276,
+    longitude: -74.012974,
+    phone: '(555) 456-7890',
+    email: 'contact@tacofiesta.com',
+    logo: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&h=300&fit=crop',
+    coverImage: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&h=400&fit=crop',
+    openingHours: {
+      monday: { isOpen: true, open: '11:00', close: '22:00' },
+      tuesday: { isOpen: true, open: '11:00', close: '22:00' },
+      wednesday: { isOpen: true, open: '11:00', close: '22:00' },
+      thursday: { isOpen: true, open: '11:00', close: '22:00' },
+      friday: { isOpen: true, open: '11:00', close: '23:00' },
+      saturday: { isOpen: true, open: '11:00', close: '23:00' },
+      sunday: { isOpen: true, open: '12:00', close: '22:00' }
+    },
+    socialMedia: {
+      facebook: 'https://facebook.com/tacofiesta',
+      instagram: 'https://instagram.com/tacofiesta',
+      twitter: 'https://twitter.com/tacofiesta'
+    },
+    isActive: true,
+    acceptsOnlineOrders: true
   }
 ];
 

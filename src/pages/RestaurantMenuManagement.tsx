@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext, Category, MenuItem as MenuItemType } from '@/context/AppContext';
@@ -57,7 +56,6 @@ const RestaurantMenuManagement: React.FC = () => {
     }
     
     addCategory({
-      id: Date.now().toString(), // Add the required id property
       name: newCategoryName,
       restaurantId
     });

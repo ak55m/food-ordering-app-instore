@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { geocodeCoordinates } from '@/lib/geocoding';
@@ -8,16 +7,11 @@ import {
 } from '@/types';
 import { mockRestaurants, mockMenuItems, mockCategories } from '@/data/mockData';
 
-// Re-export types for use by other components
-export type { 
-  Restaurant, MenuItem, CartItem, Order, User, Category,
-  OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia 
-};
-
 // Define the shape of our context
 interface AppContextType {
   // Authentication
   user: User | null;
+  setUser: (user: User | null) => void;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -57,7 +51,7 @@ interface AppContextType {
   getRestaurantCategories: (restaurantId: string) => Category[];
   getCategoryMenuItems: (categoryId: string) => MenuItem[];
   updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
-  addMenuItem: (menuItem: Omit<MenuItem, 'restaurantId'>) => void;
+  addMenuItem: (menuItem: Omit<MenuItem, 'id' | 'restaurantId'>) => void;
   updateMenuItem: (menuItem: MenuItem) => void;
   deleteMenuItem: (menuItemId: string) => void;
   addCategory: (category: Omit<Category, 'id'>) => void;
@@ -299,7 +293,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return menuItems.filter(item => item.categoryId === categoryId);
   };
   
-  const addMenuItem = (menuItem: Omit<MenuItem, 'restaurantId'>): void => {
+  const addMenuItem = (menuItem: Omit<MenuItem, 'id' | 'restaurantId'>): void => {
     // Find category to get restaurantId
     const category = categories.find(cat => cat.id === menuItem.categoryId);
     
@@ -310,6 +304,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     
     const newItem: MenuItem = {
       ...menuItem,
+      id: `item-${Date.now()}`,
       restaurantId: category.restaurantId,
     };
     
@@ -318,7 +313,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
   const updateMenuItem = (updatedItem: MenuItem): void => {
     const newItems = menuItems.map(item => 
-      item.id === updatedItem.id ? updatedItem : item
+      item.id === updatedItem.id ? { ...item, quantity: updatedItem.quantity } : item
     );
     setMenuItems(newItems);
   };
@@ -462,6 +457,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const contextValue: AppContextType = {
     // Authentication
     user,
+    setUser,
     isAuthenticated,
     login,
     logout,
@@ -524,4 +520,10 @@ export const useAppContext = (): AppContextType => {
     throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;
+};
+
+// Export types for use in other components
+export type { 
+  Restaurant, MenuItem, CartItem, Order, User, Category,
+  OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia
 };
