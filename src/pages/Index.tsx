@@ -45,7 +45,7 @@ const Index: React.FC = () => {
       <main className="mx-auto max-w-[1600px] px-4 md:px-8 relative overflow-hidden">
         {locationEnabled ? (
           <>
-            <section className={`${isMobile ? 'py-3' : 'py-6'}`}>
+            <section className={`${isMobile ? 'py-4' : 'py-6'}`}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 font-omnes">New on MunchMap</h2>
                 <div className="flex items-center gap-2">
@@ -78,7 +78,7 @@ const Index: React.FC = () => {
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <>
                   <div className="md:hidden mx-[-16px]">
-                    <div className="overflow-x-auto pl-4 pr-0 flex gap-1 pb-2 scrollbar-hide">
+                    <div className="overflow-x-auto pl-4 pr-0 flex gap-1 pb-3 scrollbar-hide">
                       {nearbyRestaurants.map(restaurant => (
                         <div key={restaurant.id} className="flex-shrink-0 w-[240px]">
                           <RestaurantCard restaurant={restaurant} />
@@ -102,7 +102,7 @@ const Index: React.FC = () => {
               )}
             </section>
             
-            <section className={`${isMobile ? 'py-3' : 'py-6'}`}>
+            <section className={`${isMobile ? 'py-4' : 'py-6'}`}>
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 font-omnes">Dinner near you</h2>
                 <div className="flex items-center gap-2">
@@ -131,7 +131,7 @@ const Index: React.FC = () => {
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <>
                   <div className="md:hidden mx-[-16px]">
-                    <div className="overflow-x-auto pl-4 pr-0 flex gap-1 pb-2 scrollbar-hide">
+                    <div className="overflow-x-auto pl-4 pr-0 flex gap-1 pb-3 scrollbar-hide">
                       {nearbyRestaurants.slice(0).reverse().map(restaurant => (
                         <div key={restaurant.id} className="flex-shrink-0 w-[240px]">
                           <RestaurantCard restaurant={restaurant} />
