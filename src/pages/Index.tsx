@@ -23,25 +23,25 @@ const Index: React.FC = () => {
   const isMobile = useIsMobile();
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   
-  // Ad banners data
+  // Ad banners data with improved images
   const adBanners = [
     {
       id: 1,
-      image: "/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png",
+      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&h=300&fit=crop",
       label: "RESTAURANT",
       title: "The Burgery Jyväskylä",
       description: "Grilled To Perfection - Powered By Better Food"
     },
     {
       id: 2,
-      image: "/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png",
+      image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=300&fit=crop",
       label: "SPECIAL OFFER",
       title: "50% Off First Order",
       description: "Limited time offer - Order now!"
     },
     {
       id: 3,
-      image: "/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png",
+      image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&h=300&fit=crop",
       label: "NEW",
       title: "Try Our Secret Menu",
       description: "Exclusive items you won't find anywhere else"
