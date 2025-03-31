@@ -23,7 +23,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer card-hover border-0 shadow-sm w-full" 
+      className="overflow-hidden cursor-pointer card-hover border border-gray-200 shadow-sm w-full" 
       onClick={handleClick}
     >
       <div className="aspect-video relative overflow-hidden">
