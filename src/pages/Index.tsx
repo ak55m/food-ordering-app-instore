@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
@@ -6,13 +5,16 @@ import LocationButton from '@/components/LocationButton';
 import RestaurantCard from '@/components/RestaurantCard';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { MapPin, Search } from 'lucide-react';
+import { MapPin, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { 
   Carousel, 
   CarouselContent, 
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
 } from '@/components/ui/carousel';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const Index: React.FC = () => {
   const { nearbyRestaurants, locationEnabled, userLocation, isLoading } = useAppContext();
@@ -45,7 +47,27 @@ const Index: React.FC = () => {
             <section className="py-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 font-omnes">New on MunchMap</h2>
-                <a href="#" className="text-brand-cyan font-medium text-sm font-omnes">See all</a>
+                <div className="flex items-center gap-2">
+                  <a href="#" className="text-brand-cyan font-medium text-sm font-omnes md:mr-2">See all</a>
+                  <div className="hidden md:flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-full border-gray-300"
+                      aria-label="Previous slide"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-full border-gray-300"
+                      aria-label="Next slide"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
               
               {isLoading.restaurants ? (
@@ -53,15 +75,25 @@ const Index: React.FC = () => {
                   <p className="text-gray-500 font-omnes">Finding restaurants near you...</p>
                 </div>
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="mx-[-16px]">
-                  <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
-                    {nearbyRestaurants.map(restaurant => (
-                      <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
+                <>
+                  <div className="md:hidden mx-[-16px]">
+                    <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
+                      {nearbyRestaurants.map(restaurant => (
+                        <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
+                          <RestaurantCard restaurant={restaurant} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="hidden md:grid grid-cols-4 gap-6">
+                    {nearbyRestaurants.slice(0, 4).map(restaurant => (
+                      <div key={restaurant.id}>
                         <RestaurantCard restaurant={restaurant} />
                       </div>
                     ))}
                   </div>
-                </div>
+                </>
               ) : (
                 <div className="text-center py-10">
                   <p className="text-gray-500 font-omnes">No restaurants found nearby</p>
@@ -72,19 +104,49 @@ const Index: React.FC = () => {
             <section className="py-6">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 font-omnes">Dinner near you</h2>
-                <a href="#" className="text-brand-cyan font-medium text-sm font-omnes">See all</a>
+                <div className="flex items-center gap-2">
+                  <a href="#" className="text-brand-cyan font-medium text-sm font-omnes md:mr-2">See all</a>
+                  <div className="hidden md:flex items-center gap-1">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-full border-gray-300"
+                      aria-label="Previous slide"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-full border-gray-300"
+                      aria-label="Next slide"
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
               </div>
               
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="mx-[-16px]">
-                  <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
-                    {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                      <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
+                <>
+                  <div className="md:hidden mx-[-16px]">
+                    <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
+                      {nearbyRestaurants.slice(0).reverse().map(restaurant => (
+                        <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
+                          <RestaurantCard restaurant={restaurant} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="hidden md:grid grid-cols-4 gap-6">
+                    {nearbyRestaurants.slice(0).reverse().slice(0, 4).map(restaurant => (
+                      <div key={restaurant.id}>
                         <RestaurantCard restaurant={restaurant} />
                       </div>
                     ))}
                   </div>
-                </div>
+                </>
               ) : null}
             </section>
           </>

@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bike } from 'lucide-react';
 import { Restaurant } from '@/types';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -10,6 +11,7 @@ interface RestaurantCardProps {
 
 const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const handleClick = () => {
     navigate(`/restaurant/${restaurant.id}`);
@@ -22,7 +24,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   return (
     <div 
-      className="overflow-hidden cursor-pointer rounded-lg shadow-sm border border-gray-200 bg-white" 
+      className="overflow-hidden cursor-pointer rounded-lg shadow-sm border border-gray-200 bg-white h-full" 
       onClick={handleClick}
     >
       <div className="relative overflow-hidden">
@@ -31,6 +33,11 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           alt={restaurant.name}
           className="w-full aspect-[4/3] object-cover"
         />
+        {!isMobile && (
+          <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
+            14 days of €0 delivery fees
+          </div>
+        )}
       </div>
       <div className="p-3">
         <h3 className="font-bold text-base line-clamp-1 font-omnes">{restaurant.name}</h3>
