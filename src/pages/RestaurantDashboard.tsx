@@ -1,15 +1,16 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { useAppContext, Order } from '@/context/AppContext';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { Clock, ChefHat, CheckCircle } from 'lucide-react';
+import { Clock, ChefHat, CheckCircle, BarChart3 } from 'lucide-react';
+import RestaurantSidebar from '@/components/RestaurantSidebar';
+import { Button } from '@/components/ui/button';
 
 const RestaurantDashboard: React.FC = () => {
-  const { orders } = useAppContext();
+  const { orders, updateOrderStatus } = useAppContext();
   const navigate = useNavigate();
   const [restaurantId, setRestaurantId] = useState('1'); // Default to first restaurant
   
@@ -20,10 +21,8 @@ const RestaurantDashboard: React.FC = () => {
   const readyOrders = restaurantOrders.filter(order => order.status === 'ready');
   const completedOrders = restaurantOrders.filter(order => order.status === 'completed');
   
-  const updateOrderStatus = (orderId: string, newStatus: Order['status']) => {
-    // In a real app, this would update the status in the backend
-    console.log(`Updating order ${orderId} to status ${newStatus}`);
-    // For now, we're using the mock data and the simulated progression
+  const handleUpdateOrderStatus = (orderId: string, newStatus: Order['status']) => {
+    updateOrderStatus(orderId, newStatus);
   };
   
   const OrderCard = ({ order }: { order: Order }) => (
@@ -55,8 +54,8 @@ const RestaurantDashboard: React.FC = () => {
         
         {order.status === 'pending' && (
           <Button 
-            className="w-full mt-3 bg-brand-orange hover:bg-orange-600"
-            onClick={() => updateOrderStatus(order.id, 'preparing')}
+            className="w-full mt-3 bg-brand-cyan hover:bg-cyan-600"
+            onClick={() => handleUpdateOrderStatus(order.id, 'preparing')}
           >
             <ChefHat className="h-4 w-4 mr-2" /> Start Preparing
           </Button>
@@ -66,7 +65,7 @@ const RestaurantDashboard: React.FC = () => {
           <Button 
             className="w-full mt-3"
             variant="outline"
-            onClick={() => updateOrderStatus(order.id, 'ready')}
+            onClick={() => handleUpdateOrderStatus(order.id, 'ready')}
           >
             <CheckCircle className="h-4 w-4 mr-2" /> Mark as Ready
           </Button>
@@ -76,7 +75,7 @@ const RestaurantDashboard: React.FC = () => {
           <Button 
             className="w-full mt-3"
             variant="outline"
-            onClick={() => updateOrderStatus(order.id, 'completed')}
+            onClick={() => handleUpdateOrderStatus(order.id, 'completed')}
           >
             Complete Order
           </Button>
@@ -87,119 +86,137 @@ const RestaurantDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <SidebarProvider>
-        <Sidebar className="border-r border-gray-200">
-          <SidebarHeader className="px-4 py-6 border-b border-gray-200">
-            <h2 className="text-lg font-bold">Restaurant Dashboard</h2>
-          </SidebarHeader>
-          <SidebarContent className="px-3 py-4">
-            <h3 className="mb-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Management</h3>
-            <button 
-              className="w-full text-left px-3 py-2 mb-1 rounded-md hover:bg-gray-100 text-gray-700 font-medium"
-            >
-              Orders
-            </button>
-            <button 
-              className="w-full text-left px-3 py-2 mb-1 rounded-md hover:bg-gray-100 text-gray-700"
-              onClick={() => navigate('/menu-management')}
-            >
-              Menu Management
-            </button>
-            <button 
-              className="w-full text-left px-3 py-2 mb-1 rounded-md hover:bg-gray-100 text-gray-700"
-            >
-              Settings
-            </button>
-          </SidebarContent>
-          <SidebarFooter className="p-4 border-t border-gray-200">
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => navigate('/')}
-            >
-              Switch to Customer View
-            </Button>
-          </SidebarFooter>
-        </Sidebar>
-        
-        <main className="flex-1 p-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6">Orders Management</h1>
-            
-            <Tabs defaultValue="pending" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-4">
-                <TabsTrigger value="pending" className="relative">
-                  Pending
-                  {pendingOrders.length > 0 && (
-                    <Badge className="absolute -top-2 -right-2 bg-brand-orange">{pendingOrders.length}</Badge>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="preparing" className="relative">
-                  Preparing
-                  {preparingOrders.length > 0 && (
-                    <Badge className="absolute -top-2 -right-2">{preparingOrders.length}</Badge>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="ready" className="relative">
-                  Ready
-                  {readyOrders.length > 0 && (
-                    <Badge className="absolute -top-2 -right-2">{readyOrders.length}</Badge>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="completed" className="relative">
-                  Completed
-                  {completedOrders.length > 0 && (
-                    <Badge className="absolute -top-2 -right-2 bg-gray-500">{completedOrders.length}</Badge>
-                  )}
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="pending">
-                {pendingOrders.length > 0 ? (
-                  pendingOrders.map(order => <OrderCard key={order.id} order={order} />)
-                ) : (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <Clock className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                    <p className="text-gray-500">No pending orders</p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="preparing">
-                {preparingOrders.length > 0 ? (
-                  preparingOrders.map(order => <OrderCard key={order.id} order={order} />)
-                ) : (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <ChefHat className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                    <p className="text-gray-500">No orders currently being prepared</p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="ready">
-                {readyOrders.length > 0 ? (
-                  readyOrders.map(order => <OrderCard key={order.id} order={order} />)
-                ) : (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <CheckCircle className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                    <p className="text-gray-500">No orders ready for pickup</p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="completed">
-                {completedOrders.length > 0 ? (
-                  completedOrders.map(order => <OrderCard key={order.id} order={order} />)
-                ) : (
-                  <div className="text-center py-12 bg-gray-50 rounded-lg">
-                    <p className="text-gray-500">No completed orders</p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
+      <RestaurantSidebar activePage="dashboard" />
+      
+      <main className="flex-1 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Orders Dashboard</h1>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => navigate('/restaurant/analytics')}>
+                <BarChart3 className="h-4 w-4 mr-2" /> View Analytics
+              </Button>
+            </div>
           </div>
-        </main>
-      </SidebarProvider>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">Pending Orders</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{pendingOrders.length}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">Preparing</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{preparingOrders.length}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">Ready for Pickup</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{readyOrders.length}</div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm text-gray-500">Today's Completed</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">
+                  {completedOrders.filter(order => {
+                    const today = new Date();
+                    return order.timestamp.getDate() === today.getDate() &&
+                           order.timestamp.getMonth() === today.getMonth() &&
+                           order.timestamp.getFullYear() === today.getFullYear();
+                  }).length}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <Tabs defaultValue="pending" className="w-full">
+            <TabsList className="grid grid-cols-4 mb-4">
+              <TabsTrigger value="pending" className="relative">
+                Pending
+                {pendingOrders.length > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-brand-cyan">{pendingOrders.length}</Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="preparing" className="relative">
+                Preparing
+                {preparingOrders.length > 0 && (
+                  <Badge className="absolute -top-2 -right-2">{preparingOrders.length}</Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="ready" className="relative">
+                Ready
+                {readyOrders.length > 0 && (
+                  <Badge className="absolute -top-2 -right-2">{readyOrders.length}</Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="relative">
+                Completed
+                {completedOrders.length > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-gray-500">{completedOrders.length}</Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="pending">
+              {pendingOrders.length > 0 ? (
+                pendingOrders.map(order => <OrderCard key={order.id} order={order} />)
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <Clock className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                  <p className="text-gray-500">No pending orders</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="preparing">
+              {preparingOrders.length > 0 ? (
+                preparingOrders.map(order => <OrderCard key={order.id} order={order} />)
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <ChefHat className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                  <p className="text-gray-500">No orders currently being prepared</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="ready">
+              {readyOrders.length > 0 ? (
+                readyOrders.map(order => <OrderCard key={order.id} order={order} />)
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <CheckCircle className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                  <p className="text-gray-500">No orders ready for pickup</p>
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="completed">
+              {completedOrders.length > 0 ? (
+                completedOrders.map(order => <OrderCard key={order.id} order={order} />)
+              ) : (
+                <div className="text-center py-12 bg-gray-50 rounded-lg">
+                  <p className="text-gray-500">No completed orders</p>
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
     </div>
   );
 };
