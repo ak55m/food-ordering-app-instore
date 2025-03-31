@@ -28,7 +28,7 @@ const Index: React.FC = () => {
         {locationEnabled ? (
           <>
             <h2 className="text-xl font-semibold mb-4">
-              Restaurants near {userLocation.address}
+              Restaurants near you
             </h2>
             
             {isLoading.restaurants ? (

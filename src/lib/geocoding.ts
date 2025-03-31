@@ -1,4 +1,3 @@
-
 /**
  * Geocoding utility functions
  */
@@ -10,7 +9,7 @@ export async function geocodeCoordinates(latitude: number, longitude: number): P
     // For this demo, we'll simulate with a hardcoded response
     await new Promise(resolve => setTimeout(resolve, 500)); // Simulate API delay
     
-    return `${latitude.toFixed(3)}, ${longitude.toFixed(3)}`;
+    return "Your location";
   } catch (error) {
     console.error('Error in geocoding:', error);
     return null;

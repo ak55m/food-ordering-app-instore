@@ -35,8 +35,8 @@ const LocationButton: React.FC = () => {
         <MapPin className="h-4 w-4 text-brand-orange" />
       )}
       <span className="text-sm text-gray-700 truncate max-w-[150px] md:max-w-[200px]">
-        {locationEnabled && userLocation.address
-          ? userLocation.address
+        {locationEnabled 
+          ? "Your location"
           : "Find restaurants near you"}
       </span>
     </Button>
