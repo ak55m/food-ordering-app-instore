@@ -39,15 +39,15 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
         )}
       </div>
       <div className={`${isMobile ? 'px-2 py-2' : 'p-3'}`}>
-        <h3 className={`font-bold ${isMobile ? 'text-xs' : 'text-base'} line-clamp-1 font-omnes`}>{restaurant.name}</h3>
-        <p className={`text-gray-500 text-xs line-clamp-1 ${isMobile ? 'mb-0.5' : 'mb-1'} font-omnes`}>
+        <h3 className={`font-bold ${isMobile ? 'text-xs' : 'text-base'} line-clamp-1 font-arial`}>{restaurant.name}</h3>
+        <p className={`text-gray-500 ${isMobile ? 'text-[9px]' : 'text-[11px]'} line-clamp-1 ${isMobile ? 'mb-0.5' : 'mb-1'} font-arial`}>
           {restaurant.categories?.slice(0, 3).join(' • ')}
         </p>
         
         <div className="flex items-center text-sm">
-          <span className={`font-medium text-brand-cyan ${isMobile ? 'text-xs' : ''}`}>{deliveryFee}</span>
+          <span className={`font-medium text-brand-cyan ${isMobile ? 'text-xs' : ''} font-arial`}>{deliveryFee}</span>
           <span className="mx-1 text-gray-500">•</span>
-          <span className={`text-gray-500 ${isMobile ? 'text-[10px]' : 'text-xs'}`}>{deliveryTime}</span>
+          <span className={`text-gray-500 ${isMobile ? 'text-[10px]' : 'text-xs'} font-arial`}>{deliveryTime}</span>
         </div>
       </div>
     </div>

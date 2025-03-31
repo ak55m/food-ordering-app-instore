@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -22,6 +21,7 @@ export default {
 			fontFamily: {
 				'wolt': ['Wolt Fonts', 'Roboto', 'system-ui', 'sans-serif'],
 				'omnes': ['Omnes', 'Roboto', 'system-ui', 'sans-serif'],
+				'arial': ['Arial', 'system-ui', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -67,7 +67,6 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors for our app
 				"brand-cyan": "#009de0",
 				"brand-light": "#ebf7fd",
 				"brand-white": "#ffffff",
