@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { ShoppingCart, Trash2, Plus, Minus, CreditCard, Wallet } from 'lucide-react';
+import { ShoppingCart, Trash2, Plus, Minus, CreditCard, Wallet, LogIn } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +10,8 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 const Cart: React.FC = () => {
-  const { cart, updateCartItemQuantity, removeFromCart, placeOrder, selectedRestaurant } = useAppContext();
+  const navigate = useNavigate();
+  const { cart, updateCartItemQuantity, removeFromCart, placeOrder, selectedRestaurant, isAuthenticated } = useAppContext();
   const [paymentMethod, setPaymentMethod] = useState<'credit_card' | 'cash'>('credit_card');
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -18,6 +20,12 @@ const Cart: React.FC = () => {
   );
   
   const handlePlaceOrder = async () => {
+    if (!isAuthenticated) {
+      toast.info("Please login to place an order");
+      navigate('/login');
+      return;
+    }
+    
     if (!selectedRestaurant) return;
     
     setIsProcessing(true);
@@ -119,37 +127,49 @@ const Cart: React.FC = () => {
           <span className="font-semibold">${total.toFixed(2)}</span>
         </div>
 
-        <div className="w-full mb-4">
-          <p className="font-medium mb-2">Payment Method</p>
-          <RadioGroup 
-            value={paymentMethod} 
-            onValueChange={(value) => setPaymentMethod(value as 'credit_card' | 'cash')} 
-            className="space-y-2"
-          >
-            <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
-              <RadioGroupItem value="credit_card" id="credit_card" />
-              <Label htmlFor="credit_card" className="flex items-center cursor-pointer w-full">
-                <CreditCard className="h-4 w-4 mr-2" />
-                Pay with Card
-              </Label>
+        {isAuthenticated ? (
+          <>
+            <div className="w-full mb-4">
+              <p className="font-medium mb-2">Payment Method</p>
+              <RadioGroup 
+                value={paymentMethod} 
+                onValueChange={(value) => setPaymentMethod(value as 'credit_card' | 'cash')} 
+                className="space-y-2"
+              >
+                <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
+                  <RadioGroupItem value="credit_card" id="credit_card" />
+                  <Label htmlFor="credit_card" className="flex items-center cursor-pointer w-full">
+                    <CreditCard className="h-4 w-4 mr-2" />
+                    Pay with Card
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
+                  <RadioGroupItem value="cash" id="cash" />
+                  <Label htmlFor="cash" className="flex items-center cursor-pointer w-full">
+                    <Wallet className="h-4 w-4 mr-2" />
+                    Cash at Pickup
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
-            <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
-              <RadioGroupItem value="cash" id="cash" />
-              <Label htmlFor="cash" className="flex items-center cursor-pointer w-full">
-                <Wallet className="h-4 w-4 mr-2" />
-                Cash at Pickup
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
 
-        <Button 
-          className="w-full bg-orange-500 text-white font-medium" 
-          onClick={handlePlaceOrder}
-          disabled={isProcessing}
-        >
-          {isProcessing ? 'Processing...' : `Place Order • $${total.toFixed(2)}`}
-        </Button>
+            <Button 
+              className="w-full bg-orange-500 text-white font-medium" 
+              onClick={handlePlaceOrder}
+              disabled={isProcessing}
+            >
+              {isProcessing ? 'Processing...' : `Place Order • $${total.toFixed(2)}`}
+            </Button>
+          </>
+        ) : (
+          <Button 
+            className="w-full bg-orange-500 text-white font-medium flex items-center justify-center" 
+            onClick={() => navigate('/login')}
+          >
+            <LogIn className="h-4 w-4 mr-2" />
+            Login to Place Order
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

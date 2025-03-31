@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Home, ShoppingBag, User, ShoppingCart, LogIn, Search } from 'lucide-react';
+import { Home, ShoppingBag, User, ShoppingCart, LogIn } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 
 const BottomNavigation = () => {
@@ -72,11 +72,16 @@ const BottomNavigation = () => {
         ) : (
           <>
             <button 
-              onClick={() => handleNavigation('/search')} 
-              className={`flex flex-col items-center ${isActive('/search') ? 'text-cyan-500' : 'text-gray-500'}`}
+              onClick={() => handleNavigation('/cart')} 
+              className={`flex flex-col items-center ${isActive('/cart') ? 'text-cyan-500' : 'text-gray-500'} relative`}
             >
-              <Search className="h-6 w-6" />
-              <span className="text-xs mt-1">Search</span>
+              <ShoppingCart className="h-6 w-6" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-brand-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartItemCount}
+                </span>
+              )}
+              <span className="text-xs mt-1">Cart</span>
             </button>
             <button 
               onClick={() => handleNavigation('/login')} 
