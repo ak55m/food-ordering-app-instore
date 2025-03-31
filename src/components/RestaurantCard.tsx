@@ -18,12 +18,10 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   // Fixed delivery time (10-15 min)
   const deliveryTime = "10-15 min";
-  // Simulate delivery fee (free or €2-€5 for desktop, $2-$5 for mobile)
+  // Simulate delivery fee (free or $2-$5)
   const deliveryFee = Math.random() > 0.3 
-    ? isMobile 
-      ? `$${(Math.random() * 3 + 2).toFixed(1)}`
-      : `€${(Math.random() * 3 + 2).toFixed(1)}` 
-    : isMobile ? '$0.00' : '€0.00';
+    ? `$${(Math.random() * 3 + 2).toFixed(1)}`
+    : '$0.00';
 
   return (
     <div 
@@ -36,9 +34,10 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           alt={restaurant.name}
           className={`w-full ${isMobile ? 'aspect-[15/8]' : 'aspect-[16/9]'} object-cover`}
         />
-        {!isMobile && (
+        {/* Banner only shown on mobile screens */}
+        {isMobile && (
           <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-            14 days of €0 delivery fees
+            14 days of $0 delivery fees
           </div>
         )}
       </div>
