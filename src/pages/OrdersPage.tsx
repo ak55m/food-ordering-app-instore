@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock } from 'lucide-react';
@@ -28,6 +29,16 @@ const OrdersPage: React.FC = () => {
       case 'ready': return 100;
       case 'completed': return 100;
       default: return 0;
+    }
+  };
+  
+  const getStatusColor = (status: OrderStatus) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-400';
+      case 'preparing': return 'bg-orange-400';
+      case 'ready': return 'bg-green-500';
+      case 'completed': return 'bg-gray-400';
+      default: return 'bg-primary';
     }
   };
 
@@ -78,7 +89,11 @@ const OrdersPage: React.FC = () => {
                   
                   {order.status !== 'completed' && (
                     <div className="mb-4">
-                      <Progress value={getProgress(order.status)} className="h-2" />
+                      <Progress 
+                        value={getProgress(order.status)} 
+                        className="h-2" 
+                        indicatorClassName={getStatusColor(order.status)}
+                      />
                     </div>
                   )}
                   

@@ -37,6 +37,16 @@ const OrderTracker: React.FC = () => {
     }
   };
   
+  const getStatusColor = (status: OrderStatus) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-400';
+      case 'preparing': return 'bg-orange-400';
+      case 'ready': return 'bg-green-500';
+      case 'completed': return 'bg-gray-400';
+      default: return 'bg-primary';
+    }
+  };
+  
   const getStatusText = (status: OrderStatus) => {
     switch (status) {
       case 'pending': return 'Order received';
@@ -63,7 +73,11 @@ const OrderTracker: React.FC = () => {
               {getStatusText(activeOrder.status)}
             </span>
           </div>
-          <Progress value={getProgress(activeOrder.status)} className="h-2" />
+          <Progress 
+            value={getProgress(activeOrder.status)} 
+            className="h-2" 
+            indicatorClassName={getStatusColor(activeOrder.status)}
+          />
         </div>
         
         <div className="text-sm">
