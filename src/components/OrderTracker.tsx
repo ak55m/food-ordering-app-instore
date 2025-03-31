@@ -4,9 +4,11 @@ import { Clock } from 'lucide-react';
 import { useAppContext, OrderStatus } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const OrderTracker: React.FC = () => {
   const { orders } = useAppContext();
+  const isMobile = useIsMobile();
   
   console.log('Orders in OrderTracker:', orders);
   
@@ -58,7 +60,7 @@ const OrderTracker: React.FC = () => {
   };
 
   return (
-    <Card className="border-2 border-brand-orange">
+    <Card className={`border-2 border-brand-orange ${isMobile ? 'mx-auto max-w-[360px]' : ''}`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center">
           <Clock className="h-5 w-5 mr-2 text-brand-orange" />

@@ -1,16 +1,18 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { useAppContext, OrderStatus } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import BottomNavigation from '@/components/BottomNavigation';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const OrdersPage: React.FC = () => {
   const { orders } = useAppContext();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const getStatusText = (status: OrderStatus) => {
     switch (status) {
@@ -57,17 +59,17 @@ const OrdersPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex items-center">
+      <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
+        <div className={`${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} mx-auto py-4 flex items-center`}>
           <h1 className="text-xl font-semibold">Your Orders</h1>
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-6">
+      <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-6`}>
         {sortedOrders.length > 0 ? (
           <div className="space-y-4">
             {sortedOrders.map(order => (
-              <Card key={order.id} className={order.status === 'ready' ? 'border-green-500 border-2' : ''}>
+              <Card key={order.id} className={`${order.status === 'ready' ? 'border-green-500 border-2' : ''} ${isMobile ? 'mx-auto' : ''}`}>
                 <CardContent className="p-4">
                   <div className="flex justify-between items-center mb-3">
                     <div>

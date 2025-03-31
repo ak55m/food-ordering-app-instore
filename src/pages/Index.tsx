@@ -6,10 +6,12 @@ import LocationButton from '@/components/LocationButton';
 import RestaurantCard from '@/components/RestaurantCard';
 import OrderTracker from '@/components/OrderTracker';
 import BottomNavigation from '@/components/BottomNavigation';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index: React.FC = () => {
   const { nearbyRestaurants, locationEnabled, userLocation, orders } = useAppContext();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   // Check if there's an active order
   const hasActiveOrder = orders && orders.length > 0 && 
@@ -17,8 +19,8 @@ const Index: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
+        <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-4 flex justify-between items-center`}>
           <h1 className="text-xl font-bold text-brand-cyan">MunchMap</h1>
           <div>
             <LocationButton />
@@ -26,7 +28,7 @@ const Index: React.FC = () => {
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-6">
+      <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-6`}>
         {hasActiveOrder && (
           <div className="mb-6">
             <OrderTracker />

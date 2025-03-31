@@ -27,7 +27,7 @@ const BottomNavigation = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white z-10">
+    <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white z-10 safe-bottom">
       <div className="flex justify-around items-center p-3">
         <button 
           onClick={() => handleNavigation('/')} 
