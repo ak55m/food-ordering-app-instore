@@ -38,7 +38,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           </div>
         )}
       </div>
-      <div className={`${isMobile ? 'p-3' : 'p-3'}`}>
+      <div className={`${isMobile ? 'px-2 py-2' : 'p-3'}`}>
         <h3 className={`font-bold ${isMobile ? 'text-sm' : 'text-base'} line-clamp-1 font-omnes`}>{restaurant.name}</h3>
         <p className="text-gray-500 text-xs line-clamp-1 mb-1 font-omnes">
           {restaurant.categories?.slice(0, 3).join(' • ')}
