@@ -29,7 +29,7 @@ const LandingPage: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-2">
                 <Button 
-                  onClick={() => navigate('/login')} 
+                  onClick={() => navigate('/home')} 
                   className="bg-brand-cyan hover:bg-brand-cyan/90 text-white font-medium px-6 py-3 rounded-full text-lg shadow-lg shadow-brand-cyan/30"
                   size="lg"
                 >
@@ -178,7 +178,7 @@ const LandingPage: React.FC = () => {
               <div className="relative">
                 <div className="absolute -top-2 -left-2 w-6 h-6 bg-yellow-300 rounded-full animate-bounce"></div>
                 <Button
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/home')}
                   className="bg-white hover:bg-white/90 text-brand-cyan font-bold px-8 py-4 rounded-full text-lg shadow-lg"
                   size="lg"
                 >
