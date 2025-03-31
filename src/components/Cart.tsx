@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 const Cart: React.FC = () => {
   const { cart, updateCartItemQuantity, removeFromCart, placeOrder, selectedRestaurant } = useAppContext();
@@ -30,8 +31,10 @@ const Cart: React.FC = () => {
       
       // Place the order with the selected payment method
       await placeOrder(selectedRestaurant.id, paymentMethod);
+      toast.success(`Order placed successfully! ${paymentMethod === 'credit_card' ? 'Payment processed.' : 'Please pay at pickup.'}`);
     } catch (error) {
       console.error('Error processing payment:', error);
+      toast.error('Failed to place order. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -123,16 +126,16 @@ const Cart: React.FC = () => {
             onValueChange={(value) => setPaymentMethod(value as 'credit_card' | 'cash')} 
             className="space-y-2"
           >
-            <div className="flex items-center space-x-2 border rounded-md p-3">
+            <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-gray-50 cursor-pointer">
               <RadioGroupItem value="credit_card" id="credit_card" />
-              <Label htmlFor="credit_card" className="flex items-center cursor-pointer">
+              <Label htmlFor="credit_card" className="flex items-center cursor-pointer w-full">
                 <CreditCard className="h-4 w-4 mr-2" />
-                Credit Card
+                Pay with Card
               </Label>
             </div>
-            <div className="flex items-center space-x-2 border rounded-md p-3">
+            <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-gray-50 cursor-pointer">
               <RadioGroupItem value="cash" id="cash" />
-              <Label htmlFor="cash" className="flex items-center cursor-pointer">
+              <Label htmlFor="cash" className="flex items-center cursor-pointer w-full">
                 <Wallet className="h-4 w-4 mr-2" />
                 Cash at Pickup
               </Label>
@@ -143,9 +146,9 @@ const Cart: React.FC = () => {
         <Button 
           className="w-full bg-brand-orange hover:bg-orange-600" 
           onClick={handlePlaceOrder}
-          disabled={cart.length === 0 || isProcessing}
+          disabled={isProcessing}
         >
-          {isProcessing ? 'Processing...' : `Pay ${paymentMethod === 'credit_card' ? 'with Card' : 'at Pickup'}`}
+          {isProcessing ? 'Processing...' : `Place Order • $${total.toFixed(2)}`}
         </Button>
       </CardFooter>
     </Card>
