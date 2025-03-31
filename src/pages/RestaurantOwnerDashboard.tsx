@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext, Order } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -14,8 +14,14 @@ const RestaurantOwnerDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [restaurantId, setRestaurantId] = useState('1'); // Default to first restaurant
   
+  // Ensure orders have proper Date objects for timestamps
+  const processedOrders = orders.map(order => ({
+    ...order,
+    timestamp: order.timestamp instanceof Date ? order.timestamp : new Date(order.timestamp)
+  }));
+  
   // Filter orders by restaurant and status
-  const restaurantOrders = orders.filter(order => order.restaurantId === restaurantId);
+  const restaurantOrders = processedOrders.filter(order => order.restaurantId === restaurantId);
   const pendingOrders = restaurantOrders.filter(order => order.status === 'pending');
   const preparingOrders = restaurantOrders.filter(order => order.status === 'preparing');
   const readyOrders = restaurantOrders.filter(order => order.status === 'ready');

@@ -15,7 +15,18 @@ const STORAGE_KEYS = {
 const getStorageItem = <T>(key: string, defaultValue: T): T => {
   try {
     const item = localStorage.getItem(key);
-    return item ? JSON.parse(item) : defaultValue;
+    if (!item) return defaultValue;
+    
+    // Parse the JSON and handle Date objects
+    const data = JSON.parse(item, (key, value) => {
+      // Convert ISO date strings back to Date objects
+      if (key === 'timestamp' && typeof value === 'string') {
+        return new Date(value);
+      }
+      return value;
+    });
+    
+    return data;
   } catch (error) {
     console.error(`Error getting ${key} from localStorage:`, error);
     return defaultValue;
@@ -24,6 +35,7 @@ const getStorageItem = <T>(key: string, defaultValue: T): T => {
 
 const setStorageItem = <T>(key: string, value: T): void => {
   try {
+    // Store dates as ISO strings to preserve them in JSON
     localStorage.setItem(key, JSON.stringify(value));
   } catch (error) {
     console.error(`Error setting ${key} in localStorage:`, error);
@@ -211,15 +223,21 @@ export const getOrders = async (userId: string, role: string) => {
   try {
     const orders = getStorageItem<Order[]>(STORAGE_KEYS.ORDERS, []);
     
+    // Ensure timestamps are Date objects
+    const ordersWithDates = orders.map(order => ({
+      ...order,
+      timestamp: order.timestamp instanceof Date ? order.timestamp : new Date(order.timestamp)
+    }));
+    
     // Filter orders based on role
     if (role === 'customer') {
-      return orders.filter(order => order.userId === userId);
+      return ordersWithDates.filter(order => order.userId === userId);
     } else if (role === 'restaurant_owner') {
       // In a real app, we'd have the owner's restaurantId
-      return orders.filter(order => order.restaurantId === 'owner-123');
+      return ordersWithDates.filter(order => order.restaurantId === 'owner-123');
     }
     
-    return orders;
+    return ordersWithDates;
   } catch (error) {
     console.error('Error fetching orders:', error);
     return [];
@@ -228,6 +246,11 @@ export const getOrders = async (userId: string, role: string) => {
 
 export const placeOrder = async (order: Order) => {
   try {
+    // Ensure the timestamp is a Date object
+    if (!(order.timestamp instanceof Date)) {
+      order.timestamp = new Date(order.timestamp);
+    }
+    
     const orders = getStorageItem<Order[]>(STORAGE_KEYS.ORDERS, []);
     orders.push(order);
     setStorageItem(STORAGE_KEYS.ORDERS, orders);

@@ -32,9 +32,12 @@ const OrdersPage: React.FC = () => {
     }
   };
 
-  const sortedOrders = orders && orders.length ? [...orders].sort((a, b) => 
-    b.timestamp.getTime() - a.timestamp.getTime()
-  ) : [];
+  const sortedOrders = orders && orders.length ? [...orders].sort((a, b) => {
+    // Safely handle timestamp comparison
+    const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+    const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+    return timeB - timeA;
+  }) : [];
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">

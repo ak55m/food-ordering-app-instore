@@ -9,9 +9,17 @@ const OrderTracker: React.FC = () => {
   const { orders } = useAppContext();
   
   // Get the most recent active order (not completed)
-  const activeOrder = orders
-    .filter(order => order.status !== 'completed')
-    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
+  // First ensure we have orders and handle potential invalid timestamps
+  const activeOrder = orders && orders.length > 0 
+    ? orders
+        .filter(order => order.status !== 'completed')
+        .sort((a, b) => {
+          // Ensure timestamps are Date objects before comparing
+          const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
+          const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+          return timeB - timeA;
+        })[0]
+    : null;
     
   if (!activeOrder) {
     return null;
