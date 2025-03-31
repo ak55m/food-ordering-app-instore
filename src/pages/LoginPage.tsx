@@ -88,11 +88,11 @@ const LoginPage = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white p-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md shadow-md border border-gray-200">
         <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold text-cyan-500">Welcome Back</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl font-bold text-gray-800">Welcome Back</CardTitle>
+          <CardDescription className="text-gray-600">
             Login to access your account
           </CardDescription>
         </CardHeader>
@@ -100,29 +100,31 @@ const LoginPage = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-700">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
                 placeholder="name@example.com" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
                 required
               />
             </div>
             
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <a href="#" className="text-sm text-cyan-500 hover:text-cyan-600">
+                <Label htmlFor="password" className="text-gray-700">Password</Label>
+                <a href="#" className="text-sm text-gray-600 hover:text-gray-800">
                   Forgot password?
                 </a>
               </div>
               <Input 
                 id="password" 
-                type="password" 
+                type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
                 required
               />
             </div>
@@ -132,10 +134,11 @@ const LoginPage = () => {
                 id="remember" 
                 checked={rememberMe}
                 onCheckedChange={(checked) => setRememberMe(checked === true)}
+                className="text-gray-600 border-gray-400"
               />
               <label
                 htmlFor="remember"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none text-gray-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Remember me
               </label>
@@ -143,7 +146,7 @@ const LoginPage = () => {
 
             <Button 
               type="submit" 
-              className="w-full bg-cyan-500 hover:bg-cyan-600" 
+              className="w-full bg-gray-800 hover:bg-gray-700 text-white" 
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}
@@ -151,23 +154,23 @@ const LoginPage = () => {
           </form>
 
           <div className="mt-4 text-center text-sm">
-            <p>Don't have an account? <a href="#" className="text-cyan-500 hover:text-cyan-600">Sign up</a></p>
+            <p className="text-gray-600">Don't have an account? <a href="#" className="text-gray-800 hover:underline">Sign up</a></p>
           </div>
         </CardContent>
 
-        <CardFooter className="flex flex-col space-y-2">
-          <p className="text-sm text-center text-muted-foreground">Test accounts for demo:</p>
+        <CardFooter className="flex flex-col space-y-2 border-t border-gray-100 pt-4">
+          <p className="text-sm text-center text-gray-500">Test accounts for demo:</p>
           <div className="flex space-x-2 w-full">
             <Button
               variant="outline" 
-              className="flex-1 text-xs"
+              className="flex-1 text-xs border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
               onClick={handleTestCustomerLogin}
             >
               Customer Login
             </Button>
             <Button 
               variant="outline" 
-              className="flex-1 text-xs"
+              className="flex-1 text-xs border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
               onClick={handleTestRestaurantLogin}
             >
               Restaurant Login
