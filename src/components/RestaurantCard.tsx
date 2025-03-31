@@ -1,9 +1,8 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Clock, Star } from 'lucide-react';
+import { Bike } from 'lucide-react';
 import { Restaurant } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface RestaurantCardProps {
   restaurant: Restaurant;
@@ -22,8 +21,8 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
   const deliveryFee = Math.random() > 0.3 ? `€${(Math.random() * 3 + 2).toFixed(1)}` : '€0.00';
 
   return (
-    <Card 
-      className="overflow-hidden cursor-pointer card-hover border border-gray-200 shadow-sm w-full" 
+    <div 
+      className="overflow-hidden cursor-pointer rounded-lg shadow-sm border border-gray-200 bg-white w-full" 
       onClick={handleClick}
     >
       <div className="aspect-video relative overflow-hidden">
@@ -33,29 +32,20 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           className="w-full h-full object-cover"
         />
       </div>
-      <CardContent className="p-3 md:p-4 lg:p-5">
-        <h3 className="font-bold text-base md:text-lg lg:text-xl line-clamp-1 font-wolt">{restaurant.name}</h3>
-        <p className="text-gray-500 text-xs md:text-sm line-clamp-1 mt-1">
+      <div className="p-3">
+        <h3 className="font-bold text-lg line-clamp-1 font-omnes">{restaurant.name}</h3>
+        <p className="text-gray-500 text-sm line-clamp-1 mb-4 font-omnes">
           {restaurant.categories?.slice(0, 1).join(', ')}
         </p>
         
-        <div className="flex items-center gap-2 mt-2 text-xs md:text-sm text-gray-600">
-          <div className="flex items-center gap-0.5">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span>{restaurant.rating}</span>
-          </div>
-          <div className="flex items-center gap-0.5">
-            <Clock className="h-4 w-4" />
-            <span>{deliveryTime}</span>
-          </div>
+        <div className="flex items-center text-brand-cyan border-t border-gray-100 pt-3">
+          <Bike className="h-5 w-5 mr-1" />
+          <span className="font-medium">{deliveryFee}</span>
+          <span className="mx-1">•</span>
+          <span className="text-gray-500">{deliveryTime}</span>
         </div>
-        
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-sm md:text-base font-medium">{deliveryFee}</span>
-          {restaurant.distance && <span className="text-xs md:text-sm text-gray-500">{restaurant.distance}</span>}
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
