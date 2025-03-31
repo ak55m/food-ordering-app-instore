@@ -232,7 +232,7 @@ const Index: React.FC = () => {
               )}
             </section>
             
-            <section className={`${isMobile ? 'pt-0 pb-1' : 'py-6'}`}>
+            <section className={`${isMobile ? 'pt-0 pb-1' : 'py-2'}`}>
               <div className="flex justify-between items-center mb-3">
                 <h2 className="text-lg font-semibold text-gray-900 font-omnes">Dinner near you</h2>
                 <div className="flex items-center gap-2">
