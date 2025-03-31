@@ -94,6 +94,7 @@ export interface Order {
   status: OrderStatus;
   timestamp: Date;
   total: number;
+  paymentMethod: 'credit_card' | 'cash';
 }
 
 interface AppContextType {
@@ -137,7 +138,7 @@ interface AppContextType {
   
   // Order related
   orders: Order[];
-  placeOrder: (restaurantId: string) => void;
+  placeOrder: (restaurantId: string, paymentMethod: 'credit_card' | 'cash') => void;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   
   // Loading states
@@ -408,7 +409,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Order functions
-  const placeOrder = async (restaurantId: string) => {
+  const placeOrder = async (restaurantId: string, paymentMethod: 'credit_card' | 'cash' = 'credit_card') => {
     if (cart.length === 0 || !user) return;
     
     const restaurant = getRestaurantById(restaurantId);
@@ -422,7 +423,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       items: [...cart],
       status: "pending",
       timestamp: new Date(),
-      total: cart.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0)
+      total: cart.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0),
+      paymentMethod
     };
     
     try {
@@ -430,9 +432,11 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       if (result) {
         setOrders(prev => [...prev, newOrder]);
         clearCart();
+        toast.success(`Order placed successfully! ${paymentMethod === 'cash' ? 'Please pay at pickup.' : 'Payment processed.'}`);
       }
     } catch (error) {
       console.error('Error placing order:', error);
+      toast.error(`Failed to place order: ${error.message}`);
     }
   };
 

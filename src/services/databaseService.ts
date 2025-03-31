@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { Restaurant, User, Category, MenuItem, Order, CartItem } from '@/context/AppContext';
 import { toast } from 'sonner';
@@ -265,7 +264,6 @@ export const placeOrder = async (order: Order) => {
       .select();
     
     if (error) throw error;
-    toast.success('Order placed successfully');
     return data[0];
   } catch (error) {
     console.error('Error placing order:', error);

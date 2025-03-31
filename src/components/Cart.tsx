@@ -1,16 +1,41 @@
 
-import React from 'react';
-import { ShoppingCart, Trash2, Plus, Minus } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShoppingCart, Trash2, Plus, Minus, CreditCard, Wallet } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const Cart: React.FC = () => {
   const { cart, updateCartItemQuantity, removeFromCart, placeOrder, selectedRestaurant } = useAppContext();
+  const [paymentMethod, setPaymentMethod] = useState<'credit_card' | 'cash'>('credit_card');
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const total = cart.reduce((sum, item) => 
     sum + item.menuItem.price * item.quantity, 0
   );
+  
+  const handlePlaceOrder = async () => {
+    if (!selectedRestaurant) return;
+    
+    setIsProcessing(true);
+    try {
+      // If credit card, we would integrate with a payment processor here
+      // For now, we'll just simulate a delay and complete the order
+      if (paymentMethod === 'credit_card') {
+        // Simulate payment processing
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      // Place the order with the selected payment method
+      await placeOrder(selectedRestaurant.id, paymentMethod);
+    } catch (error) {
+      console.error('Error processing payment:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
   
   if (cart.length === 0) {
     return (
@@ -90,11 +115,37 @@ const Cart: React.FC = () => {
           <span className="font-medium">Total</span>
           <span className="font-semibold">${total.toFixed(2)}</span>
         </div>
+
+        <div className="w-full mb-4">
+          <p className="font-medium mb-2">Payment Method</p>
+          <RadioGroup 
+            value={paymentMethod} 
+            onValueChange={(value) => setPaymentMethod(value as 'credit_card' | 'cash')} 
+            className="space-y-2"
+          >
+            <div className="flex items-center space-x-2 border rounded-md p-3">
+              <RadioGroupItem value="credit_card" id="credit_card" />
+              <Label htmlFor="credit_card" className="flex items-center cursor-pointer">
+                <CreditCard className="h-4 w-4 mr-2" />
+                Credit Card
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2 border rounded-md p-3">
+              <RadioGroupItem value="cash" id="cash" />
+              <Label htmlFor="cash" className="flex items-center cursor-pointer">
+                <Wallet className="h-4 w-4 mr-2" />
+                Cash at Pickup
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+
         <Button 
           className="w-full bg-brand-orange hover:bg-orange-600" 
-          onClick={() => selectedRestaurant && placeOrder(selectedRestaurant.id)}
+          onClick={handlePlaceOrder}
+          disabled={cart.length === 0 || isProcessing}
         >
-          Place Order
+          {isProcessing ? 'Processing...' : `Pay ${paymentMethod === 'credit_card' ? 'with Card' : 'at Pickup'}`}
         </Button>
       </CardFooter>
     </Card>
