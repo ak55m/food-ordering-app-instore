@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Star } from 'lucide-react';
+import { Clock, Star } from 'lucide-react';
 import { Restaurant } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -16,12 +16,17 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
     navigate(`/restaurant/${restaurant.id}`);
   };
 
+  // Simulate delivery time (25-40 min)
+  const deliveryTime = `${Math.floor(Math.random() * 15) + 25}-${Math.floor(Math.random() * 15) + 40} min`;
+  // Simulate delivery fee (free or €2-€5)
+  const deliveryFee = Math.random() > 0.3 ? `€${(Math.random() * 3 + 2).toFixed(1)}` : '€0.00';
+
   return (
     <Card 
-      className="overflow-hidden cursor-pointer card-hover h-full" 
+      className="overflow-hidden cursor-pointer card-hover h-full border-0 shadow-sm" 
       onClick={handleClick}
     >
-      <div className="aspect-square relative overflow-hidden">
+      <div className="aspect-[5/3] relative overflow-hidden">
         <img 
           src={restaurant.image} 
           alt={restaurant.name}
@@ -29,23 +34,25 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
         />
       </div>
       <CardContent className="p-3">
-        <h3 className="font-semibold text-sm line-clamp-1">{restaurant.name}</h3>
-        <div className="flex items-center gap-2 mt-1">
+        <h3 className="font-bold text-base line-clamp-1">{restaurant.name}</h3>
+        <p className="text-gray-500 text-sm line-clamp-1 mt-0.5">
+          {restaurant.categories?.slice(0, 1).join(', ')}
+        </p>
+        
+        <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
           <div className="flex items-center gap-1">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            <span className="text-xs">{restaurant.rating}</span>
+            <span>{restaurant.rating}</span>
           </div>
-          {restaurant.distance && <span className="text-xs text-gray-500">{restaurant.distance}</span>}
+          <div className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            <span>{deliveryTime}</span>
+          </div>
         </div>
-        <div className="flex flex-wrap gap-1 mt-1">
-          {restaurant.categories && restaurant.categories.slice(0, 2).map((category, index) => (
-            <span 
-              key={index}
-              className="text-xs bg-gray-100 px-1.5 py-0.5 rounded-full truncate"
-            >
-              {category}
-            </span>
-          ))}
+        
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-sm font-medium">{deliveryFee}</span>
+          {restaurant.distance && <span className="text-xs text-gray-500">{restaurant.distance}</span>}
         </div>
       </CardContent>
     </Card>

@@ -6,7 +6,7 @@ import LocationButton from '@/components/LocationButton';
 import RestaurantCard from '@/components/RestaurantCard';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { MapPin } from 'lucide-react';
+import { MapPin, Search } from 'lucide-react';
 import { 
   Carousel, 
   CarouselContent, 
@@ -14,6 +14,7 @@ import {
   CarouselNext,
   CarouselPrevious
 } from '@/components/ui/carousel';
+import { Input } from '@/components/ui/input';
 
 const Index: React.FC = () => {
   const { nearbyRestaurants, locationEnabled, userLocation, isLoading } = useAppContext();
@@ -29,40 +30,77 @@ const Index: React.FC = () => {
             <LocationButton />
           </div>
         </div>
+        <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} pb-4 flex items-center`}>
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input 
+              placeholder="Search for food or restaurants..." 
+              className="pl-10 bg-gray-100 border-0"
+            />
+          </div>
+        </div>
       </header>
       
-      <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-6`}>
+      <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'}`}>
         {locationEnabled ? (
           <>
-            <h2 className="text-xl font-semibold mb-4">
-              Restaurants near you
-            </h2>
+            <section className="py-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Recommendations</h2>
+                <a href="#" className="text-brand-cyan font-medium">See all</a>
+              </div>
+              
+              {isLoading.restaurants ? (
+                <div className="text-center py-10">
+                  <p className="text-gray-500">Finding restaurants near you...</p>
+                </div>
+              ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
+                <div className="w-full">
+                  <Carousel className="w-full">
+                    <CarouselContent className="-ml-4">
+                      {nearbyRestaurants.map(restaurant => (
+                        <CarouselItem key={restaurant.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <div className="flex justify-center mt-4 gap-2">
+                      <CarouselPrevious className="static translate-y-0 mx-1" />
+                      <CarouselNext className="static translate-y-0 mx-1" />
+                    </div>
+                  </Carousel>
+                </div>
+              ) : (
+                <div className="text-center py-10">
+                  <p className="text-gray-500">No restaurants found nearby</p>
+                </div>
+              )}
+            </section>
             
-            {isLoading.restaurants ? (
-              <div className="text-center py-10">
-                <p className="text-gray-500">Finding restaurants near you...</p>
+            <section className="py-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-2xl font-bold">Dinner near you</h2>
+                <a href="#" className="text-brand-cyan font-medium">See all</a>
               </div>
-            ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-              <div className="w-full">
-                <Carousel className="w-full">
-                  <CarouselContent className="-ml-2 md:-ml-4">
-                    {nearbyRestaurants.map(restaurant => (
-                      <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
-                        <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                  <div className="flex justify-center mt-4 gap-2">
-                    <CarouselPrevious className="static translate-y-0 mx-1" />
-                    <CarouselNext className="static translate-y-0 mx-1" />
-                  </div>
-                </Carousel>
-              </div>
-            ) : (
-              <div className="text-center py-10">
-                <p className="text-gray-500">No restaurants found nearby</p>
-              </div>
-            )}
+              
+              {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
+                <div className="w-full">
+                  <Carousel className="w-full">
+                    <CarouselContent className="-ml-4">
+                      {nearbyRestaurants.slice(0).reverse().map(restaurant => (
+                        <CarouselItem key={restaurant.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                          <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <div className="flex justify-center mt-4 gap-2">
+                      <CarouselPrevious className="static translate-y-0 mx-1" />
+                      <CarouselNext className="static translate-y-0 mx-1" />
+                    </div>
+                  </Carousel>
+                </div>
+              ) : null}
+            </section>
           </>
         ) : (
           <div className="py-10 text-center">
