@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { useAppContext, UserRole } from "@/context/AppContext";
 
 const LoginPage = () => {
@@ -15,7 +15,6 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { setUser } = useAppContext();
 
   // Test user credentials
@@ -46,9 +45,8 @@ const LoginPage = () => {
           role: testCustomer.role
         });
         
-        toast({
-          title: "Login successful",
-          description: "Welcome back, Test Customer!",
+        toast.success("Login successful", {
+          description: "Welcome back, Test Customer!"
         });
         
         navigate("/");
@@ -62,19 +60,16 @@ const LoginPage = () => {
           role: testRestaurantOwner.role
         });
         
-        toast({
-          title: "Login successful",
-          description: "Welcome back, Test Restaurant Owner!",
+        toast.success("Login successful", {
+          description: "Welcome back, Test Restaurant Owner!"
         });
         
         navigate("/restaurant");
       } 
       else {
         // Login failed
-        toast({
-          variant: "destructive",
-          title: "Login failed",
-          description: "Please check your credentials and try again.",
+        toast.error("Login failed", {
+          description: "Please check your credentials and try again."
         });
       }
       
