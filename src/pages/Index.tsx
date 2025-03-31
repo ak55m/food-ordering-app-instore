@@ -56,10 +56,10 @@ const Index: React.FC = () => {
                 </div>
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <div className="w-full">
-                  <Carousel className="w-full">
-                    <CarouselContent className="-ml-4">
+                  <Carousel className="w-full" opts={{ align: 'start' }}>
+                    <CarouselContent className="-ml-2 md:-ml-3">
                       {nearbyRestaurants.map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-3 basis-auto">
                           <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                         </CarouselItem>
                       ))}
@@ -85,10 +85,10 @@ const Index: React.FC = () => {
               
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <div className="w-full">
-                  <Carousel className="w-full">
-                    <CarouselContent className="-ml-4">
+                  <Carousel className="w-full" opts={{ align: 'start' }}>
+                    <CarouselContent className="-ml-2 md:-ml-3">
                       {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-4 md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-3 basis-auto">
                           <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                         </CarouselItem>
                       ))}

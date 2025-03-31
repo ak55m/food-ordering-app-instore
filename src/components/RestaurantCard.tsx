@@ -23,35 +23,35 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer card-hover h-full border-0 shadow-sm" 
+      className="overflow-hidden cursor-pointer card-hover border-0 shadow-sm max-w-[200px]" 
       onClick={handleClick}
     >
-      <div className="aspect-[5/3] relative overflow-hidden">
+      <div className="aspect-video relative overflow-hidden">
         <img 
           src={restaurant.image} 
           alt={restaurant.name}
           className="w-full h-full object-cover"
         />
       </div>
-      <CardContent className="p-3">
-        <h3 className="font-bold text-base line-clamp-1">{restaurant.name}</h3>
-        <p className="text-gray-500 text-sm line-clamp-1 mt-0.5">
+      <CardContent className="p-2">
+        <h3 className="font-bold text-sm line-clamp-1">{restaurant.name}</h3>
+        <p className="text-gray-500 text-xs line-clamp-1 mt-0.5">
           {restaurant.categories?.slice(0, 1).join(', ')}
         </p>
         
-        <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
-          <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2 mt-1 text-xs text-gray-600">
+          <div className="flex items-center gap-0.5">
             <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
             <span>{restaurant.rating}</span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <Clock className="h-3 w-3" />
             <span>{deliveryTime}</span>
           </div>
         </div>
         
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-sm font-medium">{deliveryFee}</span>
+        <div className="mt-1 flex items-center justify-between">
+          <span className="text-xs font-medium">{deliveryFee}</span>
           {restaurant.distance && <span className="text-xs text-gray-500">{restaurant.distance}</span>}
         </div>
       </CardContent>
