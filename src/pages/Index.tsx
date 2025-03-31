@@ -79,8 +79,8 @@ const Index: React.FC = () => {
                 <>
                   <div className="md:hidden mx-[-16px]">
                     <div className="overflow-x-auto pl-4 pb-3 flex gap-1 scrollbar-hide">
-                      {nearbyRestaurants.map(restaurant => (
-                        <div key={restaurant.id} className="flex-shrink-0 w-[230px]">
+                      {nearbyRestaurants.map((restaurant, index) => (
+                        <div key={restaurant.id} className={`flex-shrink-0 w-[230px] ${index === nearbyRestaurants.length - 1 ? 'pr-4' : ''}`}>
                           <RestaurantCard restaurant={restaurant} />
                         </div>
                       ))}
@@ -132,8 +132,8 @@ const Index: React.FC = () => {
                 <>
                   <div className="md:hidden mx-[-16px]">
                     <div className="overflow-x-auto pl-4 pb-3 flex gap-1 scrollbar-hide">
-                      {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                        <div key={restaurant.id} className="flex-shrink-0 w-[230px]">
+                      {nearbyRestaurants.slice(0).reverse().map((restaurant, index, arr) => (
+                        <div key={restaurant.id} className={`flex-shrink-0 w-[230px] ${index === arr.length - 1 ? 'pr-4' : ''}`}>
                           <RestaurantCard restaurant={restaurant} />
                         </div>
                       ))}
