@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useAppContext, RestaurantOpeningHours, SocialMedia } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,15 +18,15 @@ const RestaurantSettings: React.FC = () => {
   
   const [restaurantForm, setRestaurantForm] = useState({
     name: restaurant?.name || '',
-    description: 'A delicious restaurant with a variety of menu options.',
-    address: '123 Main St, Anytown, USA',
-    latitude: 40.7128,
-    longitude: -74.0060,
-    phone: '(555) 123-4567',
-    email: 'contact@restaurant.com',
-    logo: restaurant?.image || '',
-    coverImage: restaurant?.image || '',
-    openingHours: {
+    description: restaurant?.description || 'A delicious restaurant with a variety of menu options.',
+    address: restaurant?.address || '123 Main St, Anytown, USA',
+    latitude: restaurant?.latitude || 40.7128,
+    longitude: restaurant?.longitude || -74.0060,
+    phone: restaurant?.phone || '(555) 123-4567',
+    email: restaurant?.email || 'contact@restaurant.com',
+    logo: restaurant?.logo || restaurant?.image || '',
+    coverImage: restaurant?.coverImage || restaurant?.image || '',
+    openingHours: restaurant?.openingHours || {
       monday: { open: '09:00', close: '22:00', isOpen: true },
       tuesday: { open: '09:00', close: '22:00', isOpen: true },
       wednesday: { open: '09:00', close: '22:00', isOpen: true },
@@ -35,14 +35,46 @@ const RestaurantSettings: React.FC = () => {
       saturday: { open: '10:00', close: '23:00', isOpen: true },
       sunday: { open: '10:00', close: '22:00', isOpen: true },
     },
-    socialMedia: {
+    socialMedia: restaurant?.socialMedia || {
       facebook: 'https://facebook.com/restaurant',
       instagram: 'https://instagram.com/restaurant',
       twitter: 'https://twitter.com/restaurant',
     },
-    isActive: true,
-    acceptsOnlineOrders: true,
+    isActive: restaurant?.isActive !== undefined ? restaurant.isActive : true,
+    acceptsOnlineOrders: restaurant?.acceptsOnlineOrders !== undefined ? restaurant.acceptsOnlineOrders : true,
   });
+
+  useEffect(() => {
+    if (restaurant) {
+      setRestaurantForm({
+        name: restaurant.name || '',
+        description: restaurant.description || 'A delicious restaurant with a variety of menu options.',
+        address: restaurant.address || '123 Main St, Anytown, USA',
+        latitude: restaurant.latitude || 40.7128,
+        longitude: restaurant.longitude || -74.0060,
+        phone: restaurant.phone || '(555) 123-4567',
+        email: restaurant.email || 'contact@restaurant.com',
+        logo: restaurant.logo || restaurant.image || '',
+        coverImage: restaurant.coverImage || restaurant.image || '',
+        openingHours: restaurant.openingHours || {
+          monday: { open: '09:00', close: '22:00', isOpen: true },
+          tuesday: { open: '09:00', close: '22:00', isOpen: true },
+          wednesday: { open: '09:00', close: '22:00', isOpen: true },
+          thursday: { open: '09:00', close: '22:00', isOpen: true },
+          friday: { open: '09:00', close: '23:00', isOpen: true },
+          saturday: { open: '10:00', close: '23:00', isOpen: true },
+          sunday: { open: '10:00', close: '22:00', isOpen: true },
+        },
+        socialMedia: restaurant.socialMedia || {
+          facebook: 'https://facebook.com/restaurant',
+          instagram: 'https://instagram.com/restaurant',
+          twitter: 'https://twitter.com/restaurant',
+        },
+        isActive: restaurant.isActive !== undefined ? restaurant.isActive : true,
+        acceptsOnlineOrders: restaurant.acceptsOnlineOrders !== undefined ? restaurant.acceptsOnlineOrders : true,
+      });
+    }
+  }, [restaurant]);
   
   const geocodeAddress = async () => {
     if (!restaurantForm.address) {
@@ -134,9 +166,26 @@ const RestaurantSettings: React.FC = () => {
       return;
     }
     
+    if (!restaurant) {
+      toast.error("Restaurant not found");
+      return;
+    }
+    
     updateRestaurant({
       ...restaurant,
       name: restaurantForm.name,
+      description: restaurantForm.description,
+      address: restaurantForm.address,
+      latitude: restaurantForm.latitude,
+      longitude: restaurantForm.longitude,
+      phone: restaurantForm.phone,
+      email: restaurantForm.email,
+      logo: restaurantForm.logo,
+      coverImage: restaurantForm.coverImage,
+      openingHours: restaurantForm.openingHours as RestaurantOpeningHours,
+      socialMedia: restaurantForm.socialMedia as SocialMedia,
+      isActive: restaurantForm.isActive,
+      acceptsOnlineOrders: restaurantForm.acceptsOnlineOrders
     });
     
     toast.success("Restaurant settings saved successfully!");

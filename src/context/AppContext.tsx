@@ -30,6 +30,28 @@ export interface CartItem {
   quantity: number;
 }
 
+export interface OpeningHours {
+  open: string;
+  close: string;
+  isOpen: boolean;
+}
+
+export interface RestaurantOpeningHours {
+  monday: OpeningHours;
+  tuesday: OpeningHours;
+  wednesday: OpeningHours;
+  thursday: OpeningHours;
+  friday: OpeningHours;
+  saturday: OpeningHours;
+  sunday: OpeningHours;
+}
+
+export interface SocialMedia {
+  facebook: string;
+  instagram: string;
+  twitter: string;
+}
+
 export interface Restaurant {
   id: string;
   name: string;
@@ -38,11 +60,19 @@ export interface Restaurant {
   address: string;
   latitude?: number;
   longitude?: number;
+  phone?: string;
+  email?: string;
   rating: number;
   deliveryTime: string;
   distance?: string;
   categories: string[];
   ownerId?: string;
+  openingHours?: RestaurantOpeningHours;
+  socialMedia?: SocialMedia;
+  logo?: string;
+  coverImage?: string;
+  isActive?: boolean;
+  acceptsOnlineOrders?: boolean;
 }
 
 export interface Location {
@@ -135,7 +165,27 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       rating: 4.5,
       deliveryTime: "15-25 min",
       distance: "1.2 miles",
-      categories: ["Burgers", "Fast Food"]
+      categories: ["Burgers", "Fast Food"],
+      phone: "(555) 123-4567",
+      email: "contact@burgerpalace.com",
+      openingHours: {
+        monday: { open: "09:00", close: "22:00", isOpen: true },
+        tuesday: { open: "09:00", close: "22:00", isOpen: true },
+        wednesday: { open: "09:00", close: "22:00", isOpen: true },
+        thursday: { open: "09:00", close: "22:00", isOpen: true },
+        friday: { open: "09:00", close: "23:00", isOpen: true },
+        saturday: { open: "10:00", close: "23:00", isOpen: true },
+        sunday: { open: "10:00", close: "22:00", isOpen: true },
+      },
+      socialMedia: {
+        facebook: "https://facebook.com/burgerpalace",
+        instagram: "https://instagram.com/burgerpalace",
+        twitter: "https://twitter.com/burgerpalace",
+      },
+      logo: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+      coverImage: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
+      isActive: true,
+      acceptsOnlineOrders: true
     },
     {
       id: "2",
@@ -250,7 +300,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   const updateRestaurant = (updatedRestaurant: Restaurant) => {
     setRestaurants(prev => 
       prev.map(restaurant => 
-        restaurant.id === updatedRestaurant.id ? updatedRestaurant : restaurant
+        restaurant.id === updatedRestaurant.id ? { ...restaurant, ...updatedRestaurant } : restaurant
       )
     );
   };
