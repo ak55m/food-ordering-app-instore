@@ -1,4 +1,3 @@
-
 import { createContext, useState, useContext, ReactNode, useEffect } from "react";
 
 // Types definitions
@@ -37,6 +36,8 @@ export interface Restaurant {
   description: string;
   image: string;
   address: string;
+  latitude?: number;
+  longitude?: number;
   rating: number;
   deliveryTime: string;
   distance?: string;
@@ -129,6 +130,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       description: "Best burgers in town",
       image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       address: "123 Main St",
+      latitude: 40.7128,
+      longitude: -74.0060,
       rating: 4.5,
       deliveryTime: "15-25 min",
       distance: "1.2 miles",
@@ -140,6 +143,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       description: "Authentic Italian pizzas",
       image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       address: "456 Oak Ave",
+      latitude: 40.7300,
+      longitude: -73.9950,
       rating: 4.7,
       deliveryTime: "20-30 min",
       distance: "2.5 miles",
@@ -220,8 +225,21 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       address: "New York, NY"
     });
     
-    // Update nearby restaurants
-    setNearbyRestaurants(restaurants);
+    // Update nearby restaurants - in a real app, this would filter by distance
+    const nearby = restaurants.filter(restaurant => {
+      if (!restaurant.latitude || !restaurant.longitude) return false;
+      
+      // Simple distance calculation (not accurate for real-world use)
+      const distance = Math.sqrt(
+        Math.pow((restaurant.latitude - userLocation.lat), 2) + 
+        Math.pow((restaurant.longitude - userLocation.lng), 2)
+      );
+      
+      // Consider restaurants within a certain radius
+      return distance < 0.1; // Arbitrary threshold
+    });
+    
+    setNearbyRestaurants(restaurants); // For demo, we show all restaurants
   };
 
   // Restaurant functions

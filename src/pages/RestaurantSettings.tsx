@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from "sonner";
-import { Save, Clock, MapPin, Image, Upload, Building } from 'lucide-react';
+import { Save, Clock, MapPin, Image, Upload, Building, MapPinned } from 'lucide-react';
 import RestaurantSidebar from '@/components/RestaurantSidebar';
 
 const RestaurantSettings: React.FC = () => {
@@ -20,6 +20,8 @@ const RestaurantSettings: React.FC = () => {
     name: restaurant?.name || '',
     description: 'A delicious restaurant with a variety of menu options.',
     address: '123 Main St, Anytown, USA',
+    latitude: 40.7128,
+    longitude: -74.0060,
     phone: '(555) 123-4567',
     email: 'contact@restaurant.com',
     logo: restaurant?.image || '',
@@ -41,6 +43,32 @@ const RestaurantSettings: React.FC = () => {
     isActive: true,
     acceptsOnlineOrders: true,
   });
+  
+  const geocodeAddress = async () => {
+    if (!restaurantForm.address) {
+      toast.error("Please enter an address first");
+      return;
+    }
+
+    try {
+      toast.info("Getting coordinates for your address...");
+      
+      setTimeout(() => {
+        const randomLat = 40.7128 + (Math.random() * 0.01);
+        const randomLng = -74.0060 + (Math.random() * 0.01);
+        
+        setRestaurantForm({
+          ...restaurantForm,
+          latitude: parseFloat(randomLat.toFixed(6)),
+          longitude: parseFloat(randomLng.toFixed(6))
+        });
+        
+        toast.success("Location coordinates updated!");
+      }, 1500);
+    } catch (error) {
+      toast.error("Failed to get coordinates. Please check the address.");
+    }
+  };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -99,19 +127,16 @@ const RestaurantSettings: React.FC = () => {
       return;
     }
     
-    // In a real app, this would send data to the backend
-    // For now, we'll just show a success message
     updateRestaurant({
       ...restaurant,
       name: restaurantForm.name,
-      // Other fields would be updated here in a real app
     });
     
     toast.success("Restaurant settings saved successfully!");
   };
   
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-[#f5fbfe] flex">
       <div className="hidden md:block md:w-64">
         <RestaurantSidebar activePage="settings" />
       </div>
@@ -119,9 +144,9 @@ const RestaurantSettings: React.FC = () => {
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Restaurant Settings</h1>
+            <h1 className="text-2xl font-bold text-[#1fa9e4]">Restaurant Settings</h1>
             <Button 
-              className="bg-brand-cyan hover:bg-cyan-600"
+              className="bg-[#1fa9e4] hover:bg-[#1a97cf] text-white"
               onClick={handleSave}
             >
               <Save className="h-4 w-4 mr-2" /> Save Changes
@@ -129,18 +154,18 @@ const RestaurantSettings: React.FC = () => {
           </div>
           
           <Tabs defaultValue="general" className="space-y-6">
-            <TabsList className="grid grid-cols-3 mb-4">
-              <TabsTrigger value="general">General Info</TabsTrigger>
-              <TabsTrigger value="hours">Hours & Location</TabsTrigger>
-              <TabsTrigger value="appearance">Appearance</TabsTrigger>
+            <TabsList className="grid grid-cols-3 mb-4 bg-[#d6effa]">
+              <TabsTrigger value="general" className="data-[state=active]:bg-[#1fa9e4] data-[state=active]:text-white">General Info</TabsTrigger>
+              <TabsTrigger value="hours" className="data-[state=active]:bg-[#1fa9e4] data-[state=active]:text-white">Hours & Location</TabsTrigger>
+              <TabsTrigger value="appearance" className="data-[state=active]:bg-[#1fa9e4] data-[state=active]:text-white">Appearance</TabsTrigger>
             </TabsList>
             
             <TabsContent value="general">
-              <Card>
-                <CardHeader>
+              <Card className="border-[#c2e7f8]">
+                <CardHeader className="bg-[#e0f3fb] border-b border-[#c2e7f8]">
                   <CardTitle>Restaurant Information</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-6">
                   <div className="grid gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Restaurant Name</Label>
@@ -250,14 +275,14 @@ const RestaurantSettings: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="hours">
-              <Card>
-                <CardHeader>
+              <Card className="border-[#c2e7f8]">
+                <CardHeader className="bg-[#e0f3fb] border-b border-[#c2e7f8]">
                   <CardTitle className="flex items-center">
                     <Clock className="h-5 w-5 mr-2" />
                     Opening Hours
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="space-y-4">
                     {Object.entries(restaurantForm.openingHours).map(([day, hours]) => (
                       <div key={day} className="flex items-center justify-between">
@@ -294,27 +319,80 @@ const RestaurantSettings: React.FC = () => {
                 </CardContent>
               </Card>
               
-              <Card className="mt-6">
-                <CardHeader>
+              <Card className="mt-6 border-[#c2e7f8]">
+                <CardHeader className="bg-[#e0f3fb] border-b border-[#c2e7f8]">
                   <CardTitle className="flex items-center">
                     <MapPin className="h-5 w-5 mr-2" />
                     Restaurant Location
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
+                <CardContent className="pt-6">
+                  <div className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="address">Street Address</Label>
-                      <Input 
-                        id="address" 
-                        name="address" 
-                        value={restaurantForm.address} 
-                        onChange={handleInputChange} 
-                      />
+                      <div className="flex space-x-2">
+                        <Input 
+                          id="address" 
+                          name="address" 
+                          value={restaurantForm.address} 
+                          onChange={handleInputChange} 
+                          className="flex-1"
+                        />
+                        <Button 
+                          onClick={geocodeAddress}
+                          type="button"
+                          className="bg-[#1fa9e4] hover:bg-[#1a97cf]"
+                        >
+                          <MapPinned className="h-4 w-4 mr-2" />
+                          Get Coordinates
+                        </Button>
+                      </div>
                     </div>
                     
-                    <div className="h-64 bg-gray-100 rounded-md flex items-center justify-center">
-                      <p className="text-gray-500">Map view would appear here</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="latitude">Latitude</Label>
+                        <Input 
+                          id="latitude" 
+                          name="latitude" 
+                          value={restaurantForm.latitude} 
+                          onChange={(e) => handleInputChange({
+                            ...e,
+                            target: {
+                              ...e.target,
+                              name: 'latitude',
+                              value: parseFloat(e.target.value) || 0
+                            }
+                          } as React.ChangeEvent<HTMLInputElement>)} 
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="longitude">Longitude</Label>
+                        <Input 
+                          id="longitude" 
+                          name="longitude" 
+                          value={restaurantForm.longitude} 
+                          onChange={(e) => handleInputChange({
+                            ...e,
+                            target: {
+                              ...e.target,
+                              name: 'longitude',
+                              value: parseFloat(e.target.value) || 0
+                            }
+                          } as React.ChangeEvent<HTMLInputElement>)} 
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="h-64 bg-[#e0f3fb] rounded-md flex flex-col items-center justify-center p-4 border border-[#c2e7f8]">
+                      <MapPin className="h-12 w-12 text-[#1fa9e4] mb-2" />
+                      <p className="text-center text-gray-600">
+                        Restaurant location: {restaurantForm.latitude.toFixed(6)}, {restaurantForm.longitude.toFixed(6)}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-2 text-center">
+                        Interactive map would appear here in a production environment.<br />
+                        In a real app, this would display a map with the restaurant's location marker.
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -322,11 +400,11 @@ const RestaurantSettings: React.FC = () => {
             </TabsContent>
             
             <TabsContent value="appearance">
-              <Card>
-                <CardHeader>
+              <Card className="border-[#c2e7f8]">
+                <CardHeader className="bg-[#e0f3fb] border-b border-[#c2e7f8]">
                   <CardTitle>Restaurant Appearance</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pt-6">
                   <div className="space-y-6">
                     <div>
                       <h3 className="flex items-center text-lg font-medium mb-2">

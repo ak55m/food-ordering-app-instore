@@ -54,10 +54,10 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
 
   return (
     <SidebarProvider>
-      <Sidebar className="border-r border-gray-200 z-10 h-full">
-        <SidebarHeader className="px-4 py-6 border-b border-gray-200">
+      <Sidebar className="border-r border-[#c2e7f8] bg-white z-10 h-full">
+        <SidebarHeader className="px-4 py-6 border-b border-[#c2e7f8] bg-[#f5fbfe]">
           <div className="flex items-center">
-            <h2 className="text-lg font-bold text-cyan-500">Restaurant Portal</h2>
+            <h2 className="text-lg font-bold text-[#1fa9e4]">Restaurant Portal</h2>
           </div>
         </SidebarHeader>
         
@@ -67,8 +67,8 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
             {menuItems.map((item, index) => (
               <button 
                 key={index}
-                className={`w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center ${
-                  item.active ? 'bg-cyan-50 text-cyan-500 font-medium' : 'text-gray-700'
+                className={`w-full text-left px-3 py-2 rounded-md hover:bg-[#e0f3fb] flex justify-between items-center ${
+                  item.active ? 'bg-[#d6effa] text-[#1fa9e4] font-medium' : 'text-gray-700'
                 }`}
                 onClick={() => handleNavigation(item.path)}
               >
@@ -82,10 +82,10 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
           </div>
         </SidebarContent>
         
-        <SidebarFooter className="p-4 border-t border-gray-200 space-y-2">
+        <SidebarFooter className="p-4 border-t border-[#c2e7f8] space-y-2">
           <Button 
             variant="outline" 
-            className="w-full flex items-center justify-center"
+            className="w-full flex items-center justify-center border-[#c2e7f8] hover:bg-[#e0f3fb]"
             onClick={() => navigate('/')}
           >
             <Store className="h-4 w-4 mr-2" />
