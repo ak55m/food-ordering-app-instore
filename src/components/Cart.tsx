@@ -126,14 +126,14 @@ const Cart: React.FC = () => {
             onValueChange={(value) => setPaymentMethod(value as 'credit_card' | 'cash')} 
             className="space-y-2"
           >
-            <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-gray-50 cursor-pointer">
+            <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
               <RadioGroupItem value="credit_card" id="credit_card" />
               <Label htmlFor="credit_card" className="flex items-center cursor-pointer w-full">
                 <CreditCard className="h-4 w-4 mr-2" />
                 Pay with Card
               </Label>
             </div>
-            <div className="flex items-center space-x-2 border rounded-md p-3 hover:bg-gray-50 cursor-pointer">
+            <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
               <RadioGroupItem value="cash" id="cash" />
               <Label htmlFor="cash" className="flex items-center cursor-pointer w-full">
                 <Wallet className="h-4 w-4 mr-2" />
