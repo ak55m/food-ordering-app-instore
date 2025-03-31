@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -32,8 +31,8 @@ const queryClient = new QueryClient({
   },
 });
 
-// Protected route for customers
-const CustomerRoute = ({ children }: { children: React.ReactNode }) => {
+// Protected route for customers - only for actions requiring authentication
+const CustomerAuthRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated } = useAppContext();
   
   if (!isAuthenticated) {
@@ -67,31 +66,25 @@ const AppRoutes = () => {
           : <LoginPage />
       } />
       
-      {/* Customer Routes */}
-      <Route path="/home" element={
-        <CustomerRoute>
-          <Index />
-        </CustomerRoute>
-      } />
-      <Route path="/restaurant/:id" element={
-        <CustomerRoute>
-          <RestaurantDetail />
-        </CustomerRoute>
-      } />
+      {/* Customer Routes - No authentication required for browsing */}
+      <Route path="/home" element={<Index />} />
+      <Route path="/restaurant/:id" element={<RestaurantDetail />} />
+      
+      {/* Customer Routes - Authentication required for personal data and orders */}
       <Route path="/orders" element={
-        <CustomerRoute>
+        <CustomerAuthRoute>
           <OrdersPage />
-        </CustomerRoute>
+        </CustomerAuthRoute>
       } />
       <Route path="/cart" element={
-        <CustomerRoute>
+        <CustomerAuthRoute>
           <CartPage />
-        </CustomerRoute>
+        </CustomerAuthRoute>
       } />
       <Route path="/profile" element={
-        <CustomerRoute>
+        <CustomerAuthRoute>
           <ProfilePage />
-        </CustomerRoute>
+        </CustomerAuthRoute>
       } />
       
       {/* Restaurant Owner Routes */}
