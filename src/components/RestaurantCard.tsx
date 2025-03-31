@@ -23,7 +23,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer card-hover border-0 shadow-sm w-[200px] md:w-[280px] lg:w-[320px]" 
+      className="overflow-hidden cursor-pointer card-hover border-0 shadow-sm w-[200px] md:w-[220px] lg:w-[300px] xl:w-[320px]" 
       onClick={handleClick}
     >
       <div className="aspect-video relative overflow-hidden">
@@ -34,7 +34,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
         />
       </div>
       <CardContent className="p-2 md:p-3 lg:p-4">
-        <h3 className="font-bold text-sm md:text-base lg:text-lg line-clamp-1">{restaurant.name}</h3>
+        <h3 className="font-bold text-sm md:text-base lg:text-lg line-clamp-1 font-wolt">{restaurant.name}</h3>
         <p className="text-gray-500 text-xs md:text-sm line-clamp-1 mt-0.5">
           {restaurant.categories?.slice(0, 1).join(', ')}
         </p>

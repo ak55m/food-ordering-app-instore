@@ -24,13 +24,13 @@ const Index: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
-        <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-4 flex justify-between items-center`}>
-          <h1 className="text-xl font-bold text-brand-cyan">MunchMap</h1>
+        <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container max-w-[1600px] px-8'} py-4 flex justify-between items-center`}>
+          <h1 className="text-xl font-bold text-brand-cyan font-wolt">MunchMap</h1>
           <div>
             <LocationButton />
           </div>
         </div>
-        <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} pb-4 flex items-center`}>
+        <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container max-w-[1600px] px-8'} pb-4 flex items-center`}>
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input 
@@ -41,12 +41,12 @@ const Index: React.FC = () => {
         </div>
       </header>
       
-      <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'}`}>
+      <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container max-w-[1600px] px-8'} relative overflow-clip`}>
         {locationEnabled ? (
           <>
             <section className="py-3">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-2xl font-bold">Recommendations</h2>
+                <h2 className="text-2xl font-semibold mb-4 font-wolt tracking-tight">Recommendations</h2>
                 <a href="#" className="text-brand-cyan font-medium">See all</a>
               </div>
               
@@ -56,10 +56,10 @@ const Index: React.FC = () => {
                 </div>
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <div className="w-full">
-                  <Carousel className="w-full" opts={{ align: 'start' }}>
+                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: 1 }}>
                     <CarouselContent className="-ml-2 md:-ml-4">
                       {nearbyRestaurants.map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 basis-auto">
+                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 basis-auto md:basis-1/2 lg:basis-1/3">
                           <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                         </CarouselItem>
                       ))}
@@ -79,16 +79,16 @@ const Index: React.FC = () => {
             
             <section className="py-3">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-2xl font-bold">Dinner near you</h2>
+                <h2 className="text-2xl font-semibold mb-4 font-wolt tracking-tight">Dinner near you</h2>
                 <a href="#" className="text-brand-cyan font-medium">See all</a>
               </div>
               
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <div className="w-full">
-                  <Carousel className="w-full" opts={{ align: 'start' }}>
+                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: 1 }}>
                     <CarouselContent className="-ml-2 md:-ml-4">
                       {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 basis-auto">
+                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 basis-auto md:basis-1/2 lg:basis-1/3">
                           <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                         </CarouselItem>
                       ))}
