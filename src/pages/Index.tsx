@@ -80,6 +80,7 @@ const Index: React.FC = () => {
         {locationEnabled ? (
           <>
             <section className={`${isMobile ? 'py-4' : 'py-6'}`}>
+              {/* Mobile Ad Banner */}
               {isMobile && (
                 <div className="mb-3 relative rounded-lg overflow-hidden">
                   <img 
@@ -124,6 +125,64 @@ const Index: React.FC = () => {
                         }`}
                       />
                     ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Desktop Ad Banners - Two at a time */}
+              {!isMobile && (
+                <div className="mb-6 relative">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* First banner */}
+                    <div className="relative rounded-lg overflow-hidden">
+                      <img 
+                        src={adBanners[currentAdIndex].image} 
+                        alt={adBanners[currentAdIndex].title} 
+                        className="w-full h-[200px] object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6 text-white">
+                        <div className="text-xs uppercase tracking-wider mb-1">{adBanners[currentAdIndex].label}</div>
+                        <h3 className="text-2xl font-bold mb-1">{adBanners[currentAdIndex].title}</h3>
+                        <p className="text-sm">{adBanners[currentAdIndex].description}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Second banner */}
+                    <div className="relative rounded-lg overflow-hidden">
+                      <img 
+                        src={adBanners[(currentAdIndex + 1) % adBanners.length].image} 
+                        alt={adBanners[(currentAdIndex + 1) % adBanners.length].title} 
+                        className="w-full h-[200px] object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6 text-white">
+                        <div className="text-xs uppercase tracking-wider mb-1">{adBanners[(currentAdIndex + 1) % adBanners.length].label}</div>
+                        <h3 className="text-2xl font-bold mb-1">{adBanners[(currentAdIndex + 1) % adBanners.length].title}</h3>
+                        <p className="text-sm">{adBanners[(currentAdIndex + 1) % adBanners.length].description}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Ad navigation arrows for desktop - side by side */}
+                  <div className="absolute -bottom-12 right-0 flex gap-2">
+                    <Button 
+                      onClick={prevAd}
+                      className="rounded-full bg-white border border-gray-300 shadow-sm h-10 w-10"
+                      size="icon"
+                      variant="outline"
+                      aria-label="Previous advertisement"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    
+                    <Button 
+                      onClick={nextAd}
+                      className="rounded-full bg-white border border-gray-300 shadow-sm h-10 w-10"
+                      size="icon"
+                      variant="outline"
+                      aria-label="Next advertisement"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
                   </div>
                 </div>
               )}
