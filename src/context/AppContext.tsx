@@ -114,7 +114,7 @@ interface AppContextType {
   // Location related
   locationEnabled: boolean;
   userLocation: Location;
-  requestLocation: () => void;
+  requestLocation: () => Promise<void>;
   
   // Restaurant related
   restaurants: Restaurant[];
@@ -147,6 +147,7 @@ interface AppContextType {
     categories: boolean;
     menuItems: boolean;
     orders: boolean;
+    location: boolean;
   };
 }
 
@@ -310,30 +311,110 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Location functions
-  const requestLocation = () => {
-    // Simulating getting user's location
-    setLocationEnabled(true);
-    setUserLocation({
-      lat: 40.7128,
-      lng: -74.006,
-      address: "New York, NY"
-    });
+  const requestLocation = async (): Promise<void> => {
+    setIsLoading(prev => ({ ...prev, location: true }));
     
-    // Update nearby restaurants - in a real app, this would filter by distance
-    const nearby = restaurants.filter(restaurant => {
-      if (!restaurant.latitude || !restaurant.longitude) return false;
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        setIsLoading(prev => ({ ...prev, location: false }));
+        reject(new Error("Geolocation is not supported by your browser"));
+        return;
+      }
       
-      // Simple distance calculation (not accurate for real-world use)
-      const distance = Math.sqrt(
-        Math.pow((restaurant.latitude - userLocation.lat), 2) + 
-        Math.pow((restaurant.longitude - userLocation.lng), 2)
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, lng } = position.coords;
+            
+            // Reverse geocoding to get address from coordinates
+            // In a real app, you'd use a geocoding service like Google Maps API
+            // For now, we'll set a hardcoded address
+            const newLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              address: "Current Location", // This would be replaced with actual address from geocoding
+            };
+            
+            setLocationEnabled(true);
+            setUserLocation(newLocation);
+            
+            // In a real app, we would filter restaurants by distance from user's location
+            // For now, we'll simulate by adding a calculated distance property
+            const nearbyWithDistance = restaurants.map(restaurant => {
+              if (!restaurant.latitude || !restaurant.longitude) {
+                return { ...restaurant, distance: "Unknown" };
+              }
+              
+              // Calculate distance between user and restaurant (haversine formula)
+              const R = 6371; // Radius of the earth in km
+              const dLat = deg2rad(restaurant.latitude - newLocation.lat);
+              const dLon = deg2rad(restaurant.longitude - newLocation.lng); 
+              const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(newLocation.lat)) * Math.cos(deg2rad(restaurant.latitude)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2); 
+              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+              const distance = R * c; // Distance in km
+              
+              // Format distance for display
+              const formattedDistance = distance < 1 ? 
+                `${Math.round(distance * 1000)} m` : 
+                `${distance.toFixed(1)} km`;
+                
+              return { ...restaurant, distance: formattedDistance };
+            });
+            
+            // Sort by distance (ascending)
+            nearbyWithDistance.sort((a, b) => {
+              if (!a.distance || a.distance === "Unknown") return 1;
+              if (!b.distance || b.distance === "Unknown") return -1;
+              
+              const distA = parseFloat(a.distance);
+              const distB = parseFloat(b.distance);
+              
+              return distA - distB;
+            });
+            
+            setNearbyRestaurants(nearbyWithDistance);
+            setIsLoading(prev => ({ ...prev, location: false }));
+            resolve();
+          } catch (error) {
+            setIsLoading(prev => ({ ...prev, location: false }));
+            reject(error);
+          }
+        },
+        (error) => {
+          setIsLoading(prev => ({ ...prev, location: false }));
+          let errorMessage;
+          
+          switch(error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Location permission denied";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Location information is unavailable";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "Location request timed out";
+              break;
+            default:
+              errorMessage = "An unknown error occurred";
+          }
+          
+          reject(new Error(errorMessage));
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
       );
-      
-      // Consider restaurants within a certain radius
-      return distance < 0.1; // Arbitrary threshold
     });
-    
-    setNearbyRestaurants(restaurants); // For demo, we show all restaurants
+  };
+
+  // Helper function to convert degrees to radians for distance calculation
+  const deg2rad = (deg: number): number => {
+    return deg * (Math.PI/180);
   };
 
   // Restaurant functions
@@ -566,6 +647,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     categories: false,
     menuItems: false,
     orders: false,
+    location: false,
   });
 
   return (

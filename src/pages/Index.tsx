@@ -7,9 +7,10 @@ import RestaurantCard from '@/components/RestaurantCard';
 import OrderTracker from '@/components/OrderTracker';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { MapPin } from 'lucide-react';
 
 const Index: React.FC = () => {
-  const { nearbyRestaurants, locationEnabled, userLocation, orders } = useAppContext();
+  const { nearbyRestaurants, locationEnabled, userLocation, orders, isLoading } = useAppContext();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
@@ -41,7 +42,11 @@ const Index: React.FC = () => {
               Restaurants near {userLocation.address}
             </h2>
             
-            {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
+            {isLoading.restaurants ? (
+              <div className="text-center py-10">
+                <p className="text-gray-500">Finding restaurants near you...</p>
+              </div>
+            ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {nearbyRestaurants.map(restaurant => (
                   <RestaurantCard key={restaurant.id} restaurant={restaurant} />
@@ -55,10 +60,15 @@ const Index: React.FC = () => {
           </>
         ) : (
           <div className="py-10 text-center">
-            <h2 className="text-2xl font-semibold mb-2">Find Restaurants Near You</h2>
-            <p className="text-gray-500">
-              Click the location button above to discover restaurants in your area
-            </p>
+            <div className="max-w-xs mx-auto flex flex-col items-center gap-4">
+              <div className="bg-gray-100 p-5 rounded-full">
+                <MapPin className="h-10 w-10 text-brand-orange" />
+              </div>
+              <h2 className="text-2xl font-semibold mb-2">Find Restaurants Near You</h2>
+              <p className="text-gray-500">
+                Click the location button above to discover restaurants in your area
+              </p>
+            </div>
           </div>
         )}
       </main>
