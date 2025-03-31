@@ -144,7 +144,7 @@ const Cart: React.FC = () => {
         </div>
 
         <Button 
-          className="w-full bg-brand-orange hover:bg-orange-600" 
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium" 
           onClick={handlePlaceOrder}
           disabled={isProcessing}
         >
