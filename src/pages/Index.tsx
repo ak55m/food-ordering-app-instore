@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
 import LocationButton from '@/components/LocationButton';
@@ -21,6 +21,40 @@ const Index: React.FC = () => {
   const { nearbyRestaurants, locationEnabled, userLocation, isLoading } = useAppContext();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  
+  // Ad banners data
+  const adBanners = [
+    {
+      id: 1,
+      image: "/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png",
+      label: "RESTAURANT",
+      title: "The Burgery Jyväskylä",
+      description: "Grilled To Perfection - Powered By Better Food"
+    },
+    {
+      id: 2,
+      image: "/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png",
+      label: "SPECIAL OFFER",
+      title: "50% Off First Order",
+      description: "Limited time offer - Order now!"
+    },
+    {
+      id: 3,
+      image: "/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png",
+      label: "NEW",
+      title: "Try Our Secret Menu",
+      description: "Exclusive items you won't find anywhere else"
+    }
+  ];
+  
+  const nextAd = () => {
+    setCurrentAdIndex((prev) => (prev + 1) % adBanners.length);
+  };
+  
+  const prevAd = () => {
+    setCurrentAdIndex((prev) => (prev - 1 + adBanners.length) % adBanners.length);
+  };
   
   return (
     <div className="min-h-screen bg-white pb-20">
@@ -49,14 +83,47 @@ const Index: React.FC = () => {
               {isMobile && (
                 <div className="mb-4 relative rounded-lg overflow-hidden">
                   <img 
-                    src="/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png" 
-                    alt="The Burgery Jyväskylä" 
+                    src={adBanners[currentAdIndex].image} 
+                    alt={adBanners[currentAdIndex].title} 
                     className="w-full h-[140px] object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4 text-white">
-                    <div className="text-xs uppercase tracking-wider mb-1">RESTAURANT</div>
-                    <h3 className="text-xl font-bold mb-1">The Burgery Jyväskylä</h3>
-                    <p className="text-sm">Grilled To Perfection - Powered By Better Food</p>
+                    <div className="text-xs uppercase tracking-wider mb-1">{adBanners[currentAdIndex].label}</div>
+                    <h3 className="text-xl font-bold mb-1">{adBanners[currentAdIndex].title}</h3>
+                    <p className="text-sm">{adBanners[currentAdIndex].description}</p>
+                  </div>
+                  
+                  {/* Ad navigation arrows */}
+                  <Button 
+                    onClick={prevAd}
+                    className="absolute top-1/2 left-2 -translate-y-1/2 rounded-full bg-white/50 hover:bg-white/80 p-1 h-8 w-8"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Previous advertisement"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  
+                  <Button 
+                    onClick={nextAd}
+                    className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full bg-white/50 hover:bg-white/80 p-1 h-8 w-8"
+                    size="icon"
+                    variant="ghost"
+                    aria-label="Next advertisement"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                  
+                  {/* Ad indicators */}
+                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                    {adBanners.map((_, index) => (
+                      <div 
+                        key={index} 
+                        className={`h-1.5 rounded-full transition-all ${
+                          index === currentAdIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/60'
+                        }`}
+                      />
+                    ))}
                   </div>
                 </div>
               )}
