@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
@@ -45,6 +46,21 @@ const Index: React.FC = () => {
         {locationEnabled ? (
           <>
             <section className={`${isMobile ? 'py-5' : 'py-6'}`}>
+              {isMobile && (
+                <div className="mb-4 relative rounded-lg overflow-hidden">
+                  <img 
+                    src="/lovable-uploads/3b8487bd-a428-4778-85b3-72b5948c31f6.png" 
+                    alt="The Burgery Jyväskylä" 
+                    className="w-full h-[140px] object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4 text-white">
+                    <div className="text-xs uppercase tracking-wider mb-1">RESTAURANT</div>
+                    <h3 className="text-xl font-bold mb-1">The Burgery Jyväskylä</h3>
+                    <p className="text-sm">Grilled To Perfection - Powered By Better Food</p>
+                  </div>
+                </div>
+              )}
+              
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-lg font-semibold text-gray-900 font-omnes">New on MunchMap</h2>
                 <div className="flex items-center gap-2">
