@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock } from 'lucide-react';
@@ -32,10 +31,16 @@ const OrdersPage: React.FC = () => {
     }
   };
 
-  const sortedOrders = orders && orders.length ? [...orders].sort((a, b) => {
+  // Ensure all orders have proper Date objects for timestamps
+  const processedOrders = orders.map(order => ({
+    ...order,
+    timestamp: order.timestamp instanceof Date ? order.timestamp : new Date(order.timestamp)
+  }));
+
+  const sortedOrders = processedOrders && processedOrders.length ? [...processedOrders].sort((a, b) => {
     // Safely handle timestamp comparison
-    const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
-    const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+    const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
+    const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
     return timeB - timeA;
   }) : [];
 

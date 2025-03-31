@@ -8,6 +8,8 @@ import { Progress } from '@/components/ui/progress';
 const OrderTracker: React.FC = () => {
   const { orders } = useAppContext();
   
+  console.log('Orders in OrderTracker:', orders);
+  
   // Get the most recent active order (not completed)
   // First ensure we have orders and handle potential invalid timestamps
   const activeOrder = orders && orders.length > 0 
@@ -15,8 +17,8 @@ const OrderTracker: React.FC = () => {
         .filter(order => order.status !== 'completed')
         .sort((a, b) => {
           // Ensure timestamps are Date objects before comparing
-          const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : 0;
-          const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : 0;
+          const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
+          const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
           return timeB - timeA;
         })[0]
     : null;

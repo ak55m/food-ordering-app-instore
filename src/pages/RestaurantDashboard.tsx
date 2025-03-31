@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext, Order } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,12 +16,25 @@ const RestaurantDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [restaurantId, setRestaurantId] = useState('1'); // Default to first restaurant
   
+  console.log('All orders in dashboard:', orders);
+  
+  // Ensure all orders have proper Date objects for timestamps
+  const processedOrders = orders.map(order => ({
+    ...order,
+    timestamp: order.timestamp instanceof Date ? order.timestamp : new Date(order.timestamp)
+  }));
+  
   // Filter orders by restaurant and status
-  const restaurantOrders = orders.filter(order => order.restaurantId === restaurantId);
+  const restaurantOrders = processedOrders;
   const pendingOrders = restaurantOrders.filter(order => order.status === 'pending');
   const preparingOrders = restaurantOrders.filter(order => order.status === 'preparing');
   const readyOrders = restaurantOrders.filter(order => order.status === 'ready');
   const completedOrders = restaurantOrders.filter(order => order.status === 'completed');
+  
+  console.log('Pending orders:', pendingOrders);
+  console.log('Preparing orders:', preparingOrders);
+  console.log('Ready orders:', readyOrders);
+  console.log('Completed orders:', completedOrders);
   
   const handleUpdateOrderStatus = (orderId: string, newStatus: Order['status']) => {
     updateOrderStatus(orderId, newStatus);

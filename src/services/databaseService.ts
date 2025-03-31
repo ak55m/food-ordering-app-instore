@@ -233,8 +233,10 @@ export const getOrders = async (userId: string, role: string) => {
     if (role === 'customer') {
       return ordersWithDates.filter(order => order.userId === userId);
     } else if (role === 'restaurant_owner') {
-      // In a real app, we'd have the owner's restaurantId
-      return ordersWithDates.filter(order => order.restaurantId === 'owner-123');
+      // For restaurant owner, return all orders since we're using a mock database
+      // In a real app, we would filter by the restaurantId associated with the owner
+      console.log('Restaurant owner orders:', ordersWithDates);
+      return ordersWithDates;
     }
     
     return ordersWithDates;

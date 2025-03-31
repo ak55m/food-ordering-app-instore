@@ -232,8 +232,41 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     { id: "6", name: "Spaghetti Bolognese", description: "Pasta with meat sauce", price: 11.99, categoryId: "4" }
   ]);
   
-  // State for orders
-  const [orders, setOrders] = useState<Order[]>([]);
+  // State for orders - initialize with a test order
+  const [orders, setOrders] = useState<Order[]>([
+    {
+      id: "test-order-123",
+      restaurantId: "1",
+      restaurantName: "Burger Palace",
+      userId: "user-123",
+      items: [
+        {
+          menuItem: {
+            id: "1",
+            name: "Classic Burger",
+            description: "Beef patty with lettuce and tomato",
+            price: 8.99,
+            categoryId: "1"
+          },
+          quantity: 2
+        },
+        {
+          menuItem: {
+            id: "3",
+            name: "French Fries",
+            description: "Crispy golden fries",
+            price: 3.99,
+            categoryId: "2"
+          },
+          quantity: 1
+        }
+      ],
+      status: "pending",
+      timestamp: new Date(),
+      total: 21.97,
+      paymentMethod: 'credit_card'
+    }
+  ]);
 
   // Cart functions
   const addToCart = (item: CartItem) => {
