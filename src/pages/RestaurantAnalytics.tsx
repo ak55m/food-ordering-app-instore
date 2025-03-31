@@ -189,29 +189,29 @@ const RestaurantAnalytics: React.FC = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Revenue Overview</CardTitle>
-                  <TabsList>
-                    <TabsTrigger 
-                      value="day"
-                      onClick={() => setTimeRange('day')}
-                      className={timeRange === 'day' ? 'bg-brand-cyan text-white' : ''}
-                    >
-                      Day
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="week"
-                      onClick={() => setTimeRange('week')}
-                      className={timeRange === 'week' ? 'bg-brand-cyan text-white' : ''}
-                    >
-                      Week
-                    </TabsTrigger>
-                    <TabsTrigger 
-                      value="month"
-                      onClick={() => setTimeRange('month')}
-                      className={timeRange === 'month' ? 'bg-brand-cyan text-white' : ''}
-                    >
-                      Month
-                    </TabsTrigger>
-                  </TabsList>
+                  {/* Wrap the TabsList inside a Tabs component */}
+                  <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as 'day' | 'week' | 'month')}>
+                    <TabsList>
+                      <TabsTrigger 
+                        value="day"
+                        className={timeRange === 'day' ? 'bg-brand-cyan text-white' : ''}
+                      >
+                        Day
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="week"
+                        className={timeRange === 'week' ? 'bg-brand-cyan text-white' : ''}
+                      >
+                        Week
+                      </TabsTrigger>
+                      <TabsTrigger 
+                        value="month"
+                        className={timeRange === 'month' ? 'bg-brand-cyan text-white' : ''}
+                      >
+                        Month
+                      </TabsTrigger>
+                    </TabsList>
+                  </Tabs>
                 </div>
               </CardHeader>
               <CardContent>
