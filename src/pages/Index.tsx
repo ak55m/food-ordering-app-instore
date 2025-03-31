@@ -41,12 +41,12 @@ const Index: React.FC = () => {
         </div>
       </header>
       
-      <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container max-w-[1600px] px-8'} relative overflow-clip`}>
+      <main className="mx-auto max-w-[1600px] px-4 md:px-8 relative overflow-clip">
         {locationEnabled ? (
           <>
-            <section className="py-3">
+            <section className="py-6">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-2xl font-semibold mb-4 font-wolt tracking-tight">Recommendations</h2>
+                <h2 className="wolt-title">Recommendations</h2>
                 <a href="#" className="text-brand-cyan font-medium">See all</a>
               </div>
               
@@ -56,10 +56,10 @@ const Index: React.FC = () => {
                 </div>
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <div className="w-full">
-                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: 1 }}>
-                    <CarouselContent className="-ml-2 md:-ml-4">
+                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: isMobile ? 1 : 3 }}>
+                    <CarouselContent className="-ml-1 md:-ml-2">
                       {nearbyRestaurants.map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 basis-auto md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem key={restaurant.id} className="pl-1 md:pl-2 basis-full sm:basis-1/2 md:basis-1/3">
                           <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                         </CarouselItem>
                       ))}
@@ -77,18 +77,18 @@ const Index: React.FC = () => {
               )}
             </section>
             
-            <section className="py-3">
+            <section className="py-6">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="text-2xl font-semibold mb-4 font-wolt tracking-tight">Dinner near you</h2>
+                <h2 className="wolt-title">Dinner near you</h2>
                 <a href="#" className="text-brand-cyan font-medium">See all</a>
               </div>
               
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <div className="w-full">
-                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: 1 }}>
-                    <CarouselContent className="-ml-2 md:-ml-4">
+                  <Carousel className="w-full" opts={{ align: 'start', slidesToScroll: isMobile ? 1 : 3 }}>
+                    <CarouselContent className="-ml-1 md:-ml-2">
                       {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                        <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 basis-auto md:basis-1/2 lg:basis-1/3">
+                        <CarouselItem key={restaurant.id} className="pl-1 md:pl-2 basis-full sm:basis-1/2 md:basis-1/3">
                           <RestaurantCard key={restaurant.id} restaurant={restaurant} />
                         </CarouselItem>
                       ))}

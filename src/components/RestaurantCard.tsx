@@ -23,7 +23,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer card-hover border-0 shadow-sm w-[200px] md:w-[220px] lg:w-[300px] xl:w-[320px]" 
+      className="overflow-hidden cursor-pointer card-hover border-0 shadow-sm w-full" 
       onClick={handleClick}
     >
       <div className="aspect-video relative overflow-hidden">
@@ -33,25 +33,25 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           className="w-full h-full object-cover"
         />
       </div>
-      <CardContent className="p-2 md:p-3 lg:p-4">
-        <h3 className="font-bold text-sm md:text-base lg:text-lg line-clamp-1 font-wolt">{restaurant.name}</h3>
-        <p className="text-gray-500 text-xs md:text-sm line-clamp-1 mt-0.5">
+      <CardContent className="p-3 md:p-4 lg:p-5">
+        <h3 className="font-bold text-base md:text-lg lg:text-xl line-clamp-1 font-wolt">{restaurant.name}</h3>
+        <p className="text-gray-500 text-xs md:text-sm line-clamp-1 mt-1">
           {restaurant.categories?.slice(0, 1).join(', ')}
         </p>
         
-        <div className="flex items-center gap-2 mt-1 text-xs md:text-sm text-gray-600">
+        <div className="flex items-center gap-2 mt-2 text-xs md:text-sm text-gray-600">
           <div className="flex items-center gap-0.5">
-            <Star className="h-3 w-3 md:h-4 md:w-4 fill-yellow-400 text-yellow-400" />
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
             <span>{restaurant.rating}</span>
           </div>
           <div className="flex items-center gap-0.5">
-            <Clock className="h-3 w-3 md:h-4 md:w-4" />
+            <Clock className="h-4 w-4" />
             <span>{deliveryTime}</span>
           </div>
         </div>
         
-        <div className="mt-1 flex items-center justify-between">
-          <span className="text-xs md:text-sm font-medium">{deliveryFee}</span>
+        <div className="mt-2 flex items-center justify-between">
+          <span className="text-sm md:text-base font-medium">{deliveryFee}</span>
           {restaurant.distance && <span className="text-xs md:text-sm text-gray-500">{restaurant.distance}</span>}
         </div>
       </CardContent>
