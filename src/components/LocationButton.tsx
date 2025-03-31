@@ -25,7 +25,7 @@ const LocationButton: React.FC = () => {
     <Button 
       onClick={handleLocationRequest}
       variant="outline"
-      className="flex items-center gap-1 rounded-full border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+      className="flex items-center gap-2 rounded-full border-gray-300 bg-white shadow-sm hover:bg-gray-50 relative"
       size="sm"
       disabled={isLoading}
     >
@@ -34,10 +34,10 @@ const LocationButton: React.FC = () => {
       ) : (
         <MapPin className="h-4 w-4 text-brand-orange" />
       )}
-      <span className="text-sm truncate max-w-[150px] md:max-w-[200px] font-medium">
+      <span className="text-sm text-gray-700 truncate max-w-[150px] md:max-w-[200px]">
         {locationEnabled 
-          ? (userLocation.address || "Your location")
-          : "Find your location"}
+          ? userLocation.address || "Your location"
+          : "Find restaurants near you"}
       </span>
     </Button>
   );

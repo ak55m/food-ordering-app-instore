@@ -72,11 +72,6 @@ export default {
 				"brand-light": "#ebf7fd",
 				"brand-white": "#ffffff",
 				"brand-orange": "#F97316",
-				"wolt": {
-					"blue": "#00C2E8",
-					"darkblue": "#009de0",
-					"lightblue": "#ebf7fd",
-				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
