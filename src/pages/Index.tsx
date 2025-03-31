@@ -4,20 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
 import LocationButton from '@/components/LocationButton';
 import RestaurantCard from '@/components/RestaurantCard';
-import OrderTracker from '@/components/OrderTracker';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MapPin } from 'lucide-react';
 
 const Index: React.FC = () => {
-  const { nearbyRestaurants, locationEnabled, userLocation, orders, isLoading } = useAppContext();
+  const { nearbyRestaurants, locationEnabled, userLocation, isLoading } = useAppContext();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   
-  // Check if there's an active order
-  const hasActiveOrder = orders && orders.length > 0 && 
-    orders.some(order => order.status !== 'completed');
-
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
@@ -30,12 +25,6 @@ const Index: React.FC = () => {
       </header>
       
       <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-6`}>
-        {hasActiveOrder && (
-          <div className="mb-6">
-            <OrderTracker />
-          </div>
-        )}
-        
         {locationEnabled ? (
           <>
             <h2 className="text-xl font-semibold mb-4">
