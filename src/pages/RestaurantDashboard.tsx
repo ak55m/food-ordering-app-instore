@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Clock, ChefHat, CheckCircle, BarChart3 } from 'lucide-react';
 import RestaurantSidebar from '@/components/RestaurantSidebar';
 import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { toast } from 'sonner';
 
 const RestaurantDashboard: React.FC = () => {
   const { orders, updateOrderStatus } = useAppContext();
@@ -23,14 +25,21 @@ const RestaurantDashboard: React.FC = () => {
   
   const handleUpdateOrderStatus = (orderId: string, newStatus: Order['status']) => {
     updateOrderStatus(orderId, newStatus);
+    const statusMessages = {
+      'preparing': 'Order is now being prepared',
+      'ready': 'Order is ready for pickup',
+      'completed': 'Order has been completed'
+    };
+    
+    toast.success(statusMessages[newStatus] || 'Order status updated');
   };
   
   const OrderCard = ({ order }: { order: Order }) => (
-    <Card className="mb-4">
+    <Card className="mb-4 border shadow hover:shadow-md transition-shadow">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex justify-between items-center">
           <span>Order #{order.id.split('-')[1].slice(-4)}</span>
-          <Badge variant={order.status === 'pending' ? 'default' : 'outline'}>
+          <Badge variant={order.status === 'pending' ? 'default' : 'outline'} className="ml-2">
             {new Intl.DateTimeFormat('en-US', {
               hour: 'numeric',
               minute: 'numeric'
@@ -84,14 +93,35 @@ const RestaurantDashboard: React.FC = () => {
     </Card>
   );
 
+  // Mobile menu for small screens
+  const MobileNav = () => (
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button variant="outline" className="md:hidden">
+          <ChefHat className="h-4 w-4 mr-2" /> Restaurant Menu
+        </Button>
+      </SheetTrigger>
+      <SheetContent side="left" className="w-[80%]">
+        <div className="py-4">
+          <RestaurantSidebar activePage="dashboard" />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gray-50">
-      <RestaurantSidebar activePage="dashboard" />
+    <div className="min-h-screen w-full bg-gray-50 flex flex-col md:flex-row">
+      <div className="hidden md:block">
+        <RestaurantSidebar activePage="dashboard" />
+      </div>
       
-      <main className="flex-1 overflow-y-auto">
-        <div className="max-w-6xl mx-auto p-6">
+      <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+        <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Orders Dashboard</h1>
+            <div className="flex items-center gap-2">
+              <MobileNav />
+              <h1 className="text-2xl font-bold">Orders Dashboard</h1>
+            </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => navigate('/restaurant/analytics')}>
                 <BarChart3 className="h-4 w-4 mr-2" /> View Analytics
@@ -99,7 +129,7 @@ const RestaurantDashboard: React.FC = () => {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6 mb-8">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm text-gray-500">Pending Orders</CardTitle>
@@ -145,7 +175,7 @@ const RestaurantDashboard: React.FC = () => {
           </div>
           
           <Tabs defaultValue="pending" className="w-full">
-            <TabsList className="grid grid-cols-4 mb-4">
+            <TabsList className="grid grid-cols-2 sm:grid-cols-4 mb-4 w-full">
               <TabsTrigger value="pending" className="relative">
                 Pending
                 {pendingOrders.length > 0 && (
@@ -173,46 +203,54 @@ const RestaurantDashboard: React.FC = () => {
             </TabsList>
             
             <TabsContent value="pending">
-              {pendingOrders.length > 0 ? (
-                pendingOrders.map(order => <OrderCard key={order.id} order={order} />)
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <Clock className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                  <p className="text-gray-500">No pending orders</p>
-                </div>
-              )}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {pendingOrders.length > 0 ? (
+                  pendingOrders.map(order => <OrderCard key={order.id} order={order} />)
+                ) : (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg col-span-full">
+                    <Clock className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-500">No pending orders</p>
+                  </div>
+                )}
+              </div>
             </TabsContent>
             
             <TabsContent value="preparing">
-              {preparingOrders.length > 0 ? (
-                preparingOrders.map(order => <OrderCard key={order.id} order={order} />)
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <ChefHat className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                  <p className="text-gray-500">No orders currently being prepared</p>
-                </div>
-              )}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {preparingOrders.length > 0 ? (
+                  preparingOrders.map(order => <OrderCard key={order.id} order={order} />)
+                ) : (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg col-span-full">
+                    <ChefHat className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-500">No orders currently being prepared</p>
+                  </div>
+                )}
+              </div>
             </TabsContent>
             
             <TabsContent value="ready">
-              {readyOrders.length > 0 ? (
-                readyOrders.map(order => <OrderCard key={order.id} order={order} />)
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <CheckCircle className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                  <p className="text-gray-500">No orders ready for pickup</p>
-                </div>
-              )}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {readyOrders.length > 0 ? (
+                  readyOrders.map(order => <OrderCard key={order.id} order={order} />)
+                ) : (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg col-span-full">
+                    <CheckCircle className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-500">No orders ready for pickup</p>
+                  </div>
+                )}
+              </div>
             </TabsContent>
             
             <TabsContent value="completed">
-              {completedOrders.length > 0 ? (
-                completedOrders.map(order => <OrderCard key={order.id} order={order} />)
-              ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <p className="text-gray-500">No completed orders</p>
-                </div>
-              )}
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {completedOrders.length > 0 ? (
+                  completedOrders.map(order => <OrderCard key={order.id} order={order} />)
+                ) : (
+                  <div className="text-center py-12 bg-gray-50 rounded-lg col-span-full">
+                    <p className="text-gray-500">No completed orders</p>
+                  </div>
+                )}
+              </div>
             </TabsContent>
           </Tabs>
         </div>
