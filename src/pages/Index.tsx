@@ -39,7 +39,7 @@ const Index: React.FC = () => {
         </div>
       </header>
       
-      <main className="mx-auto max-w-[1600px] px-4 md:px-8 relative overflow-clip">
+      <main className="mx-auto max-w-[1600px] px-4 md:px-8 relative overflow-hidden">
         {locationEnabled ? (
           <>
             <section className="py-6">
@@ -53,10 +53,10 @@ const Index: React.FC = () => {
                   <p className="text-gray-500 font-omnes">Finding restaurants near you...</p>
                 </div>
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="ml-[-16px] mr-[-16px]">
-                  <div className="overflow-x-auto flex pl-4 gap-4 pb-4 snap-x snap-mandatory scrollbar-hide">
+                <div className="mx-[-16px]">
+                  <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
                     {nearbyRestaurants.map(restaurant => (
-                      <div key={restaurant.id} className="flex-shrink-0 w-[160px] snap-start">
+                      <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
                         <RestaurantCard restaurant={restaurant} />
                       </div>
                     ))}
@@ -76,10 +76,10 @@ const Index: React.FC = () => {
               </div>
               
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-                <div className="ml-[-16px] mr-[-16px]">
-                  <div className="overflow-x-auto flex pl-4 gap-4 pb-4 snap-x snap-mandatory scrollbar-hide">
+                <div className="mx-[-16px]">
+                  <div className="overflow-x-auto pl-4 pr-0 flex gap-4 pb-4 scrollbar-hide">
                     {nearbyRestaurants.slice(0).reverse().map(restaurant => (
-                      <div key={restaurant.id} className="flex-shrink-0 w-[160px] snap-start">
+                      <div key={restaurant.id} className="flex-shrink-0 w-[160px]">
                         <RestaurantCard restaurant={restaurant} />
                       </div>
                     ))}
