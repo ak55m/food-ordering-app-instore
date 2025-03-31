@@ -85,7 +85,7 @@ const RestaurantOwnerDashboard: React.FC = () => {
   );
 
   return (
-    <div className="flex h-screen w-full overflow-hidden">
+    <div className="flex h-screen w-full overflow-hidden bg-gray-50">
       <RestaurantSidebar activePage="dashboard" />
       
       <main className="flex-1 overflow-y-auto">
