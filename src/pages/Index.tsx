@@ -44,8 +44,8 @@ const Index: React.FC = () => {
       <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'}`}>
         {locationEnabled ? (
           <>
-            <section className="py-6">
-              <div className="flex justify-between items-center mb-4">
+            <section className="py-3">
+              <div className="flex justify-between items-center mb-2">
                 <h2 className="text-2xl font-bold">Recommendations</h2>
                 <a href="#" className="text-brand-cyan font-medium">See all</a>
               </div>
@@ -64,7 +64,7 @@ const Index: React.FC = () => {
                         </CarouselItem>
                       ))}
                     </CarouselContent>
-                    <div className="flex justify-center mt-4 gap-2">
+                    <div className="flex justify-center mt-2 gap-2">
                       <CarouselPrevious className="static translate-y-0 mx-1" />
                       <CarouselNext className="static translate-y-0 mx-1" />
                     </div>
@@ -77,8 +77,8 @@ const Index: React.FC = () => {
               )}
             </section>
             
-            <section className="py-6">
-              <div className="flex justify-between items-center mb-4">
+            <section className="py-3">
+              <div className="flex justify-between items-center mb-2">
                 <h2 className="text-2xl font-bold">Dinner near you</h2>
                 <a href="#" className="text-brand-cyan font-medium">See all</a>
               </div>
@@ -93,7 +93,7 @@ const Index: React.FC = () => {
                         </CarouselItem>
                       ))}
                     </CarouselContent>
-                    <div className="flex justify-center mt-4 gap-2">
+                    <div className="flex justify-center mt-2 gap-2">
                       <CarouselPrevious className="static translate-y-0 mx-1" />
                       <CarouselNext className="static translate-y-0 mx-1" />
                     </div>
