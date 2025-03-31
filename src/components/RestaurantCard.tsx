@@ -30,7 +30,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
         <img 
           src={restaurant.image} 
           alt={restaurant.name}
-          className={`w-full ${isMobile ? 'aspect-[15/9]' : 'aspect-[16/11]'} object-cover`}
+          className={`w-full ${isMobile ? 'aspect-[15/10]' : 'aspect-[16/11]'} object-cover`}
         />
         {!isMobile && (
           <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
