@@ -30,7 +30,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
         <img 
           src={restaurant.image} 
           alt={restaurant.name}
-          className={`w-full ${isMobile ? 'aspect-[15/10]' : 'aspect-[16/11]'} object-cover`}
+          className={`w-full ${isMobile ? 'aspect-[15/8]' : 'aspect-[16/9]'} object-cover`}
         />
         {!isMobile && (
           <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
@@ -38,9 +38,9 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           </div>
         )}
       </div>
-      <div className={`${isMobile ? 'p-2' : 'p-2'}`}>
-        <h3 className={`font-bold ${isMobile ? 'text-xs' : 'text-base'} line-clamp-1 font-omnes`}>{restaurant.name}</h3>
-        <p className="text-gray-500 text-xs line-clamp-1 mb-0.5 font-omnes">
+      <div className={`${isMobile ? 'p-3' : 'p-3'}`}>
+        <h3 className={`font-bold ${isMobile ? 'text-sm' : 'text-base'} line-clamp-1 font-omnes`}>{restaurant.name}</h3>
+        <p className="text-gray-500 text-xs line-clamp-1 mb-1 font-omnes">
           {restaurant.categories?.slice(0, 3).join(' • ')}
         </p>
         
