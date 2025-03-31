@@ -59,7 +59,7 @@ interface AppContextType {
   userLocation: UserLocation;
   locationEnabled: boolean;
   
-  // Actions
+  // Actions - Customer
   setSelectedRestaurant: (restaurant: Restaurant | null) => void;
   addToCart: (menuItem: MenuItem) => void;
   removeFromCart: (menuItemId: string) => void;
@@ -69,6 +69,17 @@ interface AppContextType {
   getRestaurantCategories: (restaurantId: string) => Category[];
   getCategoryMenuItems: (categoryId: string) => MenuItem[];
   requestLocation: () => Promise<void>;
+  
+  // Actions - Restaurant Owner
+  getRestaurantById: (restaurantId: string) => Restaurant | undefined;
+  updateRestaurant: (restaurant: Restaurant) => void;
+  updateOrderStatus: (orderId: string, status: Order['status']) => void;
+  addMenuItem: (menuItem: Omit<MenuItem, 'id'>) => void;
+  updateMenuItem: (menuItem: MenuItem) => void;
+  deleteMenuItem: (menuItemId: string) => void;
+  addCategory: (category: Omit<Category, 'id'>) => void;
+  updateCategory: (category: Category) => void;
+  deleteCategory: (categoryId: string) => void;
 }
 
 // Mock data
@@ -170,8 +181,8 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
   const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
   const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [categories] = useState<Category[]>(mockCategories);
-  const [menuItems] = useState<MenuItem[]>(mockMenuItems);
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [userLocation, setUserLocation] = useState<UserLocation>({
@@ -318,6 +329,74 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
       }, 30000); // 30 seconds after preparing
     }, 10000); // 10 seconds after placing order
   };
+  
+  // Restaurant Owner functionality
+  const getRestaurantById = (restaurantId: string): Restaurant | undefined => {
+    return restaurants.find(restaurant => restaurant.id === restaurantId);
+  };
+  
+  const updateRestaurant = (updatedRestaurant: Restaurant): void => {
+    setRestaurants(prevRestaurants => 
+      prevRestaurants.map(restaurant => 
+        restaurant.id === updatedRestaurant.id ? updatedRestaurant : restaurant
+      )
+    );
+  };
+  
+  const updateOrderStatus = (orderId: string, status: Order['status']): void => {
+    setOrders(prevOrders => 
+      prevOrders.map(order => 
+        order.id === orderId ? { ...order, status } : order
+      )
+    );
+    toast.success(`Order #${orderId.split('-')[1].slice(-4)} updated to ${status}`);
+  };
+  
+  const addMenuItem = (menuItemData: Omit<MenuItem, 'id'>): void => {
+    const newMenuItem: MenuItem = {
+      ...menuItemData,
+      id: `m${menuItems.length + 1}`,
+    };
+    
+    setMenuItems(prevMenuItems => [...prevMenuItems, newMenuItem]);
+  };
+  
+  const updateMenuItem = (updatedMenuItem: MenuItem): void => {
+    setMenuItems(prevMenuItems => 
+      prevMenuItems.map(item => 
+        item.id === updatedMenuItem.id ? updatedMenuItem : item
+      )
+    );
+  };
+  
+  const deleteMenuItem = (menuItemId: string): void => {
+    setMenuItems(prevMenuItems => 
+      prevMenuItems.filter(item => item.id !== menuItemId)
+    );
+  };
+  
+  const addCategory = (categoryData: Omit<Category, 'id'>): void => {
+    const newCategory: Category = {
+      ...categoryData,
+      id: `c${categories.length + 1}`,
+    };
+    
+    setCategories(prevCategories => [...prevCategories, newCategory]);
+  };
+  
+  const updateCategory = (updatedCategory: Category): void => {
+    setCategories(prevCategories => 
+      prevCategories.map(category => 
+        category.id === updatedCategory.id ? updatedCategory : category
+      )
+    );
+  };
+  
+  const deleteCategory = (categoryId: string): void => {
+    setCategories(prevCategories => 
+      prevCategories.filter(category => category.id !== categoryId)
+    );
+  };
 
   const value = {
     restaurants,
@@ -338,6 +417,16 @@ export const AppProvider: React.FC<{children: React.ReactNode}> = ({ children })
     getRestaurantCategories,
     getCategoryMenuItems,
     requestLocation,
+    // Restaurant owner functionality
+    getRestaurantById,
+    updateRestaurant,
+    updateOrderStatus,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem,
+    addCategory,
+    updateCategory,
+    deleteCategory,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
