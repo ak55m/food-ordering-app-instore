@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
@@ -22,17 +21,17 @@ const Index: React.FC = () => {
   const isMobile = useIsMobile();
   
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header with Wolt-style branding */}
+    <div className="min-h-screen bg-white pb-20">
+      {/* Header with MunchMap branding */}
       <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
         <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container max-w-[1600px] px-8'} py-4 flex justify-between items-center`}>
-          <h1 className="text-2xl font-bold text-gray-800 font-wolt italic">Wolt</h1>
+          <h1 className="text-2xl font-bold text-brand-orange font-omnes">MunchMap</h1>
           <div className="flex items-center gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input 
-                placeholder="Search in Wolt..." 
-                className="pl-10 bg-gray-100 border-0 font-omnes rounded-full w-[200px] md:w-[300px]"
+                placeholder="Search restaurants..." 
+                className="pl-10 bg-gray-100 border border-gray-200 font-omnes rounded-full w-[200px] md:w-[300px]"
               />
             </div>
             <LocationButton />
@@ -42,14 +41,14 @@ const Index: React.FC = () => {
         {/* Category tabs */}
         <div className="border-b border-gray-200">
           <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container max-w-[1600px] px-8'} flex overflow-x-auto no-scrollbar`}>
-            <button className="px-4 py-3 text-gray-800 font-medium border-b-2 border-gray-800">
+            <button className="px-4 py-3 text-gray-800 font-medium border-b-2 border-brand-orange">
               Restaurants
             </button>
             <button className="px-4 py-3 text-gray-500 font-medium">
               Groceries
             </button>
             <button className="px-4 py-3 text-gray-500 font-medium">
-              Wolt+
+              Quick Eats
             </button>
           </div>
         </div>
