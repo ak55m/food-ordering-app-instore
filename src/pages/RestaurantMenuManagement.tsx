@@ -70,13 +70,11 @@ const RestaurantMenuManagement = () => {
   const handleAddCategory = () => {
     if (!categoryName.trim()) return;
     
-    // Fix: remove id from the Omit type
     addCategory({
       name: categoryName,
       restaurantId
     });
     
-    // Update local state
     const updatedCategories = getRestaurantCategories(restaurantId);
     setRestaurantCategories(updatedCategories);
     setCategoryName('');
@@ -92,7 +90,6 @@ const RestaurantMenuManagement = () => {
       name: categoryName
     });
     
-    // Update local state
     const updatedCategories = getRestaurantCategories(restaurantId);
     setRestaurantCategories(updatedCategories);
     setEditedCategory(null);
@@ -105,7 +102,6 @@ const RestaurantMenuManagement = () => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       deleteCategory(categoryId);
       
-      // Update local state
       const updatedCategories = getRestaurantCategories(restaurantId);
       setRestaurantCategories(updatedCategories);
       
@@ -120,7 +116,6 @@ const RestaurantMenuManagement = () => {
   const handleAddItem = () => {
     if (!itemName.trim() || !itemPrice.trim()) return;
     
-    // Fix: remove id from the Omit type
     addMenuItem({
       name: itemName,
       description: itemDescription,
@@ -129,7 +124,6 @@ const RestaurantMenuManagement = () => {
       categoryId: selectedCategoryId,
     });
     
-    // Update local state
     setCategoryItems(getCategoryMenuItems(selectedCategoryId));
     resetItemForm();
     setIsAddItemOpen(false);
@@ -147,7 +141,6 @@ const RestaurantMenuManagement = () => {
       image: itemImage || editedItem.image
     });
     
-    // Update local state
     setCategoryItems(getCategoryMenuItems(selectedCategoryId));
     resetItemForm();
     setIsEditItemOpen(false);
@@ -158,7 +151,6 @@ const RestaurantMenuManagement = () => {
     if (window.confirm('Are you sure you want to delete this item?')) {
       deleteMenuItem(itemId);
       
-      // Update local state
       setCategoryItems(getCategoryMenuItems(selectedCategoryId));
     }
   };

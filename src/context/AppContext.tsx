@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { geocodeCoordinates } from '@/lib/geocoding';
@@ -8,16 +7,13 @@ import {
 } from '@/types';
 import { mockRestaurants, mockMenuItems, mockCategories } from '@/data/mockData';
 
-// Define the shape of our context
 interface AppContextType {
-  // Authentication
   user: User | null;
   setUser: (user: User | null) => void;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   
-  // Location
   locationEnabled: boolean;
   userLocation: {
     latitude: number;
@@ -26,26 +22,21 @@ interface AppContextType {
   };
   requestLocation: () => Promise<void>;
   
-  // Restaurants
   nearbyRestaurants: Restaurant[];
   selectedRestaurant: Restaurant | null;
   selectRestaurant: (id: string) => void;
   
-  // Menu Items
   menuItems: MenuItem[];
   
-  // Cart
   cart: CartItem[];
   addToCart: (menuItem: MenuItem) => void;
   updateCartItemQuantity: (menuItemId: string, quantity: number) => void;
   removeFromCart: (menuItemId: string) => void;
   clearCart: () => void;
   
-  // Orders
   orders: Order[];
   placeOrder: (restaurantId: string, paymentMethod: 'credit_card' | 'cash') => Promise<void>;
   
-  // Restaurant Management
   restaurants: Restaurant[];
   categories: Category[];
   getRestaurantById: (id: string) => Restaurant | null;
@@ -61,7 +52,6 @@ interface AppContextType {
   updateRestaurant: (restaurant: Restaurant) => void;
   setSelectedRestaurant: (restaurant: Restaurant | null) => void;
   
-  // Loading States
   isLoading: {
     auth: boolean;
     location: boolean;
@@ -71,16 +61,12 @@ interface AppContextType {
   };
 }
 
-// Create the context with a default value
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-// Provider component
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // Authentication state
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   
-  // Location state
   const [locationEnabled, setLocationEnabled] = useState<boolean>(false);
   const [userLocation, setUserLocation] = useState({
     latitude: 0,
@@ -88,24 +74,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     address: '',
   });
   
-  // Restaurant state
   const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurant[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   
-  // Category state
   const [categories, setCategories] = useState<Category[]>(mockCategories);
   
-  // Menu items state
   const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
   
-  // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
   
-  // Orders state
   const [orders, setOrders] = useState<Order[]>([]);
   
-  // Loading states
   const [isLoading, setIsLoading] = useState({
     auth: false,
     location: false,
@@ -114,15 +94,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     orders: false,
   });
   
-  // Authentication methods
   const login = async (email: string, password: string): Promise<void> => {
     setIsLoading({ ...isLoading, auth: true });
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Mock authentication logic - using the test credentials from LoginPage.tsx
       if (email === 'customer@example.com' && password === 'password123') {
         const user: User = {
           id: 'cust-123',
@@ -165,7 +142,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     toast.success('Logged out successfully');
   };
   
-  // Location methods
   const requestLocation = async (): Promise<void> => {
     setIsLoading({ ...isLoading, location: true });
     
@@ -180,10 +156,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       
       const { latitude, longitude } = position.coords;
       
-      // Get address from coordinates
       const address = await geocodeCoordinates(latitude, longitude);
       
-      // Update user location
       const newUserLocation = {
         latitude,
         longitude,
@@ -193,7 +167,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setUserLocation(newUserLocation);
       setLocationEnabled(true);
       
-      // Fetch restaurants near this location
       await fetchNearbyRestaurants(latitude, longitude);
       
     } catch (error) {
@@ -205,15 +178,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   
-  // Restaurant methods
   const fetchNearbyRestaurants = async (latitude: number, longitude: number): Promise<void> => {
     setIsLoading({ ...isLoading, restaurants: true });
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // For now, return mock data
       setNearbyRestaurants(mockRestaurants);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
@@ -228,7 +198,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSelectedRestaurant(restaurant);
     
     if (restaurant) {
-      // Fetch menu items for this restaurant
       fetchMenuItems(id);
     }
   };
@@ -237,7 +206,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return restaurants.find(r => r.id === id) || null;
   };
   
-  // Update restaurant
   const updateRestaurant = (restaurant: Restaurant): void => {
     const updatedRestaurants = restaurants.map(r => 
       r.id === restaurant.id ? restaurant : r
@@ -246,15 +214,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     toast.success('Restaurant updated successfully');
   };
   
-  // Menu items methods
   const fetchMenuItems = async (restaurantId: string): Promise<void> => {
     setIsLoading({ ...isLoading, menuItems: true });
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Filter mock menu items by restaurant ID
       const items = mockMenuItems.filter(item => item.restaurantId === restaurantId);
       setMenuItems(items);
     } catch (error) {
@@ -265,7 +230,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   
-  // Category methods
   const getRestaurantCategories = (restaurantId: string): Category[] => {
     return categories.filter(category => category.restaurantId === restaurantId);
   };
@@ -289,13 +253,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCategories(categories.filter(cat => cat.id !== categoryId));
   };
   
-  // Menu Item methods
   const getCategoryMenuItems = (categoryId: string): MenuItem[] => {
     return menuItems.filter(item => item.categoryId === categoryId);
   };
   
   const addMenuItem = (menuItem: Omit<MenuItem, 'id' | 'restaurantId'>): void => {
-    // Find category to get restaurantId
     const category = categories.find(cat => cat.id === menuItem.categoryId);
     
     if (!category) {
@@ -313,7 +275,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
   
   const updateMenuItem = (updatedItem: MenuItem): void => {
-    // Fix: Don't try to access 'quantity' on MenuItem type
     const newItems = menuItems.map(item => 
       item.id === updatedItem.id ? updatedItem : item
     );
@@ -324,15 +285,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setMenuItems(menuItems.filter(item => item.id !== menuItemId));
   };
   
-  // Cart methods
   const addToCart = (menuItem: MenuItem): void => {
-    // Check if we're adding an item from a different restaurant
     if (cart.length > 0) {
       const firstItem = cart[0];
       const firstItemDetails = menuItems.find(item => item.id === firstItem.menuItem.id);
       
       if (firstItemDetails && firstItemDetails.restaurantId !== menuItem.restaurantId) {
-        // Ask user if they want to clear cart
         if (window.confirm('Adding items from a different restaurant will clear your current cart. Continue?')) {
           setCart([{ menuItem, quantity: 1 }]);
           toast.success(`Added ${menuItem.name} to cart`);
@@ -341,16 +299,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       }
     }
     
-    // Check if item already exists in cart
     const existingItemIndex = cart.findIndex(item => item.menuItem.id === menuItem.id);
     
     if (existingItemIndex >= 0) {
-      // Update quantity of existing item
       const updatedCart = [...cart];
       updatedCart[existingItemIndex].quantity += 1;
       setCart(updatedCart);
     } else {
-      // Add new item to cart
       setCart([...cart, { menuItem, quantity: 1 }]);
     }
     
@@ -380,7 +335,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setCart([]);
   };
   
-  // Order methods
   const placeOrder = async (restaurantId: string, paymentMethod: 'credit_card' | 'cash'): Promise<void> => {
     if (!user) {
       toast.error('You must be logged in to place an order');
@@ -395,13 +349,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsLoading({ ...isLoading, orders: true });
     
     try {
-      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Get restaurant name
       const restaurant = restaurants.find(r => r.id === restaurantId);
       
-      // Create new order
       const newOrder: Order = {
         id: `order-${Date.now()}`,
         userId: user.id,
@@ -415,10 +366,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         paymentStatus: paymentMethod === 'credit_card' ? 'paid' : 'pending',
       };
       
-      // Add order to state
       setOrders([newOrder, ...orders]);
       
-      // Clear cart
       clearCart();
       
       toast.success('Order placed successfully!');
@@ -430,7 +379,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
   
-  // Order management for restaurant owners
   const updateOrderStatus = (orderId: string, newStatus: OrderStatus): void => {
     const updatedOrders = orders.map(order => 
       order.id === orderId ? { ...order, status: newStatus } : order
@@ -440,7 +388,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     toast.success(`Order status updated to ${newStatus}`);
   };
   
-  // Load user from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
@@ -455,40 +402,32 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   }, []);
   
-  // Context value
   const contextValue: AppContextType = {
-    // Authentication
     user,
     setUser,
     isAuthenticated,
     login,
     logout,
     
-    // Location
     locationEnabled,
     userLocation,
     requestLocation,
     
-    // Restaurants
     nearbyRestaurants,
     selectedRestaurant,
     selectRestaurant,
     
-    // Menu Items
     menuItems,
     
-    // Cart
     cart,
     addToCart,
     updateCartItemQuantity,
     removeFromCart,
     clearCart,
     
-    // Orders
     orders,
     placeOrder,
     
-    // Restaurant Management
     restaurants,
     categories,
     getRestaurantById,
@@ -504,7 +443,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     updateRestaurant,
     setSelectedRestaurant,
     
-    // Loading States
     isLoading,
   };
   
@@ -515,7 +453,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   );
 };
 
-// Custom hook to use the context
 export const useAppContext = (): AppContextType => {
   const context = useContext(AppContext);
   if (context === undefined) {
@@ -524,7 +461,6 @@ export const useAppContext = (): AppContextType => {
   return context;
 };
 
-// Export types for use in other components
 export type { 
   Restaurant, MenuItem, CartItem, Order, User, Category,
   OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia
