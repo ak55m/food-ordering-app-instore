@@ -1,9 +1,17 @@
 
-import { createClient } from '@supabase/supabase-js';
+// This file is kept for compatibility with existing code
+// But we're not actually using Supabase anymore
 
-// Replace these with your actual Supabase credentials
-// For a real app, these would be in environment variables
-const supabaseUrl = 'https://example.supabase.co';
-const supabaseKey = 'your-supabase-anon-key';
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = {
+  // Mock Supabase client methods (not used but kept for structure)
+  from: () => ({
+    select: () => ({
+      eq: () => ({
+        single: () => Promise.resolve({ data: null, error: null }),
+      }),
+      insert: () => Promise.resolve({ data: null, error: null }),
+      update: () => Promise.resolve({ data: null, error: null }),
+      delete: () => Promise.resolve({ data: null, error: null }),
+    }),
+  }),
+};

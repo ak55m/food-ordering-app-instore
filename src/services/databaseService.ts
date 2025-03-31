@@ -1,22 +1,44 @@
-import { supabase } from '@/lib/supabase';
+
 import { Restaurant, User, Category, MenuItem, Order, CartItem } from '@/context/AppContext';
 import { toast } from 'sonner';
+
+// Local storage keys
+const STORAGE_KEYS = {
+  USERS: 'foodapp_users',
+  RESTAURANTS: 'foodapp_restaurants',
+  CATEGORIES: 'foodapp_categories',
+  MENU_ITEMS: 'foodapp_menu_items',
+  ORDERS: 'foodapp_orders'
+};
+
+// Helper functions to work with localStorage
+const getStorageItem = <T>(key: string, defaultValue: T): T => {
+  try {
+    const item = localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (error) {
+    console.error(`Error getting ${key} from localStorage:`, error);
+    return defaultValue;
+  }
+};
+
+const setStorageItem = <T>(key: string, value: T): void => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.error(`Error setting ${key} in localStorage:`, error);
+  }
+};
 
 // Users
 export const getUser = async (email: string, password: string) => {
   try {
-    const { data, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single();
-      
-    if (error) throw error;
+    const users = getStorageItem<User[]>(STORAGE_KEYS.USERS, []);
+    const user = users.find(u => u.email === email);
     
-    // In a real app, you would use proper authentication
-    // This is just a simplified example
-    if (data && password === 'password123') {
-      return data;
+    // In a real app, you would hash passwords
+    if (user && password === 'password123') {
+      return user;
     }
     return null;
   } catch (error) {
@@ -27,13 +49,10 @@ export const getUser = async (email: string, password: string) => {
 
 export const createUser = async (user: User) => {
   try {
-    const { data, error } = await supabase
-      .from('users')
-      .insert(user)
-      .select();
-    
-    if (error) throw error;
-    return data[0];
+    const users = getStorageItem<User[]>(STORAGE_KEYS.USERS, []);
+    users.push(user);
+    setStorageItem(STORAGE_KEYS.USERS, users);
+    return user;
   } catch (error) {
     console.error('Error creating user:', error);
     return null;
@@ -43,12 +62,7 @@ export const createUser = async (user: User) => {
 // Restaurants
 export const getRestaurants = async () => {
   try {
-    const { data, error } = await supabase
-      .from('restaurants')
-      .select('*');
-    
-    if (error) throw error;
-    return data;
+    return getStorageItem<Restaurant[]>(STORAGE_KEYS.RESTAURANTS, []);
   } catch (error) {
     console.error('Error fetching restaurants:', error);
     toast.error('Failed to load restaurants');
@@ -58,14 +72,8 @@ export const getRestaurants = async () => {
 
 export const getRestaurantById = async (id: string) => {
   try {
-    const { data, error } = await supabase
-      .from('restaurants')
-      .select('*')
-      .eq('id', id)
-      .single();
-    
-    if (error) throw error;
-    return data;
+    const restaurants = getStorageItem<Restaurant[]>(STORAGE_KEYS.RESTAURANTS, []);
+    return restaurants.find(r => r.id === id) || null;
   } catch (error) {
     console.error(`Error fetching restaurant with ID ${id}:`, error);
     return null;
@@ -74,15 +82,13 @@ export const getRestaurantById = async (id: string) => {
 
 export const updateRestaurant = async (restaurant: Restaurant) => {
   try {
-    const { data, error } = await supabase
-      .from('restaurants')
-      .update(restaurant)
-      .eq('id', restaurant.id)
-      .select();
-    
-    if (error) throw error;
+    const restaurants = getStorageItem<Restaurant[]>(STORAGE_KEYS.RESTAURANTS, []);
+    const updatedRestaurants = restaurants.map(r => 
+      r.id === restaurant.id ? { ...r, ...restaurant } : r
+    );
+    setStorageItem(STORAGE_KEYS.RESTAURANTS, updatedRestaurants);
     toast.success('Restaurant settings saved successfully!');
-    return data[0];
+    return restaurant;
   } catch (error) {
     console.error('Error updating restaurant:', error);
     toast.error('Failed to save restaurant settings');
@@ -93,13 +99,8 @@ export const updateRestaurant = async (restaurant: Restaurant) => {
 // Categories
 export const getCategories = async (restaurantId: string) => {
   try {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('restaurantId', restaurantId);
-    
-    if (error) throw error;
-    return data;
+    const categories = getStorageItem<Category[]>(STORAGE_KEYS.CATEGORIES, []);
+    return categories.filter(c => c.restaurantId === restaurantId);
   } catch (error) {
     console.error('Error fetching categories:', error);
     return [];
@@ -108,14 +109,11 @@ export const getCategories = async (restaurantId: string) => {
 
 export const createCategory = async (category: Category) => {
   try {
-    const { data, error } = await supabase
-      .from('categories')
-      .insert(category)
-      .select();
-    
-    if (error) throw error;
+    const categories = getStorageItem<Category[]>(STORAGE_KEYS.CATEGORIES, []);
+    categories.push(category);
+    setStorageItem(STORAGE_KEYS.CATEGORIES, categories);
     toast.success('Category added successfully');
-    return data[0];
+    return category;
   } catch (error) {
     console.error('Error creating category:', error);
     toast.error('Failed to add category');
@@ -125,15 +123,13 @@ export const createCategory = async (category: Category) => {
 
 export const updateCategory = async (category: Category) => {
   try {
-    const { data, error } = await supabase
-      .from('categories')
-      .update(category)
-      .eq('id', category.id)
-      .select();
-    
-    if (error) throw error;
+    const categories = getStorageItem<Category[]>(STORAGE_KEYS.CATEGORIES, []);
+    const updatedCategories = categories.map(c => 
+      c.id === category.id ? { ...c, ...category } : c
+    );
+    setStorageItem(STORAGE_KEYS.CATEGORIES, updatedCategories);
     toast.success('Category updated successfully');
-    return data[0];
+    return category;
   } catch (error) {
     console.error('Error updating category:', error);
     toast.error('Failed to update category');
@@ -143,12 +139,9 @@ export const updateCategory = async (category: Category) => {
 
 export const deleteCategory = async (id: string) => {
   try {
-    const { error } = await supabase
-      .from('categories')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    const categories = getStorageItem<Category[]>(STORAGE_KEYS.CATEGORIES, []);
+    const updatedCategories = categories.filter(c => c.id !== id);
+    setStorageItem(STORAGE_KEYS.CATEGORIES, updatedCategories);
     toast.success('Category deleted successfully');
     return true;
   } catch (error) {
@@ -161,13 +154,8 @@ export const deleteCategory = async (id: string) => {
 // Menu Items
 export const getMenuItems = async (categoryId: string) => {
   try {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .select('*')
-      .eq('categoryId', categoryId);
-    
-    if (error) throw error;
-    return data;
+    const menuItems = getStorageItem<MenuItem[]>(STORAGE_KEYS.MENU_ITEMS, []);
+    return menuItems.filter(item => item.categoryId === categoryId);
   } catch (error) {
     console.error('Error fetching menu items:', error);
     return [];
@@ -176,14 +164,11 @@ export const getMenuItems = async (categoryId: string) => {
 
 export const createMenuItem = async (menuItem: MenuItem) => {
   try {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .insert(menuItem)
-      .select();
-    
-    if (error) throw error;
+    const menuItems = getStorageItem<MenuItem[]>(STORAGE_KEYS.MENU_ITEMS, []);
+    menuItems.push(menuItem);
+    setStorageItem(STORAGE_KEYS.MENU_ITEMS, menuItems);
     toast.success('Menu item added successfully');
-    return data[0];
+    return menuItem;
   } catch (error) {
     console.error('Error creating menu item:', error);
     toast.error('Failed to add menu item');
@@ -193,15 +178,13 @@ export const createMenuItem = async (menuItem: MenuItem) => {
 
 export const updateMenuItem = async (menuItem: MenuItem) => {
   try {
-    const { data, error } = await supabase
-      .from('menu_items')
-      .update(menuItem)
-      .eq('id', menuItem.id)
-      .select();
-    
-    if (error) throw error;
+    const menuItems = getStorageItem<MenuItem[]>(STORAGE_KEYS.MENU_ITEMS, []);
+    const updatedMenuItems = menuItems.map(item => 
+      item.id === menuItem.id ? { ...item, ...menuItem } : item
+    );
+    setStorageItem(STORAGE_KEYS.MENU_ITEMS, updatedMenuItems);
     toast.success('Menu item updated successfully');
-    return data[0];
+    return menuItem;
   } catch (error) {
     console.error('Error updating menu item:', error);
     toast.error('Failed to update menu item');
@@ -211,12 +194,9 @@ export const updateMenuItem = async (menuItem: MenuItem) => {
 
 export const deleteMenuItem = async (id: string) => {
   try {
-    const { error } = await supabase
-      .from('menu_items')
-      .delete()
-      .eq('id', id);
-    
-    if (error) throw error;
+    const menuItems = getStorageItem<MenuItem[]>(STORAGE_KEYS.MENU_ITEMS, []);
+    const updatedMenuItems = menuItems.filter(item => item.id !== id);
+    setStorageItem(STORAGE_KEYS.MENU_ITEMS, updatedMenuItems);
     toast.success('Menu item deleted successfully');
     return true;
   } catch (error) {
@@ -229,24 +209,17 @@ export const deleteMenuItem = async (id: string) => {
 // Orders
 export const getOrders = async (userId: string, role: string) => {
   try {
-    const query = supabase.from('orders').select('*');
+    const orders = getStorageItem<Order[]>(STORAGE_KEYS.ORDERS, []);
     
-    // If customer, filter by userId, if owner, get all orders for their restaurant
+    // Filter orders based on role
     if (role === 'customer') {
-      query.eq('userId', userId);
+      return orders.filter(order => order.userId === userId);
     } else if (role === 'restaurant_owner') {
       // In a real app, we'd have the owner's restaurantId
-      // This is just for demo purposes
-      query.eq('restaurantId', 'owner-123');
+      return orders.filter(order => order.restaurantId === 'owner-123');
     }
     
-    const { data, error } = await query;
-    
-    if (error) throw error;
-    return data.map(order => ({
-      ...order,
-      timestamp: new Date(order.timestamp),
-    }));
+    return orders;
   } catch (error) {
     console.error('Error fetching orders:', error);
     return [];
@@ -255,16 +228,10 @@ export const getOrders = async (userId: string, role: string) => {
 
 export const placeOrder = async (order: Order) => {
   try {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert({
-        ...order,
-        timestamp: order.timestamp.toISOString(),
-      })
-      .select();
-    
-    if (error) throw error;
-    return data[0];
+    const orders = getStorageItem<Order[]>(STORAGE_KEYS.ORDERS, []);
+    orders.push(order);
+    setStorageItem(STORAGE_KEYS.ORDERS, orders);
+    return order;
   } catch (error) {
     console.error('Error placing order:', error);
     toast.error('Failed to place order');
@@ -274,12 +241,11 @@ export const placeOrder = async (order: Order) => {
 
 export const updateOrderStatus = async (orderId: string, status: string) => {
   try {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status })
-      .eq('id', orderId);
-    
-    if (error) throw error;
+    const orders = getStorageItem<Order[]>(STORAGE_KEYS.ORDERS, []);
+    const updatedOrders = orders.map(order => 
+      order.id === orderId ? { ...order, status } : order
+    );
+    setStorageItem(STORAGE_KEYS.ORDERS, updatedOrders);
     toast.success(`Order status updated to ${status}`);
     return true;
   } catch (error) {
