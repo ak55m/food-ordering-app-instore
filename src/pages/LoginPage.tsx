@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useAppContext, UserRole } from "@/context/AppContext";
+import { supabase } from "@/lib/supabase";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -30,20 +31,36 @@ const LoginPage = () => {
     role: "restaurant_owner" as UserRole
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login process
-    setTimeout(() => {
-      // Check if credentials match test customer
+    try {
+      // For demo purposes, we'll check against our predefined test users
+      // In a real app, this would check against Supabase auth
       if (email === testCustomer.email && password === testCustomer.password) {
+        // In a real app with Supabase, this would be:
+        // const { data, error } = await supabase.auth.signInWithPassword({
+        //   email,
+        //   password
+        // });
+        
         setUser({
           id: "cust-123",
           name: "Test Customer",
           email: testCustomer.email,
           role: testCustomer.role
         });
+        
+        if (rememberMe) {
+          // Save user info to localStorage for "remember me" functionality
+          localStorage.setItem('user', JSON.stringify({
+            id: "cust-123",
+            name: "Test Customer",
+            email: testCustomer.email,
+            role: testCustomer.role
+          }));
+        }
         
         toast.success("Login successful", {
           description: "Welcome back, Test Customer!"
@@ -60,6 +77,15 @@ const LoginPage = () => {
           role: testRestaurantOwner.role
         });
         
+        if (rememberMe) {
+          localStorage.setItem('user', JSON.stringify({
+            id: "owner-123",
+            name: "Test Restaurant Owner",
+            email: testRestaurantOwner.email,
+            role: testRestaurantOwner.role
+          }));
+        }
+        
         toast.success("Login successful", {
           description: "Welcome back, Test Restaurant Owner!"
         });
@@ -72,9 +98,14 @@ const LoginPage = () => {
           description: "Please check your credentials and try again."
         });
       }
-      
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Login failed", {
+        description: "An unexpected error occurred. Please try again."
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleTestCustomerLogin = () => {
@@ -86,6 +117,27 @@ const LoginPage = () => {
     setEmail(testRestaurantOwner.email);
     setPassword(testRestaurantOwner.password);
   };
+
+  // Check for remembered user on component mount
+  React.useEffect(() => {
+    const rememberedUser = localStorage.getItem('user');
+    if (rememberedUser) {
+      try {
+        const parsedUser = JSON.parse(rememberedUser);
+        setUser(parsedUser);
+        
+        // Navigate based on user role
+        if (parsedUser.role === 'restaurant_owner') {
+          navigate('/restaurant');
+        } else {
+          navigate('/');
+        }
+      } catch (error) {
+        console.error("Error parsing remembered user:", error);
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-ebf7fd p-4">

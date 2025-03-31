@@ -1,4 +1,6 @@
 import { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import { toast } from "sonner";
+import * as databaseService from "@/services/databaseService";
 
 // Types definitions
 export type UserRole = "customer" | "restaurant_owner" | null;
@@ -137,6 +139,14 @@ interface AppContextType {
   orders: Order[];
   placeOrder: (restaurantId: string) => void;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
+  
+  // Loading states
+  isLoading: {
+    restaurants: boolean;
+    categories: boolean;
+    menuItems: boolean;
+    orders: boolean;
+  };
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -297,12 +307,19 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return restaurants.find(restaurant => restaurant.id === id);
   };
 
-  const updateRestaurant = (updatedRestaurant: Restaurant) => {
-    setRestaurants(prev => 
-      prev.map(restaurant => 
-        restaurant.id === updatedRestaurant.id ? { ...restaurant, ...updatedRestaurant } : restaurant
-      )
-    );
+  const updateRestaurant = async (updatedRestaurant: Restaurant) => {
+    try {
+      const result = await databaseService.updateRestaurant(updatedRestaurant);
+      if (result) {
+        setRestaurants(prev => 
+          prev.map(restaurant => 
+            restaurant.id === updatedRestaurant.id ? { ...restaurant, ...updatedRestaurant } : restaurant
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating restaurant:', error);
+    }
   };
 
   // Menu functions
@@ -314,40 +331,84 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     return menuItems.filter(item => item.categoryId === categoryId);
   };
 
-  const addMenuItem = (item: MenuItem) => {
-    setMenuItems(prev => [...prev, { ...item, id: Date.now().toString() }]);
+  const addMenuItem = async (item: MenuItem) => {
+    try {
+      const newItem = { ...item, id: Date.now().toString() };
+      const result = await databaseService.createMenuItem(newItem);
+      if (result) {
+        setMenuItems(prev => [...prev, result]);
+      }
+    } catch (error) {
+      console.error('Error adding menu item:', error);
+    }
   };
 
-  const updateMenuItem = (updatedItem: MenuItem) => {
-    setMenuItems(prev => 
-      prev.map(item => 
-        item.id === updatedItem.id ? updatedItem : item
-      )
-    );
+  const updateMenuItem = async (updatedItem: MenuItem) => {
+    try {
+      const result = await databaseService.updateMenuItem(updatedItem);
+      if (result) {
+        setMenuItems(prev => 
+          prev.map(item => 
+            item.id === updatedItem.id ? updatedItem : item
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating menu item:', error);
+    }
   };
 
-  const deleteMenuItem = (id: string) => {
-    setMenuItems(prev => prev.filter(item => item.id !== id));
+  const deleteMenuItem = async (id: string) => {
+    try {
+      const result = await databaseService.deleteMenuItem(id);
+      if (result) {
+        setMenuItems(prev => prev.filter(item => item.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting menu item:', error);
+    }
   };
 
-  const addCategory = (category: Category) => {
-    setCategories(prev => [...prev, { ...category, id: Date.now().toString() }]);
+  const addCategory = async (category: Category) => {
+    try {
+      const newCategory = { ...category, id: Date.now().toString() };
+      const result = await databaseService.createCategory(newCategory);
+      if (result) {
+        setCategories(prev => [...prev, result]);
+      }
+    } catch (error) {
+      console.error('Error adding category:', error);
+    }
   };
 
-  const updateCategory = (updatedCategory: Category) => {
-    setCategories(prev => 
-      prev.map(category => 
-        category.id === updatedCategory.id ? updatedCategory : category
-      )
-    );
+  const updateCategory = async (updatedCategory: Category) => {
+    try {
+      const result = await databaseService.updateCategory(updatedCategory);
+      if (result) {
+        setCategories(prev => 
+          prev.map(category => 
+            category.id === updatedCategory.id ? updatedCategory : category
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating category:', error);
+    }
   };
 
-  const deleteCategory = (id: string) => {
-    setCategories(prev => prev.filter(category => category.id !== id));
+  const deleteCategory = async (id: string) => {
+    try {
+      const result = await databaseService.deleteCategory(id);
+      if (result) {
+        setCategories(prev => prev.filter(category => category.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting category:', error);
+    }
   };
 
   // Order functions
-  const placeOrder = (restaurantId: string) => {
+  const placeOrder = async (restaurantId: string) => {
     if (cart.length === 0 || !user) return;
     
     const restaurant = getRestaurantById(restaurantId);
@@ -364,17 +425,111 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       total: cart.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0)
     };
     
-    setOrders(prev => [...prev, newOrder]);
-    clearCart();
+    try {
+      const result = await databaseService.placeOrder(newOrder);
+      if (result) {
+        setOrders(prev => [...prev, newOrder]);
+        clearCart();
+      }
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
   };
 
-  const updateOrderStatus = (orderId: string, status: OrderStatus) => {
-    setOrders(prev => 
-      prev.map(order => 
-        order.id === orderId ? { ...order, status } : order
-      )
-    );
+  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
+    try {
+      const result = await databaseService.updateOrderStatus(orderId, status);
+      if (result) {
+        setOrders(prev => 
+          prev.map(order => 
+            order.id === orderId ? { ...order, status } : order
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+    }
   };
+
+  // Fetch restaurants from database when component mounts
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      setIsLoading(prev => ({ ...prev, restaurants: true }));
+      try {
+        const fetchedRestaurants = await databaseService.getRestaurants();
+        if (fetchedRestaurants.length > 0) {
+          setRestaurants(fetchedRestaurants);
+          setNearbyRestaurants(fetchedRestaurants); // For demo, show all
+        }
+      } catch (error) {
+        console.error("Error fetching restaurants:", error);
+        // Keep the default demo restaurants if fetching fails
+      } finally {
+        setIsLoading(prev => ({ ...prev, restaurants: false }));
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
+
+  // Fetch categories and menu items when selected restaurant changes
+  useEffect(() => {
+    if (selectedRestaurant) {
+      const fetchCategoriesAndMenuItems = async () => {
+        setIsLoading(prev => ({ ...prev, categories: true }));
+        try {
+          const fetchedCategories = await databaseService.getCategories(selectedRestaurant.id);
+          if (fetchedCategories.length > 0) {
+            setCategories(fetchedCategories);
+            
+            // Fetch menu items for each category
+            const allMenuItems = [];
+            setIsLoading(prev => ({ ...prev, menuItems: true }));
+            
+            for (const category of fetchedCategories) {
+              const items = await databaseService.getMenuItems(category.id);
+              allMenuItems.push(...items);
+            }
+            
+            setMenuItems(allMenuItems);
+          }
+        } catch (error) {
+          console.error("Error fetching categories and menu items:", error);
+        } finally {
+          setIsLoading(prev => ({ ...prev, categories: false, menuItems: false }));
+        }
+      };
+
+      fetchCategoriesAndMenuItems();
+    }
+  }, [selectedRestaurant]);
+
+  // Fetch orders when user changes
+  useEffect(() => {
+    if (user) {
+      const fetchOrders = async () => {
+        setIsLoading(prev => ({ ...prev, orders: true }));
+        try {
+          const fetchedOrders = await databaseService.getOrders(user.id, user.role);
+          setOrders(fetchedOrders);
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+        } finally {
+          setIsLoading(prev => ({ ...prev, orders: false }));
+        }
+      };
+
+      fetchOrders();
+    }
+  }, [user]);
+
+  // Loading states
+  const [isLoading, setIsLoading] = useState({
+    restaurants: false,
+    categories: false,
+    menuItems: false,
+    orders: false,
+  });
 
   return (
     <AppContext.Provider
@@ -409,7 +564,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
         deleteCategory,
         orders,
         placeOrder,
-        updateOrderStatus
+        updateOrderStatus,
+        isLoading
       }}
     >
       {children}
