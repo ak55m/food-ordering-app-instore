@@ -7,6 +7,13 @@ import RestaurantCard from '@/components/RestaurantCard';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MapPin } from 'lucide-react';
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from '@/components/ui/carousel';
 
 const Index: React.FC = () => {
   const { nearbyRestaurants, locationEnabled, userLocation, isLoading } = useAppContext();
@@ -36,10 +43,20 @@ const Index: React.FC = () => {
                 <p className="text-gray-500">Finding restaurants near you...</p>
               </div>
             ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {nearbyRestaurants.map(restaurant => (
-                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
-                ))}
+              <div className="w-full">
+                <Carousel className="w-full">
+                  <CarouselContent className="-ml-2 md:-ml-4">
+                    {nearbyRestaurants.map(restaurant => (
+                      <CarouselItem key={restaurant.id} className="pl-2 md:pl-4 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                        <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <div className="flex justify-center mt-4 gap-2">
+                    <CarouselPrevious className="static translate-y-0 mx-1" />
+                    <CarouselNext className="static translate-y-0 mx-1" />
+                  </div>
+                </Carousel>
               </div>
             ) : (
               <div className="text-center py-10">

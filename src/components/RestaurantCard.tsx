@@ -18,30 +18,30 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer card-hover" 
+      className="overflow-hidden cursor-pointer card-hover h-full" 
       onClick={handleClick}
     >
-      <div className="aspect-video relative overflow-hidden">
+      <div className="aspect-square relative overflow-hidden">
         <img 
           src={restaurant.image} 
           alt={restaurant.name}
           className="w-full h-full object-cover"
         />
       </div>
-      <CardContent className="p-4">
-        <h3 className="font-semibold text-lg">{restaurant.name}</h3>
+      <CardContent className="p-3">
+        <h3 className="font-semibold text-sm line-clamp-1">{restaurant.name}</h3>
         <div className="flex items-center gap-2 mt-1">
           <div className="flex items-center gap-1">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm">{restaurant.rating}</span>
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span className="text-xs">{restaurant.rating}</span>
           </div>
-          {restaurant.distance && <span className="text-sm text-gray-500">{restaurant.distance}</span>}
+          {restaurant.distance && <span className="text-xs text-gray-500">{restaurant.distance}</span>}
         </div>
-        <div className="flex flex-wrap gap-1 mt-2">
-          {restaurant.categories && restaurant.categories.map((category, index) => (
+        <div className="flex flex-wrap gap-1 mt-1">
+          {restaurant.categories && restaurant.categories.slice(0, 2).map((category, index) => (
             <span 
               key={index}
-              className="text-xs bg-gray-100 px-2 py-1 rounded-full"
+              className="text-xs bg-gray-100 px-1.5 py-0.5 rounded-full truncate"
             >
               {category}
             </span>
