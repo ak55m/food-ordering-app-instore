@@ -39,6 +39,8 @@ export interface Restaurant {
   address: string;
   rating: number;
   deliveryTime: string;
+  distance?: string;
+  categories: string[];
   ownerId?: string;
 }
 
@@ -128,7 +130,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       address: "123 Main St",
       rating: 4.5,
-      deliveryTime: "15-25 min"
+      deliveryTime: "15-25 min",
+      distance: "1.2 miles",
+      categories: ["Burgers", "Fast Food"]
     },
     {
       id: "2",
@@ -137,7 +141,9 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
       image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
       address: "456 Oak Ave",
       rating: 4.7,
-      deliveryTime: "20-30 min"
+      deliveryTime: "20-30 min",
+      distance: "2.5 miles",
+      categories: ["Pizza", "Italian"]
     }
   ]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);

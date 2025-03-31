@@ -67,9 +67,11 @@ const RestaurantDetail: React.FC = () => {
           </Button>
           <h1 className="text-2xl md:text-3xl font-bold text-white">{restaurant.name}</h1>
           <div className="flex items-center gap-2 text-white/80 text-sm mt-1">
-            <span>{restaurant.distance}</span>
-            <span>•</span>
-            <span>{restaurant.categories.join(', ')}</span>
+            {restaurant.distance && <span>{restaurant.distance}</span>}
+            {restaurant.distance && restaurant.categories && restaurant.categories.length > 0 && <span>•</span>}
+            {restaurant.categories && restaurant.categories.length > 0 && 
+              <span>{restaurant.categories.join(', ')}</span>
+            }
           </div>
         </div>
       </div>

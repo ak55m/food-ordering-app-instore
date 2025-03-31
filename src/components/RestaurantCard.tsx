@@ -35,10 +35,10 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
             <span className="text-sm">{restaurant.rating}</span>
           </div>
-          <span className="text-sm text-gray-500">{restaurant.distance}</span>
+          {restaurant.distance && <span className="text-sm text-gray-500">{restaurant.distance}</span>}
         </div>
         <div className="flex flex-wrap gap-1 mt-2">
-          {restaurant.categories.map((category, index) => (
+          {restaurant.categories && restaurant.categories.map((category, index) => (
             <span 
               key={index}
               className="text-xs bg-gray-100 px-2 py-1 rounded-full"
