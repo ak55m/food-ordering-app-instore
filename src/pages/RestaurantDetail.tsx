@@ -4,7 +4,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useAppContext, Category } from '@/context/AppContext';
 import MenuItem from '@/components/MenuItem';
-import Cart from '@/components/Cart';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -78,42 +77,35 @@ const RestaurantDetail: React.FC = () => {
       
       {/* Content */}
       <div className="container mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Menu Section */}
-          <div className="lg:col-span-2">
-            <Tabs defaultValue={activeCategory} onValueChange={setActiveCategory}>
-              <TabsList className="w-full flex overflow-x-auto">
-                {categories.map(category => (
-                  <TabsTrigger 
-                    key={category.id} 
-                    value={category.id}
-                    className="flex-1"
-                  >
-                    {category.name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-              
-              {categories.map(category => {
-                const menuItems = getCategoryMenuItems(category.id);
-                return (
-                  <TabsContent key={category.id} value={category.id}>
-                    <h2 className="text-xl font-semibold mb-4">{category.name}</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {menuItems.map(item => (
-                        <MenuItem key={item.id} item={item} />
-                      ))}
-                    </div>
-                  </TabsContent>
-                );
-              })}
-            </Tabs>
-          </div>
-          
-          {/* Cart Section */}
-          <div>
-            <Cart />
-          </div>
+        <div className="w-full">
+          {/* Menu Section - Now takes full width */}
+          <Tabs defaultValue={activeCategory} onValueChange={setActiveCategory}>
+            <TabsList className="w-full flex overflow-x-auto">
+              {categories.map(category => (
+                <TabsTrigger 
+                  key={category.id} 
+                  value={category.id}
+                  className="flex-1"
+                >
+                  {category.name}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {categories.map(category => {
+              const menuItems = getCategoryMenuItems(category.id);
+              return (
+                <TabsContent key={category.id} value={category.id}>
+                  <h2 className="text-xl font-semibold mb-4">{category.name}</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {menuItems.map(item => (
+                      <MenuItem key={item.id} item={item} />
+                    ))}
+                  </div>
+                </TabsContent>
+              );
+            })}
+          </Tabs>
         </div>
       </div>
       
