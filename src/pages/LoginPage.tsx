@@ -92,7 +92,7 @@ const LoginPage = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ebf7fd p-4">
+    <div className="flex min-h-screen items-center justify-center bg-white p-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold text-cyan-500">Welcome Back</CardTitle>

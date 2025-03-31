@@ -46,7 +46,7 @@ const ProfilePage: React.FC = () => {
   ];
 
   return (
-    <div className="pb-20 min-h-screen bg-ebf7fd">
+    <div className="pb-20 min-h-screen bg-white">
       <div className="p-4 bg-gradient-to-b from-cyan-500 to-cyan-400 text-white">
         <h1 className="text-2xl font-bold mb-6">My Profile</h1>
         

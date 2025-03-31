@@ -8,7 +8,7 @@ const CartPage: React.FC = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
         <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-4`}>
           <h1 className="text-xl font-bold text-brand-cyan">Your Cart</h1>

@@ -58,7 +58,7 @@ const OrdersPage: React.FC = () => {
   }) : [];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-white pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
         <div className={`${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} mx-auto py-4 flex items-center`}>
           <h1 className="text-xl font-semibold">Your Orders</h1>
