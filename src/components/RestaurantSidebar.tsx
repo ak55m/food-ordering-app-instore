@@ -3,7 +3,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
-import { ChevronRight, LayoutDashboard, Menu, BarChart3, Settings, Store } from 'lucide-react';
+import { ChevronRight, LayoutDashboard, Menu, BarChart3, Settings, Store, LogOut } from 'lucide-react';
+import { useAppContext } from '@/context/AppContext';
 
 interface RestaurantSidebarProps {
   activePage: 'dashboard' | 'menu' | 'analytics' | 'settings';
@@ -11,6 +12,12 @@ interface RestaurantSidebarProps {
 
 const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => {
   const navigate = useNavigate();
+  const { logout } = useAppContext();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const menuItems = [
     {
@@ -44,7 +51,7 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
       <Sidebar className="border-r border-gray-200">
         <SidebarHeader className="px-4 py-6 border-b border-gray-200">
           <div className="flex items-center">
-            <h2 className="text-lg font-bold text-brand-cyan">Restaurant Portal</h2>
+            <h2 className="text-lg font-bold text-cyan-500">Restaurant Portal</h2>
           </div>
         </SidebarHeader>
         
@@ -55,7 +62,7 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
               <button 
                 key={index}
                 className={`w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center ${
-                  item.active ? 'bg-brand-light-blue text-brand-cyan font-medium' : 'text-gray-700'
+                  item.active ? 'bg-ebf7fd text-cyan-500 font-medium' : 'text-gray-700'
                 }`}
                 onClick={() => navigate(item.path)}
               >
@@ -69,7 +76,7 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
           </div>
         </SidebarContent>
         
-        <SidebarFooter className="p-4 border-t border-gray-200">
+        <SidebarFooter className="p-4 border-t border-gray-200 space-y-2">
           <Button 
             variant="outline" 
             className="w-full flex items-center justify-center"
@@ -77,6 +84,15 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
           >
             <Store className="h-4 w-4 mr-2" />
             Switch to Customer View
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center border-red-300 text-red-500 hover:bg-red-50 hover:text-red-600"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
           </Button>
         </SidebarFooter>
       </Sidebar>
