@@ -68,7 +68,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				"brand-cyan": "#009de0",
+				"brand-cyan": "#00c2e8",
 				"brand-light": "#ebf7fd",
 				"brand-white": "#ffffff",
 				"brand-orange": "#F97316",
@@ -115,12 +115,17 @@ export default {
 				'pulse-slow': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' },
+				},
+				'bounce': {
+					'0%, 100%': { transform: 'translateY(-15%)' },
+					'50%': { transform: 'translateY(0)' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+				'bounce': 'bounce 2s ease-in-out infinite',
 			}
 		}
 	},
