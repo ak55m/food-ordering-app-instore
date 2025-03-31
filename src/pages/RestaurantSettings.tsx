@@ -112,9 +112,11 @@ const RestaurantSettings: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <RestaurantSidebar activePage="settings" />
+      <div className="hidden md:block md:w-64">
+        <RestaurantSidebar activePage="settings" />
+      </div>
       
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Restaurant Settings</h1>

@@ -48,12 +48,13 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
   ];
 
   const handleNavigation = (path: string) => {
+    console.log('Navigating to:', path);
     navigate(path);
   };
 
   return (
     <SidebarProvider>
-      <Sidebar className="border-r border-gray-200 z-10">
+      <Sidebar className="border-r border-gray-200 z-10 h-full">
         <SidebarHeader className="px-4 py-6 border-b border-gray-200">
           <div className="flex items-center">
             <h2 className="text-lg font-bold text-cyan-500">Restaurant Portal</h2>
@@ -67,7 +68,7 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
               <button 
                 key={index}
                 className={`w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center ${
-                  item.active ? 'bg-ebf7fd text-cyan-500 font-medium' : 'text-gray-700'
+                  item.active ? 'bg-cyan-50 text-cyan-500 font-medium' : 'text-gray-700'
                 }`}
                 onClick={() => handleNavigation(item.path)}
               >

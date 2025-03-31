@@ -176,9 +176,11 @@ const RestaurantMenuManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <RestaurantSidebar activePage="menu" />
+      <div className="hidden md:block md:w-64">
+        <RestaurantSidebar activePage="menu" />
+      </div>
       
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Menu Management</h1>
@@ -209,7 +211,7 @@ const RestaurantMenuManagement: React.FC = () => {
               defaultValue={restaurantCategories[0]?.id} 
               className="w-full"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center mb-4 overflow-x-auto">
                 <TabsList className="flex-1">
                   {restaurantCategories.map(category => (
                     <TabsTrigger 

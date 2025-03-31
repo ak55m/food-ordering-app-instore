@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -132,9 +131,11 @@ const RestaurantAnalytics: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <RestaurantSidebar activePage="analytics" />
+      <div className="hidden md:block md:w-64">
+        <RestaurantSidebar activePage="analytics" />
+      </div>
       
-      <main className="flex-1 p-6">
+      <main className="flex-1 p-6 overflow-y-auto">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold mb-6">Analytics & Insights</h1>
           
@@ -189,7 +190,6 @@ const RestaurantAnalytics: React.FC = () => {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle>Revenue Overview</CardTitle>
-                  {/* Wrap the TabsList inside a Tabs component */}
                   <Tabs value={timeRange} onValueChange={(value) => setTimeRange(value as 'day' | 'week' | 'month')}>
                     <TabsList>
                       <TabsTrigger 
