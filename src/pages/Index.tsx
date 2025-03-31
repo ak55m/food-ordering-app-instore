@@ -78,7 +78,7 @@ const Index: React.FC = () => {
               ) : nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <>
                   <div className="md:hidden mx-[-16px]">
-                    <div className="overflow-x-auto pl-4 pb-3 flex gap-2 scrollbar-hide">
+                    <div className="overflow-x-auto pl-4 pb-3 flex gap-1 scrollbar-hide">
                       {nearbyRestaurants.map(restaurant => (
                         <div key={restaurant.id} className="flex-shrink-0 w-[230px]">
                           <RestaurantCard restaurant={restaurant} />
@@ -87,7 +87,7 @@ const Index: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="hidden md:grid grid-cols-4 gap-5">
+                  <div className="hidden md:grid grid-cols-4 gap-3">
                     {nearbyRestaurants.slice(0, 4).map(restaurant => (
                       <div key={restaurant.id}>
                         <RestaurantCard restaurant={restaurant} />
@@ -131,7 +131,7 @@ const Index: React.FC = () => {
               {nearbyRestaurants && nearbyRestaurants.length > 0 ? (
                 <>
                   <div className="md:hidden mx-[-16px]">
-                    <div className="overflow-x-auto pl-4 pb-3 flex gap-2 scrollbar-hide">
+                    <div className="overflow-x-auto pl-4 pb-3 flex gap-1 scrollbar-hide">
                       {nearbyRestaurants.slice(0).reverse().map(restaurant => (
                         <div key={restaurant.id} className="flex-shrink-0 w-[230px]">
                           <RestaurantCard restaurant={restaurant} />
@@ -140,7 +140,7 @@ const Index: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="hidden md:grid grid-cols-4 gap-5">
+                  <div className="hidden md:grid grid-cols-4 gap-3">
                     {nearbyRestaurants.slice(0).reverse().slice(0, 4).map(restaurant => (
                       <div key={restaurant.id}>
                         <RestaurantCard restaurant={restaurant} />
