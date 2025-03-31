@@ -77,6 +77,13 @@ const RestaurantSettings: React.FC = () => {
       [name]: value
     });
   };
+
+  const handleNumericInputChange = (name: string, value: number) => {
+    setRestaurantForm({
+      ...restaurantForm,
+      [name]: value
+    });
+  };
   
   const handleHoursChange = (day: string, field: 'open' | 'close', value: string) => {
     setRestaurantForm({
@@ -355,15 +362,10 @@ const RestaurantSettings: React.FC = () => {
                         <Input 
                           id="latitude" 
                           name="latitude" 
-                          value={restaurantForm.latitude} 
-                          onChange={(e) => handleInputChange({
-                            ...e,
-                            target: {
-                              ...e.target,
-                              name: 'latitude',
-                              value: parseFloat(e.target.value) || 0
-                            }
-                          } as React.ChangeEvent<HTMLInputElement>)} 
+                          type="number"
+                          step="0.000001"
+                          value={restaurantForm.latitude.toString()} 
+                          onChange={(e) => handleNumericInputChange('latitude', parseFloat(e.target.value) || 0)} 
                         />
                       </div>
                       <div className="space-y-2">
@@ -371,15 +373,10 @@ const RestaurantSettings: React.FC = () => {
                         <Input 
                           id="longitude" 
                           name="longitude" 
-                          value={restaurantForm.longitude} 
-                          onChange={(e) => handleInputChange({
-                            ...e,
-                            target: {
-                              ...e.target,
-                              name: 'longitude',
-                              value: parseFloat(e.target.value) || 0
-                            }
-                          } as React.ChangeEvent<HTMLInputElement>)} 
+                          type="number"
+                          step="0.000001"
+                          value={restaurantForm.longitude.toString()} 
+                          onChange={(e) => handleNumericInputChange('longitude', parseFloat(e.target.value) || 0)} 
                         />
                       </div>
                     </div>
