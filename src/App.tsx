@@ -7,6 +7,7 @@ import { AppProvider, useAppContext } from "./context/AppContext";
 
 // Pages - Authentication
 import LoginPage from "./pages/LoginPage";
+import LandingPage from "./pages/LandingPage";
 
 // Pages - Customer View
 import Index from "./pages/Index";
@@ -59,14 +60,15 @@ const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={
         isAuthenticated ? 
-          (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/" />) 
+          (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/home" />) 
           : <LoginPage />
       } />
       
       {/* Customer Routes */}
-      <Route path="/" element={
+      <Route path="/home" element={
         <CustomerRoute>
           <Index />
         </CustomerRoute>
