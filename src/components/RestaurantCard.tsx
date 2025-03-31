@@ -34,12 +34,7 @@ const RestaurantCard: React.FC<RestaurantCardProps> = ({ restaurant }) => {
           alt={restaurant.name}
           className={`w-full ${isMobile ? 'aspect-[15/8]' : 'aspect-[16/9]'} object-cover`}
         />
-        {/* Banner only shown on mobile screens */}
-        {isMobile && (
-          <div className="absolute top-2 left-2 bg-blue-500 text-white px-2 py-1 rounded-full text-xs">
-            14 days of $0 delivery fees
-          </div>
-        )}
+        {/* Banner removed from both mobile and desktop */}
       </div>
       <div className={`${isMobile ? 'px-2 py-2' : 'p-3'}`}>
         <h3 className={`font-bold ${isMobile ? 'text-xs' : 'text-base'} line-clamp-1 font-arial`}>{restaurant.name}</h3>
