@@ -90,7 +90,10 @@ const Cart: React.FC = () => {
           <span className="font-medium">Total</span>
           <span className="font-semibold">${total.toFixed(2)}</span>
         </div>
-        <Button className="w-full bg-brand-orange hover:bg-orange-600" onClick={placeOrder}>
+        <Button 
+          className="w-full bg-brand-orange hover:bg-orange-600" 
+          onClick={() => selectedRestaurant && placeOrder(selectedRestaurant.id)}
+        >
           Place Order
         </Button>
       </CardFooter>

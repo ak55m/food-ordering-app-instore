@@ -57,6 +57,7 @@ const RestaurantMenuManagement: React.FC = () => {
     }
     
     addCategory({
+      id: Date.now().toString(), // Add the required id property
       name: newCategoryName,
       restaurantId
     });
@@ -114,6 +115,7 @@ const RestaurantMenuManagement: React.FC = () => {
     }
     
     addMenuItem({
+      id: Date.now().toString(), // Add the required id property
       name: menuItemForm.name,
       description: menuItemForm.description,
       price,

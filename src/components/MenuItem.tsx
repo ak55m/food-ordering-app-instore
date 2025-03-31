@@ -14,7 +14,8 @@ const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
   const { addToCart } = useAppContext();
   
   const handleAddToCart = () => {
-    addToCart(item);
+    // Convert MenuItem to CartItem and then add to cart
+    addToCart({ menuItem: item, quantity: 1 });
   };
 
   return (

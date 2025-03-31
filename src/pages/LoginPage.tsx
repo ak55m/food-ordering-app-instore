@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-import { useAppContext } from "@/context/AppContext";
+import { useAppContext, UserRole } from "@/context/AppContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -22,13 +22,13 @@ const LoginPage = () => {
   const testCustomer = {
     email: "customer@example.com",
     password: "password123",
-    role: "customer"
+    role: "customer" as UserRole
   };
 
   const testRestaurantOwner = {
     email: "owner@example.com",
     password: "password123",
-    role: "restaurant_owner"
+    role: "restaurant_owner" as UserRole
   };
 
   const handleLogin = (e: React.FormEvent) => {
