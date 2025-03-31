@@ -95,10 +95,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   });
   
   const login = async (email: string, password: string): Promise<void> => {
-    setIsLoading({ ...isLoading, auth: true });
-    
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Simulate loading
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       if (email === 'customer@example.com' && password === 'password123') {
         const user: User = {
@@ -129,8 +128,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Failed to login');
-    } finally {
-      setIsLoading({ ...isLoading, auth: false });
+      throw error; // Rethrow to be caught in LoginPage
     }
   };
   

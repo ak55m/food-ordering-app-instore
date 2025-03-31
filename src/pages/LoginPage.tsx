@@ -17,7 +17,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  const { user, setUser, isAuthenticated } = useAppContext();
+  const { user, setUser, isAuthenticated, login } = useAppContext();
 
   // Test user credentials
   const testCustomer = {
@@ -48,63 +48,8 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      // For demo purposes, we'll check against our predefined test users
-      // In a real app, this would check against Supabase auth
-      if (email === testCustomer.email && password === testCustomer.password) {
-        // In a real app with Supabase, this would be:
-        // const { data, error } = await supabase.auth.signInWithPassword({
-        //   email,
-        //   password
-        // });
-        
-        const customerUser = {
-          id: "cust-123",
-          name: "Test Customer",
-          email: testCustomer.email,
-          role: testCustomer.role
-        };
-        
-        setUser(customerUser);
-        
-        if (rememberMe) {
-          // Save user info to localStorage for "remember me" functionality
-          localStorage.setItem('user', JSON.stringify(customerUser));
-        }
-        
-        toast.success("Login successful", {
-          description: "Welcome back, Test Customer!"
-        });
-        
-        navigate("/");
-      } 
-      // Check if credentials match test restaurant owner
-      else if (email === testRestaurantOwner.email && password === testRestaurantOwner.password) {
-        const ownerUser = {
-          id: "owner-123",
-          name: "Test Restaurant Owner",
-          email: testRestaurantOwner.email,
-          role: testRestaurantOwner.role,
-          restaurantId: "rest1"
-        };
-        
-        setUser(ownerUser);
-        
-        if (rememberMe) {
-          localStorage.setItem('user', JSON.stringify(ownerUser));
-        }
-        
-        toast.success("Login successful", {
-          description: "Welcome back, Test Restaurant Owner!"
-        });
-        
-        navigate("/restaurant");
-      } 
-      else {
-        // Login failed
-        toast.error("Login failed", {
-          description: "Please check your credentials and try again."
-        });
-      }
+      // Use the login function from context instead of handling it here
+      await login(email, password);
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed", {
