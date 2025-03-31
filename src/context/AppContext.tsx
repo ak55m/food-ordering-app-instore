@@ -1,701 +1,397 @@
-import { createContext, useState, useContext, ReactNode, useEffect } from "react";
-import { toast } from "sonner";
-import * as databaseService from "@/services/databaseService";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { toast } from 'sonner';
+import { geocodeCoordinates } from '@/lib/geocoding';
+import { Restaurant, MenuItem, CartItem, Order, User } from '@/types';
+import { mockRestaurants, mockMenuItems } from '@/data/mockData';
 
-// Types definitions
-export type UserRole = "customer" | "restaurant_owner" | null;
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: UserRole;
-}
-
-export interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image?: string;
-  categoryId: string;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  restaurantId: string;
-}
-
-export interface CartItem {
-  menuItem: MenuItem;
-  quantity: number;
-}
-
-export interface OpeningHours {
-  open: string;
-  close: string;
-  isOpen: boolean;
-}
-
-export interface RestaurantOpeningHours {
-  monday: OpeningHours;
-  tuesday: OpeningHours;
-  wednesday: OpeningHours;
-  thursday: OpeningHours;
-  friday: OpeningHours;
-  saturday: OpeningHours;
-  sunday: OpeningHours;
-}
-
-export interface SocialMedia {
-  facebook: string;
-  instagram: string;
-  twitter: string;
-}
-
-export interface Restaurant {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-  address: string;
-  latitude?: number;
-  longitude?: number;
-  phone?: string;
-  email?: string;
-  rating: number;
-  deliveryTime: string;
-  distance?: string;
-  categories: string[];
-  ownerId?: string;
-  openingHours?: RestaurantOpeningHours;
-  socialMedia?: SocialMedia;
-  logo?: string;
-  coverImage?: string;
-  isActive?: boolean;
-  acceptsOnlineOrders?: boolean;
-}
-
-export interface Location {
-  lat: number;
-  lng: number;
-  address: string;
-}
-
-export type OrderStatus = "pending" | "preparing" | "ready" | "completed";
-
-export interface Order {
-  id: string;
-  restaurantId: string;
-  restaurantName: string;
-  userId: string;
-  items: CartItem[];
-  status: OrderStatus;
-  timestamp: Date;
-  total: number;
-  paymentMethod: 'credit_card' | 'cash';
-}
-
+// Define the shape of our context
 interface AppContextType {
-  // Cart related
-  cart: CartItem[];
-  addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string) => void;
-  clearCart: () => void;
-  updateCartItemQuantity: (itemId: string, quantity: number) => void;
-  
-  // User related
+  // Authentication
   user: User | null;
-  setUser: (user: User | null) => void;
-  logout: () => void;
   isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
   
-  // Location related
+  // Location
   locationEnabled: boolean;
-  userLocation: Location;
+  userLocation: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  };
   requestLocation: () => Promise<void>;
   
-  // Restaurant related
-  restaurants: Restaurant[];
+  // Restaurants
   nearbyRestaurants: Restaurant[];
   selectedRestaurant: Restaurant | null;
-  setSelectedRestaurant: (restaurant: Restaurant | null) => void;
-  getRestaurantById: (id: string) => Restaurant | undefined;
-  updateRestaurant: (restaurant: Restaurant) => void;
+  selectRestaurant: (id: string) => void;
   
-  // Menu related
-  categories: Category[];
+  // Menu Items
   menuItems: MenuItem[];
-  getRestaurantCategories: (restaurantId: string) => Category[];
-  getCategoryMenuItems: (categoryId: string) => MenuItem[];
-  addMenuItem: (item: MenuItem) => void;
-  updateMenuItem: (item: MenuItem) => void;
-  deleteMenuItem: (id: string) => void;
-  addCategory: (category: Category) => void;
-  updateCategory: (category: Category) => void;
-  deleteCategory: (id: string) => void;
   
-  // Order related
+  // Cart
+  cart: CartItem[];
+  addToCart: (menuItem: MenuItem) => void;
+  updateCartItemQuantity: (menuItemId: string, quantity: number) => void;
+  removeFromCart: (menuItemId: string) => void;
+  clearCart: () => void;
+  
+  // Orders
   orders: Order[];
-  placeOrder: (restaurantId: string, paymentMethod: 'credit_card' | 'cash') => void;
-  updateOrderStatus: (orderId: string, status: OrderStatus) => void;
+  placeOrder: (restaurantId: string, paymentMethod: 'credit_card' | 'cash') => Promise<void>;
   
-  // Loading states
+  // Loading States
   isLoading: {
+    auth: boolean;
+    location: boolean;
     restaurants: boolean;
-    categories: boolean;
     menuItems: boolean;
     orders: boolean;
-    location: boolean;
   };
 }
 
+// Create the context with a default value
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const AppProvider = ({ children }: { children: ReactNode }) => {
-  // State for cart
+// Provider component
+export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Authentication state
+  const [user, setUser] = useState<User | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  
+  // Location state
+  const [locationEnabled, setLocationEnabled] = useState<boolean>(false);
+  const [userLocation, setUserLocation] = useState({
+    latitude: 0,
+    longitude: 0,
+    address: '',
+  });
+  
+  // Restaurant state
+  const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurant[]>([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  
+  // Menu items state
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  
+  // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
   
-  // State for user
-  const [user, setUser] = useState<User | null>(null);
+  // Orders state
+  const [orders, setOrders] = useState<Order[]>([]);
   
-  // State for location
-  const [locationEnabled, setLocationEnabled] = useState<boolean>(false);
-  const [userLocation, setUserLocation] = useState<Location>({ lat: 0, lng: 0, address: "" });
-  
-  // State for restaurants
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([
-    {
-      id: "1",
-      name: "Burger Palace",
-      description: "Best burgers in town",
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      address: "750 Synergy Park Drive, Richardson, TX 75080",
-      latitude: 32.986837,
-      longitude: -96.750879,
-      rating: 4.5,
-      deliveryTime: "15-25 min",
-      distance: "1.2 miles",
-      categories: ["Burgers", "Fast Food"],
-      phone: "(555) 123-4567",
-      email: "contact@burgerpalace.com",
-      openingHours: {
-        monday: { open: "09:00", close: "22:00", isOpen: true },
-        tuesday: { open: "09:00", close: "22:00", isOpen: true },
-        wednesday: { open: "09:00", close: "22:00", isOpen: true },
-        thursday: { open: "09:00", close: "22:00", isOpen: true },
-        friday: { open: "09:00", close: "23:00", isOpen: true },
-        saturday: { open: "10:00", close: "23:00", isOpen: true },
-        sunday: { open: "10:00", close: "22:00", isOpen: true },
-      },
-      socialMedia: {
-        facebook: "https://facebook.com/burgerpalace",
-        instagram: "https://instagram.com/burgerpalace",
-        twitter: "https://twitter.com/burgerpalace",
-      },
-      logo: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      coverImage: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      isActive: true,
-      acceptsOnlineOrders: true
-    },
-    {
-      id: "2",
-      name: "Pizza Heaven",
-      description: "Authentic Italian pizzas",
-      image: "https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3",
-      address: "456 Oak Ave",
-      latitude: 40.7300,
-      longitude: -73.9950,
-      rating: 4.7,
-      deliveryTime: "20-30 min",
-      distance: "2.5 miles",
-      categories: ["Pizza", "Italian"]
-    }
-  ]);
-  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurant[]>([]);
-  
-  // State for menu
-  const [categories, setCategories] = useState<Category[]>([
-    { id: "1", name: "Burgers", restaurantId: "1" },
-    { id: "2", name: "Sides", restaurantId: "1" },
-    { id: "3", name: "Pizzas", restaurantId: "2" },
-    { id: "4", name: "Pastas", restaurantId: "2" }
-  ]);
-  
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([
-    { id: "1", name: "Classic Burger", description: "Beef patty with lettuce and tomato", price: 8.99, categoryId: "1" },
-    { id: "2", name: "Cheese Burger", description: "Classic with cheddar cheese", price: 9.99, categoryId: "1" },
-    { id: "3", name: "French Fries", description: "Crispy golden fries", price: 3.99, categoryId: "2" },
-    { id: "4", name: "Margherita", description: "Tomato sauce, mozzarella, and basil", price: 12.99, categoryId: "3" },
-    { id: "5", name: "Pepperoni", description: "Tomato sauce, mozzarella, and pepperoni", price: 14.99, categoryId: "3" },
-    { id: "6", name: "Spaghetti Bolognese", description: "Pasta with meat sauce", price: 11.99, categoryId: "4" }
-  ]);
-  
-  // State for orders - initialize with a test order
-  const [orders, setOrders] = useState<Order[]>([
-    {
-      id: "test-order-123",
-      restaurantId: "1",
-      restaurantName: "Burger Palace",
-      userId: "user-123",
-      items: [
-        {
-          menuItem: {
-            id: "1",
-            name: "Classic Burger",
-            description: "Beef patty with lettuce and tomato",
-            price: 8.99,
-            categoryId: "1"
-          },
-          quantity: 2
-        },
-        {
-          menuItem: {
-            id: "3",
-            name: "French Fries",
-            description: "Crispy golden fries",
-            price: 3.99,
-            categoryId: "2"
-          },
-          quantity: 1
-        }
-      ],
-      status: "pending",
-      timestamp: new Date(),
-      total: 21.97,
-      paymentMethod: 'credit_card'
-    }
-  ]);
-
-  // Cart functions
-  const addToCart = (item: CartItem) => {
-    setCart((prev) => {
-      // Check if the item already exists in cart
-      const existingItemIndex = prev.findIndex(
-        (cartItem) => cartItem.menuItem.id === item.menuItem.id
-      );
-      
-      if (existingItemIndex >= 0) {
-        // Update quantity if item exists
-        const updatedCart = [...prev];
-        updatedCart[existingItemIndex].quantity += item.quantity;
-        return updatedCart;
-      } else {
-        // Add new item if it doesn't exist
-        return [...prev, item];
-      }
-    });
-  };
-
-  const removeFromCart = (id: string) => {
-    setCart((prev) => prev.filter((item) => item.menuItem.id !== id));
-  };
-
-  const updateCartItemQuantity = (itemId: string, quantity: number) => {
-    setCart((prev) => 
-      prev.map(item => 
-        item.menuItem.id === itemId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const clearCart = () => {
-    setCart([]);
-  };
-
-  // User functions
-  const logout = () => {
-    setUser(null);
-  };
-
-  // Location functions
-  const requestLocation = async (): Promise<void> => {
-    setIsLoading(prev => ({ ...prev, location: true }));
-    
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        setIsLoading(prev => ({ ...prev, location: false }));
-        reject(new Error("Geolocation is not supported by your browser"));
-        return;
-      }
-      
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          try {
-            const { latitude, lng } = position.coords;
-            
-            // Reverse geocoding to get address from coordinates
-            // In a real app, you'd use a geocoding service like Google Maps API
-            // For now, we'll set a hardcoded address
-            const newLocation = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-              address: "Current Location", // This would be replaced with actual address from geocoding
-            };
-            
-            setLocationEnabled(true);
-            setUserLocation(newLocation);
-            
-            // In a real app, we would filter restaurants by distance from user's location
-            // For now, we'll simulate by adding a calculated distance property
-            const nearbyWithDistance = restaurants.map(restaurant => {
-              if (!restaurant.latitude || !restaurant.longitude) {
-                return { ...restaurant, distance: "Unknown" };
-              }
-              
-              // Calculate distance between user and restaurant (haversine formula)
-              const R = 6371; // Radius of the earth in km
-              const dLat = deg2rad(restaurant.latitude - newLocation.lat);
-              const dLon = deg2rad(restaurant.longitude - newLocation.lng); 
-              const a = 
-                Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(deg2rad(newLocation.lat)) * Math.cos(deg2rad(restaurant.latitude)) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2); 
-              const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-              const distance = R * c; // Distance in km
-              
-              // Format distance for display
-              const formattedDistance = distance < 1 ? 
-                `${Math.round(distance * 1000)} m` : 
-                `${distance.toFixed(1)} km`;
-                
-              return { ...restaurant, distance: formattedDistance };
-            });
-            
-            // Sort by distance (ascending)
-            nearbyWithDistance.sort((a, b) => {
-              if (!a.distance || a.distance === "Unknown") return 1;
-              if (!b.distance || b.distance === "Unknown") return -1;
-              
-              const distA = parseFloat(a.distance);
-              const distB = parseFloat(b.distance);
-              
-              return distA - distB;
-            });
-            
-            setNearbyRestaurants(nearbyWithDistance);
-            setIsLoading(prev => ({ ...prev, location: false }));
-            resolve();
-          } catch (error) {
-            setIsLoading(prev => ({ ...prev, location: false }));
-            reject(error);
-          }
-        },
-        (error) => {
-          setIsLoading(prev => ({ ...prev, location: false }));
-          let errorMessage;
-          
-          switch(error.code) {
-            case error.PERMISSION_DENIED:
-              errorMessage = "Location permission denied";
-              break;
-            case error.POSITION_UNAVAILABLE:
-              errorMessage = "Location information is unavailable";
-              break;
-            case error.TIMEOUT:
-              errorMessage = "Location request timed out";
-              break;
-            default:
-              errorMessage = "An unknown error occurred";
-          }
-          
-          reject(new Error(errorMessage));
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
-        }
-      );
-    });
-  };
-
-  // Helper function to convert degrees to radians for distance calculation
-  const deg2rad = (deg: number): number => {
-    return deg * (Math.PI/180);
-  };
-
-  // Restaurant functions
-  const getRestaurantById = (id: string) => {
-    return restaurants.find(restaurant => restaurant.id === id);
-  };
-
-  const updateRestaurant = async (updatedRestaurant: Restaurant) => {
-    try {
-      const result = await databaseService.updateRestaurant(updatedRestaurant);
-      if (result) {
-        setRestaurants(prev => 
-          prev.map(restaurant => 
-            restaurant.id === updatedRestaurant.id ? { ...restaurant, ...updatedRestaurant } : restaurant
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error updating restaurant:', error);
-    }
-  };
-
-  // Menu functions
-  const getRestaurantCategories = (restaurantId: string) => {
-    return categories.filter(category => category.restaurantId === restaurantId);
-  };
-
-  const getCategoryMenuItems = (categoryId: string) => {
-    return menuItems.filter(item => item.categoryId === categoryId);
-  };
-
-  const addMenuItem = async (item: MenuItem) => {
-    try {
-      const newItem = { ...item, id: Date.now().toString() };
-      const result = await databaseService.createMenuItem(newItem);
-      if (result) {
-        setMenuItems(prev => [...prev, result]);
-      }
-    } catch (error) {
-      console.error('Error adding menu item:', error);
-    }
-  };
-
-  const updateMenuItem = async (updatedItem: MenuItem) => {
-    try {
-      const result = await databaseService.updateMenuItem(updatedItem);
-      if (result) {
-        setMenuItems(prev => 
-          prev.map(item => 
-            item.id === updatedItem.id ? updatedItem : item
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error updating menu item:', error);
-    }
-  };
-
-  const deleteMenuItem = async (id: string) => {
-    try {
-      const result = await databaseService.deleteMenuItem(id);
-      if (result) {
-        setMenuItems(prev => prev.filter(item => item.id !== id));
-      }
-    } catch (error) {
-      console.error('Error deleting menu item:', error);
-    }
-  };
-
-  const addCategory = async (category: Category) => {
-    try {
-      const newCategory = { ...category, id: Date.now().toString() };
-      const result = await databaseService.createCategory(newCategory);
-      if (result) {
-        setCategories(prev => [...prev, result]);
-      }
-    } catch (error) {
-      console.error('Error adding category:', error);
-    }
-  };
-
-  const updateCategory = async (updatedCategory: Category) => {
-    try {
-      const result = await databaseService.updateCategory(updatedCategory);
-      if (result) {
-        setCategories(prev => 
-          prev.map(category => 
-            category.id === updatedCategory.id ? updatedCategory : category
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error updating category:', error);
-    }
-  };
-
-  const deleteCategory = async (id: string) => {
-    try {
-      const result = await databaseService.deleteCategory(id);
-      if (result) {
-        setCategories(prev => prev.filter(category => category.id !== id));
-      }
-    } catch (error) {
-      console.error('Error deleting category:', error);
-    }
-  };
-
-  // Order functions
-  const placeOrder = async (restaurantId: string, paymentMethod: 'credit_card' | 'cash' = 'credit_card') => {
-    if (cart.length === 0 || !user) return;
-    
-    const restaurant = getRestaurantById(restaurantId);
-    if (!restaurant) return;
-    
-    const newOrder: Order = {
-      id: `order-${Date.now()}`,
-      restaurantId,
-      restaurantName: restaurant.name,
-      userId: user.id,
-      items: [...cart],
-      status: "pending",
-      timestamp: new Date(),
-      total: cart.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0),
-      paymentMethod
-    };
-    
-    try {
-      const result = await databaseService.placeOrder(newOrder);
-      if (result) {
-        setOrders(prev => [...prev, newOrder]);
-        clearCart();
-        toast.success(`Order placed successfully! ${paymentMethod === 'cash' ? 'Please pay at pickup.' : 'Payment processed.'}`);
-      }
-    } catch (error) {
-      console.error('Error placing order:', error);
-      toast.error(`Failed to place order: ${error.message}`);
-    }
-  };
-
-  const updateOrderStatus = async (orderId: string, status: OrderStatus) => {
-    try {
-      const result = await databaseService.updateOrderStatus(orderId, status);
-      if (result) {
-        setOrders(prev => 
-          prev.map(order => 
-            order.id === orderId ? { ...order, status } : order
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error updating order status:', error);
-    }
-  };
-
-  // Fetch restaurants from database when component mounts
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      setIsLoading(prev => ({ ...prev, restaurants: true }));
-      try {
-        const fetchedRestaurants = await databaseService.getRestaurants();
-        if (fetchedRestaurants.length > 0) {
-          setRestaurants(fetchedRestaurants);
-          setNearbyRestaurants(fetchedRestaurants); // For demo, show all
-        }
-      } catch (error) {
-        console.error("Error fetching restaurants:", error);
-        // Keep the default demo restaurants if fetching fails
-      } finally {
-        setIsLoading(prev => ({ ...prev, restaurants: false }));
-      }
-    };
-
-    fetchRestaurants();
-  }, []);
-
-  // Fetch categories and menu items when selected restaurant changes
-  useEffect(() => {
-    if (selectedRestaurant) {
-      const fetchCategoriesAndMenuItems = async () => {
-        setIsLoading(prev => ({ ...prev, categories: true }));
-        try {
-          const fetchedCategories = await databaseService.getCategories(selectedRestaurant.id);
-          if (fetchedCategories.length > 0) {
-            setCategories(fetchedCategories);
-            
-            // Fetch menu items for each category
-            const allMenuItems = [];
-            setIsLoading(prev => ({ ...prev, menuItems: true }));
-            
-            for (const category of fetchedCategories) {
-              const items = await databaseService.getMenuItems(category.id);
-              allMenuItems.push(...items);
-            }
-            
-            setMenuItems(allMenuItems);
-          }
-        } catch (error) {
-          console.error("Error fetching categories and menu items:", error);
-        } finally {
-          setIsLoading(prev => ({ ...prev, categories: false, menuItems: false }));
-        }
-      };
-
-      fetchCategoriesAndMenuItems();
-    }
-  }, [selectedRestaurant]);
-
-  // Fetch orders when user changes
-  useEffect(() => {
-    if (user) {
-      const fetchOrders = async () => {
-        setIsLoading(prev => ({ ...prev, orders: true }));
-        try {
-          const fetchedOrders = await databaseService.getOrders(user.id, user.role);
-          setOrders(fetchedOrders);
-        } catch (error) {
-          console.error("Error fetching orders:", error);
-        } finally {
-          setIsLoading(prev => ({ ...prev, orders: false }));
-        }
-      };
-
-      fetchOrders();
-    }
-  }, [user]);
-
   // Loading states
   const [isLoading, setIsLoading] = useState({
+    auth: false,
+    location: false,
     restaurants: false,
-    categories: false,
     menuItems: false,
     orders: false,
-    location: false,
   });
-
+  
+  // Authentication methods
+  const login = async (email: string, password: string): Promise<void> => {
+    setIsLoading({ ...isLoading, auth: true });
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock authentication logic
+      if (email === 'user@example.com' && password === 'password') {
+        const user: User = {
+          id: '1',
+          email: 'user@example.com',
+          name: 'John Doe',
+          role: 'customer',
+        };
+        setUser(user);
+        setIsAuthenticated(true);
+        localStorage.setItem('user', JSON.stringify(user));
+        toast.success('Logged in successfully!');
+      } else if (email === 'restaurant@example.com' && password === 'password') {
+        const user: User = {
+          id: '2',
+          email: 'restaurant@example.com',
+          name: 'Restaurant Owner',
+          role: 'restaurant_owner',
+          restaurantId: 'rest1',
+        };
+        setUser(user);
+        setIsAuthenticated(true);
+        localStorage.setItem('user', JSON.stringify(user));
+        toast.success('Logged in successfully!');
+      } else {
+        toast.error('Invalid email or password');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      toast.error('Failed to login');
+    } finally {
+      setIsLoading({ ...isLoading, auth: false });
+    }
+  };
+  
+  const logout = (): void => {
+    setUser(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('user');
+    setCart([]);
+    toast.success('Logged out successfully');
+  };
+  
+  // Location methods
+  const requestLocation = async (): Promise<void> => {
+    setIsLoading({ ...isLoading, location: true });
+    
+    try {
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0
+        });
+      });
+      
+      const { latitude, longitude } = position.coords;
+      
+      // Get address from coordinates
+      const address = await geocodeCoordinates(latitude, longitude);
+      
+      // Update user location
+      const newUserLocation = {
+        latitude,
+        longitude,
+        address: address || 'Unknown location'
+      };
+      
+      setUserLocation(newUserLocation);
+      setLocationEnabled(true);
+      
+      // Fetch restaurants near this location
+      await fetchNearbyRestaurants(latitude, longitude);
+      
+    } catch (error) {
+      console.error('Error getting location:', error);
+      toast.error('Could not access your location');
+      throw error;
+    } finally {
+      setIsLoading({ ...isLoading, location: false });
+    }
+  };
+  
+  // Restaurant methods
+  const fetchNearbyRestaurants = async (latitude: number, longitude: number): Promise<void> => {
+    setIsLoading({ ...isLoading, restaurants: true });
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // For now, return mock data
+      setNearbyRestaurants(mockRestaurants);
+    } catch (error) {
+      console.error('Error fetching restaurants:', error);
+      toast.error('Failed to fetch nearby restaurants');
+    } finally {
+      setIsLoading({ ...isLoading, restaurants: false });
+    }
+  };
+  
+  const selectRestaurant = (id: string): void => {
+    const restaurant = nearbyRestaurants.find(r => r.id === id) || null;
+    setSelectedRestaurant(restaurant);
+    
+    if (restaurant) {
+      // Fetch menu items for this restaurant
+      fetchMenuItems(id);
+    }
+  };
+  
+  // Menu items methods
+  const fetchMenuItems = async (restaurantId: string): Promise<void> => {
+    setIsLoading({ ...isLoading, menuItems: true });
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Filter mock menu items by restaurant ID
+      const items = mockMenuItems.filter(item => item.restaurantId === restaurantId);
+      setMenuItems(items);
+    } catch (error) {
+      console.error('Error fetching menu items:', error);
+      toast.error('Failed to fetch menu items');
+    } finally {
+      setIsLoading({ ...isLoading, menuItems: false });
+    }
+  };
+  
+  // Cart methods
+  const addToCart = (menuItem: MenuItem): void => {
+    // Check if we're adding an item from a different restaurant
+    if (cart.length > 0) {
+      const firstItem = cart[0];
+      const firstItemDetails = menuItems.find(item => item.id === firstItem.menuItem.id);
+      
+      if (firstItemDetails && firstItemDetails.restaurantId !== menuItem.restaurantId) {
+        // Ask user if they want to clear cart
+        if (window.confirm('Adding items from a different restaurant will clear your current cart. Continue?')) {
+          setCart([{ menuItem, quantity: 1 }]);
+          toast.success(`Added ${menuItem.name} to cart`);
+        }
+        return;
+      }
+    }
+    
+    // Check if item already exists in cart
+    const existingItemIndex = cart.findIndex(item => item.menuItem.id === menuItem.id);
+    
+    if (existingItemIndex >= 0) {
+      // Update quantity of existing item
+      const updatedCart = [...cart];
+      updatedCart[existingItemIndex].quantity += 1;
+      setCart(updatedCart);
+    } else {
+      // Add new item to cart
+      setCart([...cart, { menuItem, quantity: 1 }]);
+    }
+    
+    toast.success(`Added ${menuItem.name} to cart`);
+  };
+  
+  const updateCartItemQuantity = (menuItemId: string, quantity: number): void => {
+    if (quantity <= 0) {
+      removeFromCart(menuItemId);
+      return;
+    }
+    
+    const updatedCart = cart.map(item => 
+      item.menuItem.id === menuItemId ? { ...item, quantity } : item
+    );
+    
+    setCart(updatedCart);
+  };
+  
+  const removeFromCart = (menuItemId: string): void => {
+    const updatedCart = cart.filter(item => item.menuItem.id !== menuItemId);
+    setCart(updatedCart);
+    toast.success('Item removed from cart');
+  };
+  
+  const clearCart = (): void => {
+    setCart([]);
+  };
+  
+  // Order methods
+  const placeOrder = async (restaurantId: string, paymentMethod: 'credit_card' | 'cash'): Promise<void> => {
+    if (!user) {
+      toast.error('You must be logged in to place an order');
+      return;
+    }
+    
+    if (cart.length === 0) {
+      toast.error('Your cart is empty');
+      return;
+    }
+    
+    setIsLoading({ ...isLoading, orders: true });
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Create new order
+      const newOrder: Order = {
+        id: `order-${Date.now()}`,
+        userId: user.id,
+        restaurantId,
+        items: [...cart],
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        total: cart.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0),
+        paymentMethod,
+        paymentStatus: paymentMethod === 'credit_card' ? 'paid' : 'pending',
+      };
+      
+      // Add order to state
+      setOrders([newOrder, ...orders]);
+      
+      // Clear cart
+      clearCart();
+      
+      toast.success('Order placed successfully!');
+    } catch (error) {
+      console.error('Error placing order:', error);
+      toast.error('Failed to place order');
+    } finally {
+      setIsLoading({ ...isLoading, orders: false });
+    }
+  };
+  
+  // Load user from localStorage on mount
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error parsing stored user:', error);
+        localStorage.removeItem('user');
+      }
+    }
+  }, []);
+  
+  // Context value
+  const contextValue: AppContextType = {
+    // Authentication
+    user,
+    isAuthenticated,
+    login,
+    logout,
+    
+    // Location
+    locationEnabled,
+    userLocation,
+    requestLocation,
+    
+    // Restaurants
+    nearbyRestaurants,
+    selectedRestaurant,
+    selectRestaurant,
+    
+    // Menu Items
+    menuItems,
+    
+    // Cart
+    cart,
+    addToCart,
+    updateCartItemQuantity,
+    removeFromCart,
+    clearCart,
+    
+    // Orders
+    orders,
+    placeOrder,
+    
+    // Loading States
+    isLoading,
+  };
+  
   return (
-    <AppContext.Provider
-      value={{
-        cart,
-        addToCart,
-        removeFromCart,
-        clearCart,
-        updateCartItemQuantity,
-        user,
-        setUser,
-        logout,
-        isAuthenticated: !!user,
-        locationEnabled,
-        userLocation,
-        requestLocation,
-        restaurants,
-        nearbyRestaurants,
-        selectedRestaurant,
-        setSelectedRestaurant,
-        getRestaurantById,
-        updateRestaurant,
-        categories,
-        menuItems,
-        getRestaurantCategories,
-        getCategoryMenuItems,
-        addMenuItem,
-        updateMenuItem,
-        deleteMenuItem,
-        addCategory,
-        updateCategory,
-        deleteCategory,
-        orders,
-        placeOrder,
-        updateOrderStatus,
-        isLoading
-      }}
-    >
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );
 };
 
-export const useAppContext = () => {
+// Custom hook to use the context
+export const useAppContext = (): AppContextType => {
   const context = useContext(AppContext);
   if (context === undefined) {
-    throw new Error("useAppContext must be used within an AppProvider");
+    throw new Error('useAppContext must be used within an AppProvider');
   }
   return context;
 };

@@ -12,6 +12,7 @@ import LoginPage from "./pages/LoginPage";
 import Index from "./pages/Index";
 import RestaurantDetail from "./pages/RestaurantDetail";
 import OrdersPage from "./pages/OrdersPage";
+import CartPage from "./pages/CartPage";  // Import the CartPage component
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
@@ -65,6 +66,11 @@ const AppRoutes = () => {
       <Route path="/orders" element={
         <CustomerRoute>
           <OrdersPage />
+        </CustomerRoute>
+      } />
+      <Route path="/cart" element={
+        <CustomerRoute>
+          <CartPage />
         </CustomerRoute>
       } />
       <Route path="/profile" element={
