@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, LayoutDashboard, Menu, BarChart3, Settings, Store, LogOut } from 'lucide-react';
@@ -12,6 +12,7 @@ interface RestaurantSidebarProps {
 
 const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { logout } = useAppContext();
 
   const handleLogout = () => {
@@ -46,9 +47,13 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
     }
   ];
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <SidebarProvider>
-      <Sidebar className="border-r border-gray-200">
+      <Sidebar className="border-r border-gray-200 z-10">
         <SidebarHeader className="px-4 py-6 border-b border-gray-200">
           <div className="flex items-center">
             <h2 className="text-lg font-bold text-cyan-500">Restaurant Portal</h2>
@@ -64,7 +69,7 @@ const RestaurantSidebar: React.FC<RestaurantSidebarProps> = ({ activePage }) => 
                 className={`w-full text-left px-3 py-2 rounded-md hover:bg-gray-100 flex justify-between items-center ${
                   item.active ? 'bg-ebf7fd text-cyan-500 font-medium' : 'text-gray-700'
                 }`}
-                onClick={() => navigate(item.path)}
+                onClick={() => handleNavigation(item.path)}
               >
                 <span className="flex items-center">
                   {item.icon}

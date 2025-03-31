@@ -111,7 +111,7 @@ const RestaurantDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex flex-col md:flex-row">
-      <div className="hidden md:block">
+      <div className="hidden md:block md:w-64">
         <RestaurantSidebar activePage="dashboard" />
       </div>
       

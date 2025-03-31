@@ -17,7 +17,7 @@ import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 // Pages - Restaurant Owner View
-import RestaurantOwnerDashboard from "./pages/RestaurantOwnerDashboard";
+import RestaurantDashboard from "./pages/RestaurantDashboard";
 import RestaurantMenuManagement from "./pages/RestaurantMenuManagement";
 import RestaurantAnalytics from "./pages/RestaurantAnalytics";
 import RestaurantSettings from "./pages/RestaurantSettings";
@@ -77,7 +77,7 @@ const AppRoutes = () => {
       {/* Restaurant Owner Routes */}
       <Route path="/restaurant" element={
         <RestaurantRoute>
-          <RestaurantOwnerDashboard />
+          <RestaurantDashboard />
         </RestaurantRoute>
       } />
       <Route path="/restaurant/menu" element={
