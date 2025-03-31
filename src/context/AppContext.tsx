@@ -1,8 +1,18 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from 'sonner';
 import { geocodeCoordinates } from '@/lib/geocoding';
-import { Restaurant, MenuItem, CartItem, Order, User } from '@/types';
-import { mockRestaurants, mockMenuItems } from '@/data/mockData';
+import { 
+  Restaurant, MenuItem, CartItem, Order, User, Category, 
+  OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia 
+} from '@/types';
+import { mockRestaurants, mockMenuItems, mockCategories } from '@/data/mockData';
+
+// Re-export types for use by other components
+export type { 
+  Restaurant, MenuItem, CartItem, Order, User, Category,
+  OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia 
+};
 
 // Define the shape of our context
 interface AppContextType {
@@ -40,6 +50,22 @@ interface AppContextType {
   orders: Order[];
   placeOrder: (restaurantId: string, paymentMethod: 'credit_card' | 'cash') => Promise<void>;
   
+  // Restaurant Management
+  restaurants: Restaurant[];
+  categories: Category[];
+  getRestaurantById: (id: string) => Restaurant | null;
+  getRestaurantCategories: (restaurantId: string) => Category[];
+  getCategoryMenuItems: (categoryId: string) => MenuItem[];
+  updateOrderStatus: (orderId: string, newStatus: OrderStatus) => void;
+  addMenuItem: (menuItem: Omit<MenuItem, 'restaurantId'>) => void;
+  updateMenuItem: (menuItem: MenuItem) => void;
+  deleteMenuItem: (menuItemId: string) => void;
+  addCategory: (category: Omit<Category, 'id'>) => void;
+  updateCategory: (category: Category) => void;
+  deleteCategory: (categoryId: string) => void;
+  updateRestaurant: (restaurant: Restaurant) => void;
+  setSelectedRestaurant: (restaurant: Restaurant | null) => void;
+  
   // Loading States
   isLoading: {
     auth: boolean;
@@ -69,10 +95,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
   // Restaurant state
   const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurant[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   
+  // Category state
+  const [categories, setCategories] = useState<Category[]>(mockCategories);
+  
   // Menu items state
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(mockMenuItems);
   
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -199,13 +229,26 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
   
   const selectRestaurant = (id: string): void => {
-    const restaurant = nearbyRestaurants.find(r => r.id === id) || null;
+    const restaurant = restaurants.find(r => r.id === id) || null;
     setSelectedRestaurant(restaurant);
     
     if (restaurant) {
       // Fetch menu items for this restaurant
       fetchMenuItems(id);
     }
+  };
+  
+  const getRestaurantById = (id: string): Restaurant | null => {
+    return restaurants.find(r => r.id === id) || null;
+  };
+  
+  // Update restaurant
+  const updateRestaurant = (restaurant: Restaurant): void => {
+    const updatedRestaurants = restaurants.map(r => 
+      r.id === restaurant.id ? restaurant : r
+    );
+    setRestaurants(updatedRestaurants);
+    toast.success('Restaurant updated successfully');
   };
   
   // Menu items methods
@@ -225,6 +268,63 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } finally {
       setIsLoading({ ...isLoading, menuItems: false });
     }
+  };
+  
+  // Category methods
+  const getRestaurantCategories = (restaurantId: string): Category[] => {
+    return categories.filter(category => category.restaurantId === restaurantId);
+  };
+  
+  const addCategory = (category: Omit<Category, 'id'>): void => {
+    const newCategory: Category = {
+      ...category,
+      id: `cat-${Date.now()}`,
+    };
+    setCategories([...categories, newCategory]);
+  };
+  
+  const updateCategory = (updatedCategory: Category): void => {
+    const newCategories = categories.map(cat => 
+      cat.id === updatedCategory.id ? updatedCategory : cat
+    );
+    setCategories(newCategories);
+  };
+  
+  const deleteCategory = (categoryId: string): void => {
+    setCategories(categories.filter(cat => cat.id !== categoryId));
+  };
+  
+  // Menu Item methods
+  const getCategoryMenuItems = (categoryId: string): MenuItem[] => {
+    return menuItems.filter(item => item.categoryId === categoryId);
+  };
+  
+  const addMenuItem = (menuItem: Omit<MenuItem, 'restaurantId'>): void => {
+    // Find category to get restaurantId
+    const category = categories.find(cat => cat.id === menuItem.categoryId);
+    
+    if (!category) {
+      toast.error('Category not found');
+      return;
+    }
+    
+    const newItem: MenuItem = {
+      ...menuItem,
+      restaurantId: category.restaurantId,
+    };
+    
+    setMenuItems([...menuItems, newItem]);
+  };
+  
+  const updateMenuItem = (updatedItem: MenuItem): void => {
+    const newItems = menuItems.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    );
+    setMenuItems(newItems);
+  };
+  
+  const deleteMenuItem = (menuItemId: string): void => {
+    setMenuItems(menuItems.filter(item => item.id !== menuItemId));
   };
   
   // Cart methods
@@ -301,14 +401,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Get restaurant name
+      const restaurant = restaurants.find(r => r.id === restaurantId);
+      
       // Create new order
       const newOrder: Order = {
         id: `order-${Date.now()}`,
         userId: user.id,
         restaurantId,
+        restaurantName: restaurant?.name,
         items: [...cart],
         status: 'pending',
-        createdAt: new Date().toISOString(),
+        timestamp: new Date(),
         total: cart.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0),
         paymentMethod,
         paymentStatus: paymentMethod === 'credit_card' ? 'paid' : 'pending',
@@ -327,6 +431,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     } finally {
       setIsLoading({ ...isLoading, orders: false });
     }
+  };
+  
+  // Order management for restaurant owners
+  const updateOrderStatus = (orderId: string, newStatus: OrderStatus): void => {
+    const updatedOrders = orders.map(order => 
+      order.id === orderId ? { ...order, status: newStatus } : order
+    );
+    
+    setOrders(updatedOrders);
+    toast.success(`Order status updated to ${newStatus}`);
   };
   
   // Load user from localStorage on mount
@@ -375,6 +489,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Orders
     orders,
     placeOrder,
+    
+    // Restaurant Management
+    restaurants,
+    categories,
+    getRestaurantById,
+    getRestaurantCategories,
+    getCategoryMenuItems,
+    updateOrderStatus,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    updateRestaurant,
+    setSelectedRestaurant,
     
     // Loading States
     isLoading,

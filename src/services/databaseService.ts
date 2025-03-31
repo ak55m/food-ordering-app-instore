@@ -1,5 +1,4 @@
-
-import { Restaurant, User, Category, MenuItem, Order, CartItem } from '@/context/AppContext';
+import { Restaurant, User, Category, MenuItem, Order, CartItem } from '@/types';
 import { toast } from 'sonner';
 
 // Local storage keys

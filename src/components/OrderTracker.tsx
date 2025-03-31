@@ -1,7 +1,8 @@
 
 import React from 'react';
 import { Clock } from 'lucide-react';
-import { useAppContext, OrderStatus } from '@/context/AppContext';
+import { useAppContext } from '@/context/AppContext';
+import { OrderStatus } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -35,6 +36,7 @@ const OrderTracker: React.FC = () => {
       case 'preparing': return 50;
       case 'ready': return 100;
       case 'completed': return 100;
+      case 'cancelled': return 0;
       default: return 0;
     }
   };
@@ -45,6 +47,7 @@ const OrderTracker: React.FC = () => {
       case 'preparing': return 'bg-orange-400';
       case 'ready': return 'bg-green-500';
       case 'completed': return 'bg-gray-400';
+      case 'cancelled': return 'bg-red-500';
       default: return 'bg-primary';
     }
   };
@@ -55,6 +58,7 @@ const OrderTracker: React.FC = () => {
       case 'preparing': return 'Preparing your food';
       case 'ready': return 'Ready for pickup!';
       case 'completed': return 'Completed';
+      case 'cancelled': return 'Cancelled';
       default: return '';
     }
   };

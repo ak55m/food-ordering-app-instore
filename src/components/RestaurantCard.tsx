@@ -2,7 +2,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
-import { Restaurant } from '@/context/AppContext';
+import { Restaurant } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface RestaurantCardProps {

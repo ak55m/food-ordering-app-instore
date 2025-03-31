@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Plus } from 'lucide-react';
-import { MenuItem as MenuItemType } from '@/context/AppContext';
+import { MenuItem as MenuItemType } from '@/types';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,8 +14,7 @@ const MenuItem: React.FC<MenuItemProps> = ({ item }) => {
   const { addToCart } = useAppContext();
   
   const handleAddToCart = () => {
-    // Convert MenuItem to CartItem and then add to cart
-    addToCart({ menuItem: item, quantity: 1 });
+    addToCart(item);
   };
 
   return (
