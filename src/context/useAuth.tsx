@@ -63,7 +63,7 @@ export function useAuth() {
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem('rememberUser');
-      // Removed the success toast
+      toast.success('Logged out successfully');
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Logout failed');
