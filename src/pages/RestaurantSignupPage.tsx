@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { createDatabaseTables, checkDatabaseSetup } from "@/utils/setupRealData";
+import { createDatabaseTables, checkDatabaseSetup, setupRealData } from "@/utils/setupRealData";
 import { Loader2, AlertCircle } from "lucide-react";
 
 const RestaurantSignupPage = () => {
@@ -22,7 +22,7 @@ const RestaurantSignupPage = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [isDbReady, setIsDbReady] = useState<boolean | null>(null);
-  const [isSettingUpDemo, setIsSettingUpDemo] = useState(false);
+  const [isSettingUpData, setIsSettingUpData] = useState(false);
   const [dbSetupMessage, setDbSetupMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, isAuthenticated, register } = useAppContext();
@@ -119,69 +119,29 @@ const RestaurantSignupPage = () => {
     }
   };
 
-  const setupDemoRestaurant = async () => {
-    setIsSettingUpDemo(true);
-    setDbSetupMessage("Setting up database tables and demo data. This may take a moment...");
+  const setupRealRestaurantData = async () => {
+    setIsSettingUpData(true);
+    setDbSetupMessage("Setting up database tables and your restaurant data. This may take a moment...");
     
     try {
-      // First create tables if they don't exist
-      await createDatabaseTables();
+      const result = await setupRealData();
       
-      // Now create the restaurant and user
-      const { data: restaurantData, error: restaurantError } = await supabase
-        .from('restaurants')
-        .insert([
-          {
-            name: 'Rainbow Teashop',
-            description: 'Delicious milk teas and specialty drinks',
-            address: '750 Synergy Park drive Richardson Texas, 75080',
-            latitude: 32.9899,
-            longitude: -96.7501,
-            phone: '972-555-1234',
-            email: 'contact@rainbowteashop.com',
-            logo: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_logo.png',
-            cover_image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_cover.jpg',
-            is_active: true,
-            accepts_online_orders: true,
-            image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop.jpg'
-          }
-        ])
-        .select()
-        .single();
-      
-      if (restaurantError) {
-        throw new Error(`Restaurant creation failed: ${restaurantError.message}`);
+      if (result.success) {
+        setIsDbReady(true);
+        setDbSetupMessage(null);
+        toast.success('Restaurant data was set up successfully!');
+        toast.info('You can now log in with restaurant@rainbowteashop.com / password123');
+        setTimeout(() => {
+          navigate('/restaurant/login');
+        }, 3000);
+      } else {
+        throw new Error(result.error || 'Unknown error');
       }
-      
-      const restaurantId = restaurantData.id;
-      
-      // Create test user account
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: 'restaurant@rainbowteashop.com',
-        password: 'password123',
-        options: {
-          data: {
-            name: 'Vy Nguyen',
-            role: 'restaurant_owner',
-            restaurant_id: restaurantId
-          }
-        }
-      });
-      
-      if (signUpError) {
-        throw new Error(`User creation failed: ${signUpError.message}`);
-      }
-      
-      setIsDbReady(true);
-      setDbSetupMessage(null);
-      toast.success('Rainbow Teashop demo data was set up successfully!');
-      toast.info('You can now log in with restaurant@rainbowteashop.com / password123');
-      
     } catch (error: any) {
-      toast.error(`Error setting up demo restaurant: ${error.message}`);
+      toast.error(`Error setting up restaurant data: ${error.message}`);
       setDbSetupMessage(`Database setup error: ${error.message}`);
     } finally {
-      setIsSettingUpDemo(false);
+      setIsSettingUpData(false);
     }
   };
 
@@ -310,26 +270,24 @@ const RestaurantSignupPage = () => {
             <div className="w-full border-t border-gray-200 my-2"></div>
             <div className="text-center w-full">
               <p className="text-sm text-gray-600 mb-2">
-                {isDbReady 
-                  ? "Want to reset with demo data?" 
-                  : "Set up database with demo data:"}
+                Set up database with ready-to-use data:
               </p>
               <Button
                 type="button"
                 variant="outline"
                 className="w-full"
-                disabled={isSettingUpDemo}
-                onClick={setupDemoRestaurant}
+                disabled={isSettingUpData}
+                onClick={setupRealRestaurantData}
               >
-                {isSettingUpDemo ? (
+                {isSettingUpData ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Setting up database...
                   </>
                 ) : (
-                  "Create Rainbow Teashop demo"
+                  "Create Restaurant Data"
                 )}
               </Button>
-              {isSettingUpDemo && (
+              {isSettingUpData && (
                 <p className="text-xs text-gray-500 mt-1">This might take a few moments...</p>
               )}
             </div>

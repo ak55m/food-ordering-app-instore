@@ -200,7 +200,7 @@ const RestaurantLoginPage = () => {
           <CardFooter className="flex flex-col space-y-2 border-t border-gray-100 pt-4">
             <div className="flex items-center justify-center w-full gap-2 bg-gray-50 p-2 rounded-md">
               <div className="text-left text-sm">
-                <p className="font-medium text-gray-700">Rainbow Teashop demo:</p>
+                <p className="font-medium text-gray-700">Rainbow Teashop login:</p>
                 <p className="text-gray-600 text-xs">Email: {testRestaurantOwner.email}</p>
                 <p className="text-gray-600 text-xs">Password: {testRestaurantOwner.password}</p>
               </div>
@@ -210,7 +210,7 @@ const RestaurantLoginPage = () => {
                 className="ml-auto text-xs border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
                 onClick={handleTestRestaurantLogin}
               >
-                Use Demo
+                Use These
               </Button>
             </div>
             
@@ -234,7 +234,7 @@ const RestaurantLoginPage = () => {
                   <Link to="/restaurant/signup" className="font-medium underline">
                     Go to signup page
                   </Link> 
-                  {" "}to register a new restaurant
+                  {" "}to register a new restaurant or set up your data
                 </p>
               </>
             )}

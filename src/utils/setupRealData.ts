@@ -162,7 +162,7 @@ export async function checkDatabaseSetup() {
   }
 }
 
-export async function setupRainbowTeashop() {
+export async function setupRealData() {
   try {
     // First ensure tables exist
     const tablesCreated = await createDatabaseTables();
