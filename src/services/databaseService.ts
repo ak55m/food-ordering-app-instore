@@ -1,3 +1,4 @@
+
 import { Restaurant, User, Category, MenuItem, Order, CartItem } from '@/types';
 import { toast } from 'sonner';
 
@@ -7,7 +8,8 @@ const STORAGE_KEYS = {
   RESTAURANTS: 'foodapp_restaurants',
   CATEGORIES: 'foodapp_categories',
   MENU_ITEMS: 'foodapp_menu_items',
-  ORDERS: 'foodapp_orders'
+  ORDERS: 'foodapp_orders',
+  PAYMENT_METHODS: 'foodapp_payment_methods'
 };
 
 // Helper functions to work with localStorage
@@ -48,8 +50,8 @@ export const getUser = async (email: string, password: string) => {
     const user = users.find(u => u.email === email);
     
     // In a real app, you would hash passwords
-    if (user && password === 'password123') {
-      return user;
+    if (user && user.password === password) {
+      return { ...user, password: undefined }; // Don't return the password
     }
     return null;
   } catch (error) {
@@ -58,14 +60,30 @@ export const getUser = async (email: string, password: string) => {
   }
 };
 
-export const createUser = async (user: User) => {
+export const createUser = async (user: Omit<User, 'id'>) => {
   try {
     const users = getStorageItem<User[]>(STORAGE_KEYS.USERS, []);
-    users.push(user);
+    
+    // Check if user with this email already exists
+    const existingUser = users.find(u => u.email === user.email);
+    if (existingUser) {
+      toast.error('User with this email already exists');
+      return null;
+    }
+    
+    const newUser = { 
+      ...user, 
+      id: `user-${Date.now()}` 
+    };
+    
+    users.push(newUser);
     setStorageItem(STORAGE_KEYS.USERS, users);
-    return user;
+    
+    // Return user without password
+    return { ...newUser, password: undefined };
   } catch (error) {
     console.error('Error creating user:', error);
+    toast.error('Failed to create user');
     return null;
   }
 };
@@ -232,10 +250,8 @@ export const getOrders = async (userId: string, role: string) => {
     if (role === 'customer') {
       return ordersWithDates.filter(order => order.userId === userId);
     } else if (role === 'restaurant_owner') {
-      // For restaurant owner, return all orders since we're using a mock database
-      // In a real app, we would filter by the restaurantId associated with the owner
-      console.log('Restaurant owner orders:', ordersWithDates);
-      return ordersWithDates;
+      // For restaurant owner, filter by restaurantId
+      return ordersWithDates.filter(order => order.restaurantId === userId);
     }
     
     return ordersWithDates;
@@ -255,6 +271,7 @@ export const placeOrder = async (order: Order) => {
     const orders = getStorageItem<Order[]>(STORAGE_KEYS.ORDERS, []);
     orders.push(order);
     setStorageItem(STORAGE_KEYS.ORDERS, orders);
+    toast.success('Order placed successfully');
     return order;
   } catch (error) {
     console.error('Error placing order:', error);
@@ -275,6 +292,99 @@ export const updateOrderStatus = async (orderId: string, status: string) => {
   } catch (error) {
     console.error('Error updating order status:', error);
     toast.error('Failed to update order status');
+    return false;
+  }
+};
+
+// Payment Methods
+export type PaymentMethod = {
+  id: string;
+  userId: string;
+  type: 'credit_card' | 'debit_card' | 'paypal';
+  lastFour: string;
+  expiryDate?: string;
+  cardholderName?: string;
+  isDefault: boolean;
+  brand?: 'visa' | 'mastercard' | 'amex' | 'discover';
+};
+
+export const getPaymentMethods = async (userId: string) => {
+  try {
+    const paymentMethods = getStorageItem<PaymentMethod[]>(STORAGE_KEYS.PAYMENT_METHODS, []);
+    return paymentMethods.filter(pm => pm.userId === userId);
+  } catch (error) {
+    console.error('Error fetching payment methods:', error);
+    return [];
+  }
+};
+
+export const addPaymentMethod = async (paymentMethod: Omit<PaymentMethod, 'id'>) => {
+  try {
+    const paymentMethods = getStorageItem<PaymentMethod[]>(STORAGE_KEYS.PAYMENT_METHODS, []);
+    
+    // Set all existing payment methods as non-default if this one is default
+    let updatedPaymentMethods = paymentMethods;
+    if (paymentMethod.isDefault) {
+      updatedPaymentMethods = paymentMethods.map(pm => 
+        pm.userId === paymentMethod.userId ? { ...pm, isDefault: false } : pm
+      );
+    }
+    
+    const newPaymentMethod = {
+      ...paymentMethod,
+      id: `pm-${Date.now()}`,
+    };
+    
+    updatedPaymentMethods.push(newPaymentMethod);
+    setStorageItem(STORAGE_KEYS.PAYMENT_METHODS, updatedPaymentMethods);
+    toast.success('Payment method added successfully');
+    return newPaymentMethod;
+  } catch (error) {
+    console.error('Error adding payment method:', error);
+    toast.error('Failed to add payment method');
+    return null;
+  }
+};
+
+export const updatePaymentMethod = async (paymentMethod: PaymentMethod) => {
+  try {
+    const paymentMethods = getStorageItem<PaymentMethod[]>(STORAGE_KEYS.PAYMENT_METHODS, []);
+    
+    // If this payment method is being set as default, update others
+    let updatedPaymentMethods = paymentMethods;
+    if (paymentMethod.isDefault) {
+      updatedPaymentMethods = paymentMethods.map(pm => 
+        pm.userId === paymentMethod.userId && pm.id !== paymentMethod.id 
+          ? { ...pm, isDefault: false } 
+          : pm
+      );
+    }
+    
+    // Update the specific payment method
+    updatedPaymentMethods = updatedPaymentMethods.map(pm => 
+      pm.id === paymentMethod.id ? paymentMethod : pm
+    );
+    
+    setStorageItem(STORAGE_KEYS.PAYMENT_METHODS, updatedPaymentMethods);
+    toast.success('Payment method updated successfully');
+    return paymentMethod;
+  } catch (error) {
+    console.error('Error updating payment method:', error);
+    toast.error('Failed to update payment method');
+    return null;
+  }
+};
+
+export const deletePaymentMethod = async (id: string) => {
+  try {
+    const paymentMethods = getStorageItem<PaymentMethod[]>(STORAGE_KEYS.PAYMENT_METHODS, []);
+    const updatedPaymentMethods = paymentMethods.filter(pm => pm.id !== id);
+    setStorageItem(STORAGE_KEYS.PAYMENT_METHODS, updatedPaymentMethods);
+    toast.success('Payment method removed successfully');
+    return true;
+  } catch (error) {
+    console.error('Error removing payment method:', error);
+    toast.error('Failed to remove payment method');
     return false;
   }
 };

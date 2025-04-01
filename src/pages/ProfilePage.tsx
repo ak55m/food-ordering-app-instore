@@ -1,20 +1,24 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, LogOut, Settings, CreditCard, Heart, HelpCircle } from 'lucide-react';
+import { User, LogOut, Settings, CreditCard, Heart, HelpCircle, Plus, ChevronRight, X } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useAppContext } from '@/context/AppContext';
+import SavedPaymentMethods from '@/components/SavedPaymentMethods';
+import PaymentMethodForm from '@/components/PaymentMethodForm';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const ProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, logout } = useAppContext();
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
-    navigate('/home'); // Changed from '/login' to '/home'
+    navigate('/home');
   };
 
   const profileOptions = [
@@ -31,7 +35,7 @@ const ProfilePage: React.FC = () => {
     { 
       title: 'Payment Methods', 
       icon: <CreditCard className="h-5 w-5" />,
-      onClick: () => console.log('Payment methods')
+      onClick: () => setPaymentDialogOpen(true)
     },
     { 
       title: 'Favorites', 
@@ -84,9 +88,7 @@ const ProfilePage: React.FC = () => {
                   <div className="text-cyan-500">{option.icon}</div>
                   <span>{option.title}</span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                </svg>
+                <ChevronRight className="h-4 w-4 text-gray-400" />
               </button>
             ))}
           </CardContent>
@@ -101,6 +103,38 @@ const ProfilePage: React.FC = () => {
           Logout
         </Button>
       </div>
+
+      <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Payment Methods</DialogTitle>
+            <DialogDescription>
+              Manage your saved payment methods
+            </DialogDescription>
+          </DialogHeader>
+          
+          {user && (
+            <div className="mt-4">
+              <SavedPaymentMethods 
+                userId={user.id}
+                onAddNew={() => setPaymentDialogOpen(true)} 
+              />
+              
+              <div className="mt-8">
+                <h3 className="font-medium mb-4">Add New Payment Method</h3>
+                <PaymentMethodForm 
+                  userId={user.id}
+                  onSuccess={() => {
+                    // Force refresh of payment methods list
+                    setPaymentDialogOpen(false);
+                    setTimeout(() => setPaymentDialogOpen(true), 100);
+                  }} 
+                />
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <BottomNavigation />
     </div>

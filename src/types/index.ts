@@ -7,6 +7,7 @@ export type User = {
   name: string;
   role: 'customer' | 'restaurant_owner';
   restaurantId?: string;
+  password?: string; // Added password field (will be omitted when sending to client)
 };
 
 export type UserRole = 'customer' | 'restaurant_owner';
@@ -69,8 +70,9 @@ export type Order = {
   status: OrderStatus;
   timestamp: Date;
   total: number;
-  paymentMethod: 'credit_card' | 'cash';
+  paymentMethod: 'credit_card' | 'cash' | 'saved_card';
   paymentStatus: 'paid' | 'pending' | 'failed';
+  paymentMethodId?: string; // Reference to saved payment method if used
 };
 
 export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
@@ -87,4 +89,15 @@ export type SocialMedia = {
   facebook?: string;
   instagram?: string;
   twitter?: string;
+};
+
+export type PaymentMethod = {
+  id: string;
+  userId: string;
+  type: 'credit_card' | 'debit_card' | 'paypal';
+  lastFour: string;
+  expiryDate?: string;
+  cardholderName?: string;
+  isDefault: boolean;
+  brand?: 'visa' | 'mastercard' | 'amex' | 'discover';
 };
