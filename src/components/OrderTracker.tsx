@@ -1,31 +1,63 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
 import { OrderStatus } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/lib/supabase';
 
 const OrderTracker: React.FC = () => {
   const { orders } = useAppContext();
   const isMobile = useIsMobile();
+  const [activeOrder, setActiveOrder] = useState<any>(null);
   
-  console.log('Orders in OrderTracker:', orders);
-  
-  // Get the most recent active order (not completed)
-  // First ensure we have orders and handle potential invalid timestamps
-  const activeOrder = orders && orders.length > 0 
-    ? orders
-        .filter(order => order.status !== 'completed')
+  useEffect(() => {
+    // Get the most recent active order (not completed)
+    if (orders && orders.length > 0) {
+      const currentActiveOrder = orders
+        .filter(order => order.status !== 'completed' && order.status !== 'cancelled')
         .sort((a, b) => {
           // Ensure timestamps are Date objects before comparing
           const timeA = a.timestamp instanceof Date ? a.timestamp.getTime() : new Date(a.timestamp).getTime();
           const timeB = b.timestamp instanceof Date ? b.timestamp.getTime() : new Date(b.timestamp).getTime();
           return timeB - timeA;
-        })[0]
-    : null;
-    
+        })[0];
+        
+      setActiveOrder(currentActiveOrder);
+      
+      // Set up real-time listener if we have an active order
+      if (currentActiveOrder) {
+        const orderId = currentActiveOrder.id;
+        
+        // Subscribe to changes on this order
+        const subscription = supabase
+          .channel(`order-${orderId}`)
+          .on('postgres_changes', { 
+            event: 'UPDATE', 
+            schema: 'public', 
+            table: 'orders',
+            filter: `id=eq.${orderId}` 
+          }, (payload) => {
+            // Update the order status when changed in the database
+            if (payload.new && payload.new.status) {
+              setActiveOrder(prev => ({
+                ...prev,
+                status: payload.new.status
+              }));
+            }
+          })
+          .subscribe();
+          
+        // Cleanup subscription
+        return () => {
+          subscription.unsubscribe();
+        };
+      }
+    }
+  }, [orders]);
+  
   if (!activeOrder) {
     return null;
   }

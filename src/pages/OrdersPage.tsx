@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 import { useAppContext, OrderStatus } from '@/context/AppContext';
@@ -8,11 +8,46 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { supabase } from '@/lib/supabase';
 
 const OrdersPage: React.FC = () => {
-  const { orders } = useAppContext();
+  const { orders, user } = useAppContext();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [localOrders, setLocalOrders] = useState(orders);
+  
+  useEffect(() => {
+    setLocalOrders(orders);
+    
+    // Set up real-time listener for all user orders if user is authenticated
+    if (user && user.id) {
+      const subscription = supabase
+        .channel('orders-updates')
+        .on('postgres_changes', { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'orders',
+          filter: `user_id=eq.${user.id}` 
+        }, (payload) => {
+          // Update the specific order's status
+          if (payload.new && payload.new.id) {
+            setLocalOrders(prevOrders => 
+              prevOrders.map(order => 
+                order.id === payload.new.id 
+                  ? { ...order, status: payload.new.status } 
+                  : order
+              )
+            );
+          }
+        })
+        .subscribe();
+        
+      // Cleanup subscription
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [orders, user]);
   
   const getStatusText = (status: OrderStatus) => {
     switch (status) {
@@ -45,7 +80,7 @@ const OrdersPage: React.FC = () => {
   };
 
   // Ensure all orders have proper Date objects for timestamps
-  const processedOrders = orders.map(order => ({
+  const processedOrders = localOrders.map(order => ({
     ...order,
     timestamp: order.timestamp instanceof Date ? order.timestamp : new Date(order.timestamp)
   }));
