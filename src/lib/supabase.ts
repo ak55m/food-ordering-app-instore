@@ -11,3 +11,31 @@ export const supabase = createClient<Database>(
   supabaseUrl,
   supabaseAnonKey
 );
+
+// Add direct SQL query method
+supabase.query = async (sql: string, params?: any[]) => {
+  try {
+    const response = await fetch(`${supabaseUrl}/rest/v1/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': supabaseAnonKey,
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        query: sql,
+        params: params || []
+      })
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      return { error: errorData };
+    }
+    
+    return { data: true, error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+};

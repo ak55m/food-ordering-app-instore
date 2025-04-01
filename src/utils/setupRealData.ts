@@ -2,37 +2,35 @@
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
-// Create database tables if they don't exist
+// Create database tables using standard Supabase API instead of exec_sql
 export async function createDatabaseTables() {
   try {
     console.log("Creating database tables...");
     
     // Create restaurants table
-    const { error: restaurantsError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.restaurants (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          image TEXT,
-          categories TEXT[],
-          rating FLOAT DEFAULT 0,
-          address TEXT,
-          latitude FLOAT,
-          longitude FLOAT,
-          phone TEXT,
-          email TEXT,
-          logo TEXT,
-          cover_image TEXT,
-          is_open BOOLEAN DEFAULT true,
-          is_new BOOLEAN DEFAULT false,
-          is_active BOOLEAN DEFAULT true,
-          accepts_online_orders BOOLEAN DEFAULT true,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          owner_id UUID
-        );
-      `
-    });
+    const { error: restaurantsError } = await supabase.query(`
+      CREATE TABLE IF NOT EXISTS public.restaurants (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name TEXT NOT NULL,
+        description TEXT,
+        image TEXT,
+        categories TEXT[],
+        rating FLOAT DEFAULT 0,
+        address TEXT,
+        latitude FLOAT,
+        longitude FLOAT,
+        phone TEXT,
+        email TEXT,
+        logo TEXT,
+        cover_image TEXT,
+        is_open BOOLEAN DEFAULT true,
+        is_new BOOLEAN DEFAULT false,
+        is_active BOOLEAN DEFAULT true,
+        accepts_online_orders BOOLEAN DEFAULT true,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        owner_id UUID
+      )
+    `);
     
     if (restaurantsError) {
       console.error('Error creating restaurants table:', restaurantsError);
@@ -40,18 +38,16 @@ export async function createDatabaseTables() {
     }
 
     // Create restaurant_opening_hours table
-    const { error: hoursError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.restaurant_opening_hours (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
-          day TEXT NOT NULL,
-          is_open BOOLEAN DEFAULT true,
-          open_time TEXT,
-          close_time TEXT
-        );
-      `
-    });
+    const { error: hoursError } = await supabase.query(`
+      CREATE TABLE IF NOT EXISTS public.restaurant_opening_hours (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
+        day TEXT NOT NULL,
+        is_open BOOLEAN DEFAULT true,
+        open_time TEXT,
+        close_time TEXT
+      )
+    `);
     
     if (hoursError) {
       console.error('Error creating restaurant_opening_hours table:', hoursError);
@@ -59,16 +55,14 @@ export async function createDatabaseTables() {
     }
 
     // Create restaurant_social_media table
-    const { error: socialMediaError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.restaurant_social_media (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
-          platform TEXT NOT NULL,
-          url TEXT NOT NULL
-        );
-      `
-    });
+    const { error: socialMediaError } = await supabase.query(`
+      CREATE TABLE IF NOT EXISTS public.restaurant_social_media (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
+        platform TEXT NOT NULL,
+        url TEXT NOT NULL
+      )
+    `);
     
     if (socialMediaError) {
       console.error('Error creating restaurant_social_media table:', socialMediaError);
@@ -76,15 +70,13 @@ export async function createDatabaseTables() {
     }
 
     // Create categories table
-    const { error: categoriesError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.categories (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
-        );
-      `
-    });
+    const { error: categoriesError } = await supabase.query(`
+      CREATE TABLE IF NOT EXISTS public.categories (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name TEXT NOT NULL,
+        restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
+      )
+    `);
     
     if (categoriesError) {
       console.error('Error creating categories table:', categoriesError);
@@ -92,19 +84,17 @@ export async function createDatabaseTables() {
     }
 
     // Create menu_items table
-    const { error: menuItemsError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.menu_items (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          price FLOAT NOT NULL,
-          image TEXT,
-          category_id UUID REFERENCES public.categories(id) ON DELETE CASCADE,
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
-        );
-      `
-    });
+    const { error: menuItemsError } = await supabase.query(`
+      CREATE TABLE IF NOT EXISTS public.menu_items (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name TEXT NOT NULL,
+        description TEXT,
+        price FLOAT NOT NULL,
+        image TEXT,
+        category_id UUID REFERENCES public.categories(id) ON DELETE CASCADE,
+        restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
+      )
+    `);
     
     if (menuItemsError) {
       console.error('Error creating menu_items table:', menuItemsError);

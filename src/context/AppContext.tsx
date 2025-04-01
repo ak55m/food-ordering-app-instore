@@ -9,8 +9,10 @@ import { useCart } from './useCart';
 import { useOrders } from './useOrders';
 import { Restaurant, MenuItem, CartItem, Order, User, Category, 
          OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia } from '@/types';
-import { setupRainbowTeashop } from '@/utils/setupRealData';
 import { toast } from 'sonner';
+
+// Remove the non-existent import of setupRainbowTeashop
+// import { setupRainbowTeashop } from '@/utils/setupRealData';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
