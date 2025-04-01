@@ -64,15 +64,19 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 const USER_LOCATION_KEY = 'munchmap_user_location';
 
+// Default location coordinates (New York City)
+const DEFAULT_LATITUDE = 40.712776;
+const DEFAULT_LONGITUDE = -74.005974;
+
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   
   const [locationEnabled, setLocationEnabled] = useState<boolean>(false);
   const [userLocation, setUserLocation] = useState({
-    latitude: 0,
-    longitude: 0,
-    address: '',
+    latitude: DEFAULT_LATITUDE,
+    longitude: DEFAULT_LONGITUDE,
+    address: 'New York City',
   });
   
   const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurant[]>([]);
@@ -165,6 +169,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       
     } catch (error) {
       console.error('Error getting location:', error);
+      
+      // If geolocation fails, still fetch restaurants using default location
+      setLocationEnabled(true); // We still want to show restaurants
+      await fetchNearbyRestaurants(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+      
       throw error;
     } finally {
       setIsLoading({ ...isLoading, location: false });
@@ -177,9 +186,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Always show restaurants, even if using default location
       setNearbyRestaurants(mockRestaurants);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
+      // Ensure we still have restaurants even on error
+      setNearbyRestaurants(mockRestaurants);
     } finally {
       setIsLoading({ ...isLoading, restaurants: false });
     }
@@ -391,7 +403,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       } catch (error) {
         console.error('Error parsing stored location:', error);
         localStorage.removeItem(USER_LOCATION_KEY);
+        
+        // If stored location is invalid, use default location to show restaurants
+        fetchNearbyRestaurants(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+        setLocationEnabled(true); // Show restaurants anyway
       }
+    } else {
+      // If no stored location, load restaurants using default location on initial load
+      fetchNearbyRestaurants(DEFAULT_LATITUDE, DEFAULT_LONGITUDE);
+      setLocationEnabled(true); // Show restaurants anyway
     }
   }, []);
   

@@ -6,17 +6,25 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 const LocationButton: React.FC = () => {
-  const { locationEnabled, requestLocation, userLocation } = useAppContext();
+  const { locationEnabled, requestLocation, userLocation, nearbyRestaurants } = useAppContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLocationRequest = async () => {
     setIsLoading(true);
     try {
       await requestLocation();
-      toast.success("Location found successfully!");
+      if (nearbyRestaurants.length > 0) {
+        toast.success("Restaurants found nearby!");
+      } else {
+        toast.success("Location found successfully!");
+      }
     } catch (error) {
       console.error("Location error:", error);
-      toast.error(error instanceof Error ? error.message : "Could not access your location. Please check your browser permissions.");
+      // More user-friendly error message
+      toast.error("Unable to access your location. Using default location instead.");
+      
+      // Even if geolocation fails, we'll still show restaurants using a default location
+      // This happens in the AppContext's requestLocation method
     } finally {
       setIsLoading(false);
     }
