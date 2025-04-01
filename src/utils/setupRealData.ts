@@ -26,7 +26,6 @@ export async function checkDatabaseSetup() {
 // Create database schema
 export async function createDatabaseTables() {
   try {
-    // We'll create the database tables here
     // First check if restaurants table already exists
     const tablesExist = await checkDatabaseSetup();
     if (tablesExist) {
@@ -34,21 +33,18 @@ export async function createDatabaseTables() {
       return true;
     }
 
+    // We need to execute SQL directly to create the tables
     // Create restaurants table
-    const { error: restaurantsError } = await supabase.from('restaurants').insert({
-      id: 'dummy',
-      name: 'Test Restaurant',
-      description: 'Test Description'
-    });
-
-    if (restaurantsError && !restaurantsError.message.includes('already exists')) {
-      console.error("Cannot create restaurants table:", restaurantsError);
-      toast.error("You don't have permission to create tables. Please create them in the Supabase dashboard.");
+    const { error: createRestaurantsError } = await supabase.rpc('create_tables', {});
+    
+    if (createRestaurantsError) {
+      console.error("Error creating tables:", createRestaurantsError);
+      toast.error("Failed to create database tables. Please create them in the Supabase dashboard or check permissions.");
       return false;
     }
 
-    // If we got this far, tables exist or were created
-    toast.success("Database tables are ready!");
+    // If we got this far, tables were created
+    toast.success("Database tables created successfully!");
     return true;
   } catch (error) {
     console.error('Error creating database tables:', error);
@@ -59,12 +55,12 @@ export async function createDatabaseTables() {
 
 export async function setupRealData() {
   try {
-    // Check if tables exist
-    const tablesExist = await checkDatabaseSetup();
+    // First try to create the tables
+    const tablesCreated = await createDatabaseTables();
     
-    if (!tablesExist) {
-      toast.error('Database tables do not exist. Please contact an administrator to set up the database.');
-      return { success: false, error: "Database tables don't exist" };
+    if (!tablesCreated) {
+      toast.error('Could not create database tables. Please check your Supabase setup and permissions.');
+      return { success: false, error: "Could not create database tables" };
     }
 
     // Check if the restaurant already exists
@@ -109,11 +105,6 @@ export async function setupRealData() {
 
     if (restaurantError) {
       console.error('Error creating restaurant:', restaurantError);
-      if (restaurantError.message.includes('does not exist')) {
-        toast.error('The restaurants table does not exist. Please contact an administrator.');
-      } else {
-        toast.error(`Failed to create restaurant: ${restaurantError.message}`);
-      }
       return { success: false, error: restaurantError.message };
     }
 

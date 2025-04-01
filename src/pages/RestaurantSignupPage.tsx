@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -43,7 +42,7 @@ const RestaurantSignupPage = () => {
       const isReady = await checkDatabaseSetup();
       setIsDbReady(isReady);
       if (!isReady) {
-        setDbSetupMessage("Database tables not found. You'll need to create them in the Supabase dashboard.");
+        setDbSetupMessage("Database tables not found. Click the 'Create Restaurant Data' button below to set them up.");
       }
     };
     
@@ -119,7 +118,17 @@ const RestaurantSignupPage = () => {
     setDbSetupMessage("Setting up your restaurant data. This may take a moment...");
     
     try {
-      const tablesCreated = await createDatabaseTables();
+      const { error: createFunctionError } = await supabase.rpc('setup_database');
+      
+      if (createFunctionError) {
+        console.log("Error or function doesn't exist yet, creating tables directly:", createFunctionError);
+        
+        const { error: sqlError } = await supabase.rpc('create_tables_direct', {});
+        
+        if (sqlError && !sqlError.message.includes("already exists")) {
+          throw new Error(`Error creating database tables: ${sqlError.message}`);
+        }
+      }
       
       const result = await setupRealData();
       
@@ -136,7 +145,7 @@ const RestaurantSignupPage = () => {
       }
     } catch (error: any) {
       toast.error(`Error setting up restaurant data: ${error.message}`);
-      setDbSetupMessage(`Database setup error: ${error.message}. Make sure your Supabase database has the required tables.`);
+      setDbSetupMessage(`Database setup error: ${error.message}. You may need to set up the tables manually in Supabase.`);
     } finally {
       setIsSettingUpData(false);
     }
