@@ -2,18 +2,12 @@
 import { createClient } from '@supabase/supabase-js';
 import { type Database } from '@/types/supabase';
 
-// Get Supabase URL and key from environment variables, with default values for development
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-// Check if URL and key are available
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set.');
-}
+// Supabase URL and key - hardcoded for this project
+const supabaseUrl = 'https://jurgzlaiespprlrwkpxk.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1cmd6bGFpZXNwcHJscndrcHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0ODU1NTQsImV4cCI6MjA1OTA2MTU1NH0.uLozsONSMn3wEtGlvw2yT2UBlmm7_0Qq81sg4c13ulc';
 
 // Initialize the Supabase client
 export const supabase = createClient<Database>(
-  supabaseUrl || 'http://your-supabase-url.com',
-  supabaseAnonKey || 'your-anon-key'
+  supabaseUrl,
+  supabaseAnonKey
 );
-
