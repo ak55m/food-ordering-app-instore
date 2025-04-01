@@ -11,21 +11,21 @@ const LandingPage = () => {
     <div className="min-h-screen bg-white overflow-hidden">
       {/* Hero Section with Cartoon Style */}
       <div className="relative pt-16 pb-20 px-4 sm:px-6 lg:pt-24 lg:pb-28 lg:px-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-orange/80 to-amber-500/70 h-3/4"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-brand-light to-brand-light/70 h-3/4"></div>
         <div className="relative max-w-7xl mx-auto">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white sm:text-5xl md:text-6xl lg:max-w-3xl mx-auto font-omnes">
+            <h1 className="text-4xl font-bold text-gray-800 sm:text-5xl md:text-6xl lg:max-w-3xl mx-auto font-omnes">
               <span className="block">Seamless Self-Service</span>
               <span className="block">Ordering for Restaurants & Bars</span>
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-amber-50 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+            <p className="mt-3 max-w-md mx-auto text-base text-gray-600 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
               In house food ordering process automated.
             </p>
             <div className="mt-8 max-w-md mx-auto sm:flex sm:justify-center">
               <div className="rounded-md shadow-lg transform rotate-1">
                 <Button 
                   onClick={() => navigate('/login')}
-                  className="w-full flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-white bg-brand-orange hover:bg-amber-600 md:py-4 md:text-lg md:px-10"
+                  className="w-full flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-brand-light hover:bg-brand-cyan/10 md:py-4 md:text-lg md:px-10"
                 >
                   Get Started <ArrowRight className="ml-2" />
                 </Button>
@@ -34,7 +34,7 @@ const LandingPage = () => {
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/home')}
-                  className="w-full flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-brand-orange bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
+                  className="w-full flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
                 >
                   Browse Menu
                 </Button>
@@ -55,7 +55,7 @@ const LandingPage = () => {
                   filter: "drop-shadow(0px 5px 15px rgba(0,0,0,0.2))",
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-tr from-amber-500/20 to-brand-orange/20"></div>
+              <div className="absolute inset-0 bg-gradient-to-tr from-brand-light/30 to-brand-light/10"></div>
             </div>
           </div>
         </div>
@@ -65,7 +65,7 @@ const LandingPage = () => {
       <div className="py-16 bg-brand-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-base text-brand-orange font-semibold tracking-wide uppercase font-omnes">How It Works</h2>
+            <h2 className="text-base text-brand-cyan font-semibold tracking-wide uppercase font-omnes">How It Works</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl font-omnes">
               Order in 4 Simple Steps
             </p>
@@ -76,10 +76,10 @@ const LandingPage = () => {
 
           <div className="mt-16">
             <dl className="space-y-10 md:space-y-0 md:grid md:grid-cols-4 md:gap-x-8 md:gap-y-10">
-              {/* Step 1 */}
+              {/* Step 1 - Light Blue */}
               <div className="relative transform hover:scale-105 transition duration-300">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-brand-orange text-white transform -rotate-3 border-2 border-gray-800">
+                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-brand-light text-brand-cyan transform -rotate-3 border-2 border-gray-800">
                     <MapPin className="h-6 w-6" />
                   </div>
                   <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-omnes">Arrive at the location</p>
@@ -89,10 +89,10 @@ const LandingPage = () => {
                 </dd>
               </div>
               
-              {/* Step 2 */}
+              {/* Step 2 - Light Yellow */}
               <div className="relative transform hover:scale-105 transition duration-300">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-amber-500 text-white transform rotate-3 border-2 border-gray-800">
+                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 text-yellow-600 transform rotate-3 border-2 border-gray-800">
                     <MenuSquare className="h-6 w-6" />
                   </div>
                   <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-omnes">Browse the menu</p>
@@ -102,10 +102,10 @@ const LandingPage = () => {
                 </dd>
               </div>
               
-              {/* Step 3 */}
+              {/* Step 3 - Light Green */}
               <div className="relative transform hover:scale-105 transition duration-300">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-brand-orange text-white transform -rotate-3 border-2 border-gray-800">
+                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-green-100 text-green-600 transform -rotate-3 border-2 border-gray-800">
                     <ShoppingCart className="h-6 w-6" />
                   </div>
                   <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-omnes">Place an order</p>
@@ -115,10 +115,10 @@ const LandingPage = () => {
                 </dd>
               </div>
               
-              {/* Step 4 */}
+              {/* Step 4 - Light Orange */}
               <div className="relative transform hover:scale-105 transition duration-300">
                 <dt>
-                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-amber-500 text-white transform rotate-3 border-2 border-gray-800">
+                  <div className="absolute flex items-center justify-center h-12 w-12 rounded-full bg-orange-100 text-orange-500 transform rotate-3 border-2 border-gray-800">
                     <Bell className="h-6 w-6" />
                   </div>
                   <p className="ml-16 text-lg leading-6 font-medium text-gray-900 font-omnes">Get notified</p>
@@ -136,7 +136,7 @@ const LandingPage = () => {
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-base text-brand-orange font-semibold tracking-wide uppercase font-omnes">Benefits for Restaurants</h2>
+            <h2 className="text-base text-brand-cyan font-semibold tracking-wide uppercase font-omnes">Benefits for Restaurants</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl font-omnes">
               Transform Your Business
             </p>
@@ -192,7 +192,7 @@ const LandingPage = () => {
       <div className="py-16 bg-brand-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-base text-brand-orange font-semibold tracking-wide uppercase font-omnes">Customer Reviews</h2>
+            <h2 className="text-base text-brand-cyan font-semibold tracking-wide uppercase font-omnes">Customer Reviews</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl font-omnes">
               People Love OrderU
             </p>
@@ -203,7 +203,7 @@ const LandingPage = () => {
               {/* Review 1 */}
               <div className="bg-white p-6 rounded-lg border-2 border-gray-800 shadow-lg transform rotate-1">
                 <div className="flex items-center mb-4">
-                  <div className="text-amber-500 flex">
+                  <div className="text-brand-cyan flex">
                     {"★★★★★"}
                   </div>
                 </div>
@@ -216,7 +216,7 @@ const LandingPage = () => {
               {/* Review 2 */}
               <div className="bg-white p-6 rounded-lg border-2 border-gray-800 shadow-lg transform -rotate-1">
                 <div className="flex items-center mb-4">
-                  <div className="text-amber-500 flex">
+                  <div className="text-brand-cyan flex">
                     {"★★★★★"}
                   </div>
                 </div>
@@ -229,7 +229,7 @@ const LandingPage = () => {
               {/* Review 3 */}
               <div className="bg-white p-6 rounded-lg border-2 border-gray-800 shadow-lg transform rotate-1">
                 <div className="flex items-center mb-4">
-                  <div className="text-amber-500 flex">
+                  <div className="text-brand-cyan flex">
                     {"★★★★★"}
                   </div>
                 </div>
@@ -247,7 +247,7 @@ const LandingPage = () => {
       <div className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
-            <h2 className="text-base text-brand-orange font-semibold tracking-wide uppercase font-omnes">For Customers</h2>
+            <h2 className="text-base text-brand-cyan font-semibold tracking-wide uppercase font-omnes">For Customers</h2>
             <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl font-omnes">
               A Faster, Easier Way to Order
             </p>
@@ -300,17 +300,17 @@ const LandingPage = () => {
       </div>
 
       {/* Final CTA with Cartoon Style */}
-      <div className="py-16 bg-gradient-to-r from-brand-orange/80 to-amber-500/70">
+      <div className="py-16 bg-gradient-to-r from-brand-light/80 to-brand-cyan/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl font-extrabold text-white sm:text-4xl font-omnes">
+            <h2 className="text-3xl font-extrabold text-gray-800 sm:text-4xl font-omnes">
               <span className="block">Ready to Revolutionize Your Ordering System?</span>
             </h2>
             <div className="mt-8 flex justify-center">
               <div className="rounded-md shadow-lg transform rotate-2">
                 <Button 
                   onClick={() => navigate('/login')}
-                  className="px-5 py-3 border-2 border-white text-base font-medium rounded-md text-brand-orange bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-8"
+                  className="px-5 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-8"
                 >
                   Get Started
                 </Button>
@@ -319,7 +319,7 @@ const LandingPage = () => {
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/home')}
-                  className="px-5 py-3 border-2 border-white text-base font-medium rounded-md text-white bg-transparent hover:bg-brand-orange/60 md:py-4 md:text-lg md:px-8"
+                  className="px-5 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-transparent hover:bg-brand-cyan/10 md:py-4 md:text-lg md:px-8"
                 >
                   Schedule a Demo
                 </Button>
