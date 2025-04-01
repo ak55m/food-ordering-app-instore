@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,12 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
+import { checkDatabaseSetup } from "@/utils/setupRealData";
+import { AlertCircle } from "lucide-react";
 
 const RestaurantLoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [dbError, setDbError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, isAuthenticated, login } = useAppContext();
 
@@ -21,6 +25,18 @@ const RestaurantLoginPage = () => {
     email: "restaurant@rainbowteashop.com",
     password: "password123"
   };
+
+  // Check database status on component mount
+  useEffect(() => {
+    const checkDb = async () => {
+      const isReady = await checkDatabaseSetup();
+      if (!isReady) {
+        setDbError("Database tables not found. Please go to the signup page and click 'Create Rainbow Teashop demo' to set up the database.");
+      }
+    };
+    
+    checkDb();
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -45,9 +61,18 @@ const RestaurantLoginPage = () => {
       if (rememberMe) {
         localStorage.setItem('rememberUser', 'true');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
-      toast.error("Failed to login. Please check your credentials.");
+      
+      // Show a more detailed error message
+      if (error.message?.includes('Invalid login credentials')) {
+        toast.error("Invalid email or password. Please check your credentials.");
+      } else if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        toast.error("Database not set up. Please go to signup page to create the database.");
+        setDbError("Database tables not found. Please go to the signup page and click 'Create Rainbow Teashop demo' to set up the database.");
+      } else {
+        toast.error(`Failed to login: ${error.message || "Unknown error"}`);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +102,13 @@ const RestaurantLoginPage = () => {
             <CardDescription className="text-gray-600">
               Login to manage your restaurant
             </CardDescription>
+            
+            {dbError && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-md flex items-start mt-2 text-sm">
+                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                <p className="text-left">{dbError}</p>
+              </div>
+            )}
           </CardHeader>
           
           <CardContent>
@@ -137,7 +169,7 @@ const RestaurantLoginPage = () => {
 
             <div className="mt-4 text-center text-sm">
               <p className="text-gray-600">
-                Don't have a restaurant account? <Link to="/restaurant/signup" className="text-gray-800 hover:underline">Register</Link>
+                Don't have a restaurant account? <Link to="/restaurant/signup" className="text-gray-800 hover:underline font-medium">Register</Link>
               </p>
               <p className="text-gray-600 mt-2">
                 Looking to order food? <Link to="/customer/login" className="text-gray-800 hover:underline">Customer login</Link>
@@ -146,14 +178,30 @@ const RestaurantLoginPage = () => {
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-2 border-t border-gray-100 pt-4">
-            <p className="text-sm text-center text-gray-500">Rainbow Teashop demo account:</p>
-            <Button
-              variant="outline" 
-              className="w-full text-xs border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-              onClick={handleTestRestaurantLogin}
-            >
-              Use Rainbow Teashop Account
-            </Button>
+            <div className="flex items-center justify-center w-full gap-2 bg-gray-50 p-2 rounded-md">
+              <div className="text-left text-sm">
+                <p className="font-medium text-gray-700">Rainbow Teashop demo:</p>
+                <p className="text-gray-600 text-xs">Email: {testRestaurantOwner.email}</p>
+                <p className="text-gray-600 text-xs">Password: {testRestaurantOwner.password}</p>
+              </div>
+              <Button
+                variant="outline" 
+                size="sm"
+                className="ml-auto text-xs border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                onClick={handleTestRestaurantLogin}
+              >
+                Use Demo
+              </Button>
+            </div>
+            
+            {dbError && (
+              <p className="text-xs text-center text-amber-600">
+                <Link to="/restaurant/signup" className="font-medium underline">
+                  Go to signup page
+                </Link> 
+                {" "}to set up the database first
+              </p>
+            )}
           </CardFooter>
         </Card>
       </div>

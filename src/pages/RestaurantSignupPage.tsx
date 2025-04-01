@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,7 @@ import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { setupRainbowTeashop, checkDatabaseSetup } from "@/utils/setupRealData";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 
 const RestaurantSignupPage = () => {
   const [restaurantName, setRestaurantName] = useState("");
@@ -23,6 +22,7 @@ const RestaurantSignupPage = () => {
   const [passwordError, setPasswordError] = useState("");
   const [isDbReady, setIsDbReady] = useState<boolean | null>(null);
   const [isSettingUpDemo, setIsSettingUpDemo] = useState(false);
+  const [dbSetupMessage, setDbSetupMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user, isAuthenticated, register } = useAppContext();
 
@@ -40,6 +40,9 @@ const RestaurantSignupPage = () => {
     const checkDb = async () => {
       const isReady = await checkDatabaseSetup();
       setIsDbReady(isReady);
+      if (!isReady) {
+        setDbSetupMessage("Database tables not found. Click 'Create Rainbow Teashop demo' to set up database tables.");
+      }
     };
     
     checkDb();
@@ -55,6 +58,11 @@ const RestaurantSignupPage = () => {
     
     if (password.length < 6) {
       setPasswordError("Password must be at least 6 characters");
+      return;
+    }
+    
+    if (!isDbReady) {
+      toast.warning("Database tables need to be created first. Please set up the demo restaurant to initialize the database.");
       return;
     }
 
@@ -102,17 +110,23 @@ const RestaurantSignupPage = () => {
 
   const setupDemoRestaurant = async () => {
     setIsSettingUpDemo(true);
+    setDbSetupMessage("Setting up database tables and demo data. This may take a moment...");
+    
     try {
       const result = await setupRainbowTeashop();
       
       if (result.success) {
+        setIsDbReady(true);
+        setDbSetupMessage(null);
         toast.success('Rainbow Teashop demo data was set up successfully!');
         toast.info('You can now log in with restaurant@rainbowteashop.com / password123');
       } else {
         toast.error(`Failed to set up demo restaurant: ${result.error}`);
+        setDbSetupMessage(`Database setup failed: ${result.error}`);
       }
     } catch (error: any) {
       toast.error(`Error setting up demo restaurant: ${error.message}`);
+      setDbSetupMessage(`Database setup error: ${error.message}`);
     } finally {
       setIsSettingUpDemo(false);
     }
@@ -127,6 +141,13 @@ const RestaurantSignupPage = () => {
             <CardDescription className="text-gray-600">
               Create an account to start serving customers
             </CardDescription>
+            
+            {dbSetupMessage && (
+              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-md flex items-start mt-2 text-sm">
+                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                <p className="text-left">{dbSetupMessage}</p>
+              </div>
+            )}
           </CardHeader>
           
           <CardContent>
@@ -216,10 +237,16 @@ const RestaurantSignupPage = () => {
               <Button 
                 type="submit" 
                 className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
-                disabled={isLoading || !agreeTerms}
+                disabled={isLoading || !agreeTerms || !isDbReady}
               >
                 {isLoading ? "Creating Account..." : "Register Restaurant"}
               </Button>
+              
+              {!isDbReady && (
+                <p className="text-xs text-center text-amber-600">
+                  Please set up the database first using the button below
+                </p>
+              )}
             </form>
 
             <div className="mt-4 text-center text-sm">
@@ -235,7 +262,11 @@ const RestaurantSignupPage = () => {
           <CardFooter className="flex flex-col">
             <div className="w-full border-t border-gray-200 my-2"></div>
             <div className="text-center w-full">
-              <p className="text-sm text-gray-600 mb-2">Want to try with demo data?</p>
+              <p className="text-sm text-gray-600 mb-2">
+                {isDbReady 
+                  ? "Want to reset with demo data?" 
+                  : "Set up database with demo data:"}
+              </p>
               <Button
                 type="button"
                 variant="outline"
@@ -245,7 +276,7 @@ const RestaurantSignupPage = () => {
               >
                 {isSettingUpDemo ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Setting up demo data...
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Setting up database...
                   </>
                 ) : (
                   "Create Rainbow Teashop demo"
