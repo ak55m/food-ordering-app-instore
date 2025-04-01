@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
-import { signUp } from "@/services";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 
@@ -20,7 +20,7 @@ const RestaurantSignupPage = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAppContext();
+  const { user, isAuthenticated, auth } = useAppContext();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -73,7 +73,7 @@ const RestaurantSignupPage = () => {
         restaurantId: restaurantData.id
       };
       
-      const newUser = await signUp(email, password, userData);
+      const newUser = await auth.register(email, password, userData);
       
       if (newUser) {
         toast.success('Restaurant account created successfully! Please log in.');

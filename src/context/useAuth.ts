@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { User } from '@/types';
-import { signIn, signOut, getCurrentUser } from '@/services';
+import { signIn, signOut, getCurrentUser, signUp } from '@/services';
 import { toast } from 'sonner';
 
 export function useAuth() {
@@ -32,6 +32,28 @@ export function useAuth() {
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const register = async (email: string, password: string, userData: Partial<User>): Promise<User | null> => {
+    try {
+      setIsLoading(true);
+      
+      const newUser = await signUp(email, password, userData);
+      
+      if (newUser) {
+        toast.success('Account created successfully! Please log in.');
+        return newUser;
+      } else {
+        toast.error('Failed to create account');
+        return null;
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      toast.error('Registration failed. Please try again.');
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -74,6 +96,7 @@ export function useAuth() {
     isLoading,
     login,
     logout,
+    register,
     initUser
   };
 }

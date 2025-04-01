@@ -1,27 +1,24 @@
-
 import { supabase } from '@/lib/supabase';
 import { User } from '@/types';
 import { toast } from 'sonner';
 
 export async function signUp(email: string, password: string, userData: Partial<User>) {
   try {
-    const { data, error } = await supabase.auth.signUp({
+    // Sign up with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: userData,
-      }
     });
 
-    if (error) {
-      toast.error(error.message);
+    if (authError) {
+      toast.error(authError.message);
       return null;
     }
 
-    if (data?.user) {
+    if (authData?.user) {
       // Create user profile in the users table
       const { error: profileError } = await supabase.from('users').insert({
-        id: data.user.id,
+        id: authData.user.id,
         email: email,
         name: userData.name || '',
         role: userData.role || 'customer',
@@ -30,12 +27,19 @@ export async function signUp(email: string, password: string, userData: Partial<
       });
 
       if (profileError) {
+        console.error('Error creating user profile:', profileError);
         toast.error('Error creating user profile');
         return null;
       }
 
       toast.success('Account created successfully!');
-      return data.user;
+      return {
+        id: authData.user.id,
+        email: email,
+        name: userData.name || '',
+        role: userData.role || 'customer',
+        restaurantId: userData.restaurantId || null,
+      };
     }
     
     return null;

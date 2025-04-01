@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import BottomNavigation from "@/components/BottomNavigation";
-import { signUp } from '@/services';
 import { toast } from "sonner";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
@@ -33,7 +32,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 const CustomerSignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAppContext();
+  const { user, isAuthenticated, auth } = useAppContext();
 
   const form = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
@@ -65,7 +64,7 @@ const CustomerSignupPage = () => {
         role: 'customer' as const
       };
       
-      const newUser = await signUp(values.email, values.password, userData);
+      const newUser = await auth.register(values.email, values.password, userData);
       
       if (newUser) {
         toast.success('Account created successfully! Please log in.');
