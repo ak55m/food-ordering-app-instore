@@ -106,7 +106,7 @@ export async function signOut() {
       return false;
     }
     localStorage.removeItem('sessionActive');
-    toast.success('Signed out successfully');
+    // Removed the success toast
     return true;
   } catch (error) {
     console.error('Error signing out:', error);
