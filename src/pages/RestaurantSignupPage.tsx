@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,7 +10,8 @@ import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { createDatabaseTables, checkDatabaseSetup, setupRealData } from "@/utils/setupRealData";
-import { Loader2, AlertCircle, Info, Alert, AlertDescription } from "lucide-react";
+import { Loader2, AlertCircle, Info } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const RestaurantSignupPage = () => {
   const [restaurantName, setRestaurantName] = useState("");
