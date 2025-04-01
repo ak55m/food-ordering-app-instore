@@ -33,143 +33,43 @@ export async function createDatabaseTables() {
       return true;
     }
 
-    // Try direct SQL execution through the REST API
-    // This is the most reliable method for creating tables
+    // Direct SQL execution through REST API
+    console.log("Attempting to create tables via direct SQL...");
+    
+    // Create tables with simple SQL (no stored procedures)
     try {
-      // Create all tables in one operation using SQL
-      const rawResponse = await fetch(
-        `${supabaseUrl}/rest/v1/`,
+      // Enable UUID extension
+      const enableUuidResult = await fetch(
+        `${supabaseUrl}/rest/v1/rpc/exec_sql`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${supabaseAnonKey}`,
-            'apikey': `${supabaseAnonKey}`,
-            'Prefer': 'resolution=ignore-duplicates'
+            'apikey': `${supabaseAnonKey}`
           },
           body: JSON.stringify({
-            query: `
-              -- Enable UUID extension if not already enabled
-              CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-              -- Create restaurants table
-              CREATE TABLE IF NOT EXISTS restaurants (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  name TEXT NOT NULL,
-                  description TEXT,
-                  address TEXT,
-                  latitude NUMERIC,
-                  longitude NUMERIC,
-                  phone TEXT,
-                  email TEXT,
-                  image TEXT,
-                  logo TEXT,
-                  cover_image TEXT,
-                  is_open BOOLEAN DEFAULT true,
-                  is_new BOOLEAN DEFAULT true,
-                  is_active BOOLEAN DEFAULT true,
-                  accepts_online_orders BOOLEAN DEFAULT true,
-                  created_at TIMESTAMPTZ DEFAULT NOW(),
-                  categories TEXT[] DEFAULT ARRAY[]::TEXT[]
-              );
-              
-              -- Create restaurant_opening_hours table
-              CREATE TABLE IF NOT EXISTS restaurant_opening_hours (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-                  day TEXT NOT NULL,
-                  is_open BOOLEAN DEFAULT true,
-                  open_time TEXT,
-                  close_time TEXT
-              );
-
-              -- Create restaurant_social_media table
-              CREATE TABLE IF NOT EXISTS restaurant_social_media (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-                  platform TEXT NOT NULL,
-                  url TEXT NOT NULL
-              );
-
-              -- Create categories table
-              CREATE TABLE IF NOT EXISTS categories (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  name TEXT NOT NULL,
-                  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
-              );
-
-              -- Create menu_items table
-              CREATE TABLE IF NOT EXISTS menu_items (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  name TEXT NOT NULL,
-                  description TEXT,
-                  price NUMERIC NOT NULL,
-                  image TEXT,
-                  category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-                  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
-              );
-
-              -- Create orders table
-              CREATE TABLE IF NOT EXISTS orders (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  user_id UUID NOT NULL,
-                  restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-                  status TEXT NOT NULL DEFAULT 'pending',
-                  timestamp TIMESTAMPTZ DEFAULT NOW(),
-                  total NUMERIC NOT NULL DEFAULT 0,
-                  payment_method TEXT,
-                  payment_status TEXT DEFAULT 'pending',
-                  payment_method_id UUID
-              );
-
-              -- Create order_items table
-              CREATE TABLE IF NOT EXISTS order_items (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-                  menu_item_id UUID NOT NULL REFERENCES menu_items(id) ON DELETE CASCADE,
-                  quantity INTEGER NOT NULL DEFAULT 1,
-                  price NUMERIC NOT NULL
-              );
-
-              -- Create payment_methods table
-              CREATE TABLE IF NOT EXISTS payment_methods (
-                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                  user_id UUID NOT NULL,
-                  type TEXT NOT NULL,
-                  last_four TEXT NOT NULL,
-                  expiry_date TEXT,
-                  cardholder_name TEXT,
-                  is_default BOOLEAN DEFAULT false,
-                  brand TEXT,
-                  created_at TIMESTAMPTZ DEFAULT NOW()
-              );
-            `
+            sql: `CREATE EXTENSION IF NOT EXISTS "uuid-ossp";`
           })
         }
       );
-
-      if (!rawResponse.ok) {
-        const errorData = await rawResponse.json();
-        throw new Error(`SQL error: ${JSON.stringify(errorData)}`);
-      }
-    } catch (error) {
-      console.error("Direct SQL execution failed:", error);
-      toast.error("Failed to create tables via direct SQL. Trying alternative methods...");
       
-      // Fallback to using the SQL script through RPC function if direct execution fails
-      try {
-        // First try to create the exec_sql function if it doesn't exist
-        const createFnResult = await fetch(
-          `${supabaseUrl}/rest/v1/rpc/exec_sql`,
+      // If exec_sql doesn't exist, create it
+      if (!enableUuidResult.ok) {
+        console.log("Creating exec_sql function...");
+        
+        const createFnResponse = await fetch(
+          `${supabaseUrl}/rest/v1/`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${supabaseAnonKey}`,
-              'apikey': `${supabaseAnonKey}`
+              'apikey': `${supabaseAnonKey}`,
+              'Prefer': 'resolution=ignore-duplicates'
             },
             body: JSON.stringify({
-              sql: `
+              query: `
                 CREATE OR REPLACE FUNCTION exec_sql(sql text) RETURNS void AS $$
                 BEGIN
                   EXECUTE sql;
@@ -180,147 +80,210 @@ export async function createDatabaseTables() {
           }
         );
         
-        if (!createFnResult.ok) {
-          console.log("Could not create exec_sql function");
+        if (!createFnResponse.ok) {
+          console.error("Failed to create exec_sql function");
         }
+      }
+      
+      // Create tables one by one
+      const tables = [
+        `CREATE TABLE IF NOT EXISTS restaurants (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            name TEXT NOT NULL,
+            description TEXT,
+            address TEXT,
+            latitude NUMERIC,
+            longitude NUMERIC,
+            phone TEXT,
+            email TEXT,
+            image TEXT,
+            logo TEXT,
+            cover_image TEXT,
+            is_open BOOLEAN DEFAULT true,
+            is_new BOOLEAN DEFAULT true,
+            is_active BOOLEAN DEFAULT true,
+            accepts_online_orders BOOLEAN DEFAULT true,
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            categories TEXT[] DEFAULT ARRAY[]::TEXT[]
+        )`,
+        `CREATE TABLE IF NOT EXISTS restaurant_opening_hours (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+            day TEXT NOT NULL,
+            is_open BOOLEAN DEFAULT true,
+            open_time TEXT,
+            close_time TEXT
+        )`,
+        `CREATE TABLE IF NOT EXISTS restaurant_social_media (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+            platform TEXT NOT NULL,
+            url TEXT NOT NULL
+        )`,
+        `CREATE TABLE IF NOT EXISTS categories (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            name TEXT NOT NULL,
+            restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
+        )`,
+        `CREATE TABLE IF NOT EXISTS menu_items (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            name TEXT NOT NULL,
+            description TEXT,
+            price NUMERIC NOT NULL,
+            image TEXT,
+            category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+            restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
+        )`,
+        `CREATE TABLE IF NOT EXISTS orders (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            user_id UUID NOT NULL,
+            restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+            status TEXT NOT NULL DEFAULT 'pending',
+            timestamp TIMESTAMPTZ DEFAULT NOW(),
+            total NUMERIC NOT NULL DEFAULT 0,
+            payment_method TEXT,
+            payment_status TEXT DEFAULT 'pending',
+            payment_method_id UUID
+        )`,
+        `CREATE TABLE IF NOT EXISTS order_items (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+            menu_item_id UUID NOT NULL REFERENCES menu_items(id) ON DELETE CASCADE,
+            quantity INTEGER NOT NULL DEFAULT 1,
+            price NUMERIC NOT NULL
+        )`,
+        `CREATE TABLE IF NOT EXISTS payment_methods (
+            id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+            user_id UUID NOT NULL,
+            type TEXT NOT NULL,
+            last_four TEXT NOT NULL,
+            expiry_date TEXT,
+            cardholder_name TEXT,
+            is_default BOOLEAN DEFAULT false,
+            brand TEXT,
+            created_at TIMESTAMPTZ DEFAULT NOW()
+        )`
+      ];
+      
+      // Direct SQL injection without relying on stored procedures
+      // First, create restaurants table
+      console.log("Creating restaurants table...");
+      const createRestaurantsResponse = await fetch(
+        `${supabaseUrl}/rest/v1/`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'apikey': `${supabaseAnonKey}`,
+            'Prefer': 'resolution=ignore-duplicates'
+          },
+          body: JSON.stringify({
+            query: tables[0]
+          })
+        }
+      );
+      
+      if (!createRestaurantsResponse.ok) {
+        const errorData = await createRestaurantsResponse.json();
+        console.error("Failed to create restaurants table:", errorData);
+      } else {
+        console.log("Restaurants table created successfully");
+      }
+      
+      // Create remaining tables
+      for (let i = 1; i < tables.length; i++) {
+        console.log(`Creating table ${i+1}/${tables.length}...`);
         
-        // Use the function to create tables (from create_tables.sql)
-        const execResult = await fetch(
-          `${supabaseUrl}/rest/v1/rpc/exec_sql`,
+        const createTableResponse = await fetch(
+          `${supabaseUrl}/rest/v1/`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
               'Authorization': `Bearer ${supabaseAnonKey}`,
-              'apikey': `${supabaseAnonKey}`
+              'apikey': `${supabaseAnonKey}`,
+              'Prefer': 'resolution=ignore-duplicates'
             },
             body: JSON.stringify({
-              sql: `
-                -- Make sure UUID extension is enabled
+              query: tables[i]
+            })
+          }
+        );
+        
+        if (!createTableResponse.ok) {
+          const errorData = await createTableResponse.json();
+          console.error(`Failed to create table ${i+1}:`, errorData);
+        }
+      }
+      
+    } catch (error) {
+      console.error("Error in direct table creation:", error);
+      toast.error("Could not create database tables automatically");
+      return false;
+    }
+
+    // Final verification
+    const tablesCreated = await checkDatabaseSetup();
+    if (tablesCreated) {
+      toast.success("Database tables created successfully!");
+      return true;
+    } else {
+      // One last attempt with SQL from Supabase UI
+      console.log("Tables not created. Attempting final method...");
+      
+      try {
+        const finalAttempt = await fetch(
+          `${supabaseUrl}/rest/v1/`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseAnonKey}`,
+              'apikey': `${supabaseAnonKey}`,
+              'Prefer': 'resolution=ignore-duplicates'
+            },
+            body: JSON.stringify({
+              query: `
                 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-                
-                -- Create restaurants table
+
                 CREATE TABLE IF NOT EXISTS restaurants (
-                    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-                    name TEXT NOT NULL,
-                    description TEXT,
-                    address TEXT,
-                    latitude NUMERIC,
-                    longitude NUMERIC,
-                    phone TEXT,
-                    email TEXT,
-                    image TEXT,
-                    logo TEXT,
-                    cover_image TEXT,
-                    is_open BOOLEAN DEFAULT true,
-                    is_new BOOLEAN DEFAULT true,
-                    is_active BOOLEAN DEFAULT true,
-                    accepts_online_orders BOOLEAN DEFAULT true,
-                    created_at TIMESTAMPTZ DEFAULT NOW(),
-                    categories TEXT[] DEFAULT ARRAY[]::TEXT[]
+                  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+                  name TEXT NOT NULL,
+                  description TEXT DEFAULT '',
+                  address TEXT DEFAULT '',
+                  latitude NUMERIC,
+                  longitude NUMERIC,
+                  phone TEXT DEFAULT '',
+                  email TEXT DEFAULT '',
+                  image TEXT DEFAULT '',
+                  logo TEXT DEFAULT '',
+                  cover_image TEXT DEFAULT '',
+                  is_open BOOLEAN DEFAULT true,
+                  is_new BOOLEAN DEFAULT true,
+                  is_active BOOLEAN DEFAULT true,
+                  accepts_online_orders BOOLEAN DEFAULT true,
+                  created_at TIMESTAMPTZ DEFAULT NOW(),
+                  categories TEXT[] DEFAULT ARRAY[]::TEXT[]
                 );
               `
             })
           }
         );
         
-        if (!execResult.ok) {
-          const errorData = await execResult.json();
-          throw new Error(`Failed to create restaurants table: ${JSON.stringify(errorData)}`);
+        if (finalAttempt.ok) {
+          // Check one last time
+          const finalCheck = await checkDatabaseSetup();
+          if (finalCheck) {
+            toast.success("Database tables created with final attempt!");
+            return true;
+          }
         }
-        
-        // Create remaining tables one by one
-        const remainingTables = [
-          `CREATE TABLE IF NOT EXISTS restaurant_opening_hours (
-              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-              restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-              day TEXT NOT NULL,
-              is_open BOOLEAN DEFAULT true,
-              open_time TEXT,
-              close_time TEXT
-          )`,
-          `CREATE TABLE IF NOT EXISTS restaurant_social_media (
-              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-              restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-              platform TEXT NOT NULL,
-              url TEXT NOT NULL
-          )`,
-          `CREATE TABLE IF NOT EXISTS categories (
-              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-              name TEXT NOT NULL,
-              restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
-          )`,
-          `CREATE TABLE IF NOT EXISTS menu_items (
-              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-              name TEXT NOT NULL,
-              description TEXT,
-              price NUMERIC NOT NULL,
-              image TEXT,
-              category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-              restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
-          )`,
-          `CREATE TABLE IF NOT EXISTS orders (
-              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-              user_id UUID NOT NULL,
-              restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-              status TEXT NOT NULL DEFAULT 'pending',
-              timestamp TIMESTAMPTZ DEFAULT NOW(),
-              total NUMERIC NOT NULL DEFAULT 0,
-              payment_method TEXT,
-              payment_status TEXT DEFAULT 'pending',
-              payment_method_id UUID
-          )`,
-          `CREATE TABLE IF NOT EXISTS order_items (
-              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-              order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-              menu_item_id UUID NOT NULL REFERENCES menu_items(id) ON DELETE CASCADE,
-              quantity INTEGER NOT NULL DEFAULT 1,
-              price NUMERIC NOT NULL
-          )`,
-          `CREATE TABLE IF NOT EXISTS payment_methods (
-              id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-              user_id UUID NOT NULL,
-              type TEXT NOT NULL,
-              last_four TEXT NOT NULL,
-              expiry_date TEXT,
-              cardholder_name TEXT,
-              is_default BOOLEAN DEFAULT false,
-              brand TEXT,
-              created_at TIMESTAMPTZ DEFAULT NOW()
-          )`
-        ];
-        
-        // Create each table one by one
-        for (const tableSql of remainingTables) {
-          await fetch(
-            `${supabaseUrl}/rest/v1/rpc/exec_sql`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${supabaseAnonKey}`,
-                'apikey': `${supabaseAnonKey}`
-              },
-              body: JSON.stringify({
-                sql: tableSql
-              })
-            }
-          );
-        }
-      } catch (error) {
-        console.error("Fallback methods failed too:", error);
-        toast.error("Could not create database tables automatically");
-        return false;
+      } catch (e) {
+        console.error("Final attempt failed too:", e);
       }
-    }
-
-    // Verify tables were created
-    const tablesCreated = await checkDatabaseSetup();
-    if (tablesCreated) {
-      toast.success("Database tables created successfully!");
-      return true;
-    } else {
-      toast.error("Failed to create database tables. Please check your Supabase setup.");
+      
+      toast.error("Failed to create database tables. Please create them manually in your Supabase SQL Editor.");
       return false;
     }
   } catch (error) {

@@ -118,18 +118,6 @@ const RestaurantSignupPage = () => {
     setDbSetupMessage("Setting up your restaurant data. This may take a moment...");
     
     try {
-      const { error: createFunctionError } = await supabase.rpc('setup_database');
-      
-      if (createFunctionError) {
-        console.log("Error or function doesn't exist yet, creating tables directly:", createFunctionError);
-        
-        const { error: sqlError } = await supabase.rpc('create_tables_direct', {});
-        
-        if (sqlError && !sqlError.message.includes("already exists")) {
-          throw new Error(`Error creating database tables: ${sqlError.message}`);
-        }
-      }
-      
       const result = await setupRealData();
       
       if (result.success) {
