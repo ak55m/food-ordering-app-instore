@@ -1,18 +1,15 @@
 
 import React, { useState } from 'react';
-import { ShoppingCart, Trash2, Plus, Minus, CreditCard, Wallet, LogIn } from 'lucide-react';
+import { ShoppingCart, Trash2, Plus, Minus, CreditCard, LogIn } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 const Cart: React.FC = () => {
   const navigate = useNavigate();
   const { cart, updateCartItemQuantity, removeFromCart, placeOrder, selectedRestaurant, isAuthenticated } = useAppContext();
-  const [paymentMethod, setPaymentMethod] = useState<'credit_card' | 'cash'>('credit_card');
   const [isProcessing, setIsProcessing] = useState(false);
   
   const total = cart.reduce((sum, item) => 
@@ -30,16 +27,11 @@ const Cart: React.FC = () => {
     
     setIsProcessing(true);
     try {
-      // If credit card, we would integrate with a payment processor here
-      // For now, we'll just simulate a delay and complete the order
-      if (paymentMethod === 'credit_card') {
-        // Simulate payment processing
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
+      // Always use credit card payment now
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Place the order with the selected payment method
-      await placeOrder(selectedRestaurant.id, paymentMethod);
-      toast.success(`Order placed successfully! ${paymentMethod === 'credit_card' ? 'Payment processed.' : 'Please pay at pickup.'}`);
+      await placeOrder(selectedRestaurant.id, 'credit_card');
+      toast.success('Order placed successfully! Payment processed.');
     } catch (error) {
       console.error('Error processing payment:', error);
       toast.error('Failed to place order. Please try again.');
@@ -131,30 +123,14 @@ const Cart: React.FC = () => {
           <>
             <div className="w-full mb-4">
               <p className="font-medium mb-2">Payment Method</p>
-              <RadioGroup 
-                value={paymentMethod} 
-                onValueChange={(value) => setPaymentMethod(value as 'credit_card' | 'cash')} 
-                className="space-y-2"
-              >
-                <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
-                  <RadioGroupItem value="credit_card" id="credit_card" />
-                  <Label htmlFor="credit_card" className="flex items-center cursor-pointer w-full">
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Pay with Card
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2 border rounded-md p-3 cursor-pointer">
-                  <RadioGroupItem value="cash" id="cash" />
-                  <Label htmlFor="cash" className="flex items-center cursor-pointer w-full">
-                    <Wallet className="h-4 w-4 mr-2" />
-                    Cash at Pickup
-                  </Label>
-                </div>
-              </RadioGroup>
+              <div className="flex items-center space-x-2 border rounded-md p-3">
+                <CreditCard className="h-4 w-4 mr-2 text-gray-500" />
+                <span className="text-gray-700">Pay with Card</span>
+              </div>
             </div>
 
             <Button 
-              className="w-full bg-orange-500 text-white font-medium" 
+              className="w-full bg-green-300 hover:bg-green-400 text-gray-800 font-medium" 
               onClick={handlePlaceOrder}
               disabled={isProcessing}
             >
@@ -163,7 +139,7 @@ const Cart: React.FC = () => {
           </>
         ) : (
           <Button 
-            className="w-full bg-orange-500 text-white font-medium flex items-center justify-center" 
+            className="w-full bg-green-300 hover:bg-green-400 text-gray-800 font-medium flex items-center justify-center" 
             onClick={() => navigate('/login')}
           >
             <LogIn className="h-4 w-4 mr-2" />
