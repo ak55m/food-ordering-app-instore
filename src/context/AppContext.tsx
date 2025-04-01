@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { AppContextType } from './types';
 import { useAuth } from './useAuth';
@@ -45,6 +46,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       menuData.fetchMenuItems(restaurantData.selectedRestaurant.id);
     }
   }, [restaurantData.selectedRestaurant]);
+  
+  // Load user's orders when authenticated
+  useEffect(() => {
+    if (auth.isAuthenticated && auth.user) {
+      orderData.fetchOrders(auth.user.id, auth.user.role);
+    }
+  }, [auth.isAuthenticated, auth.user]);
   
   const placeOrder = async (restaurantId: string, paymentMethod: 'credit_card' | 'cash'): Promise<void> => {
     const restaurant = restaurantData.getRestaurantById(restaurantId);

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext, Order } from '@/context/AppContext';
@@ -10,41 +9,92 @@ import RestaurantSidebar from '@/components/RestaurantSidebar';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
+import { getOrders, updateOrderStatus as updateOrderStatusService } from '@/services';
 
 const RestaurantDashboard: React.FC = () => {
-  const { orders, updateOrderStatus } = useAppContext();
+  const { user, updateOrderStatus } = useAppContext();
   const navigate = useNavigate();
-  const [restaurantId, setRestaurantId] = useState('1'); // Default to first restaurant
+  const [restaurantId, setRestaurantId] = useState<string>('');
+  const [localOrders, setLocalOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    if (user && user.restaurantId) {
+      setRestaurantId(user.restaurantId);
+      fetchOrders(user.restaurantId);
+    }
+  }, [user]);
+
+  const fetchOrders = async (restId: string) => {
+    setIsLoading(true);
+    try {
+      if (user) {
+        const orders = await getOrders(restId, 'restaurant_owner');
+        setLocalOrders(orders);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (restaurantId) {
+      const subscription = supabase
+        .channel('restaurant-orders')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'orders',
+          filter: `restaurant_id=eq.${restaurantId}` 
+        }, (payload) => {
+          console.log('Order update received:', payload);
+          
+          if (payload.eventType === 'INSERT') {
+            fetchOrders(restaurantId);
+            toast.info('New order received!', {
+              description: `Order #${payload.new.id.slice(-4)}`,
+            });
+          } else if (payload.eventType === 'UPDATE') {
+            fetchOrders(restaurantId);
+          }
+        })
+        .subscribe();
+        
+      return () => {
+        subscription.unsubscribe();
+      };
+    }
+  }, [restaurantId]);
   
-  console.log('All orders in dashboard:', orders);
-  
-  // Ensure all orders have proper Date objects for timestamps
-  const processedOrders = orders.map(order => ({
+  const processedOrders = localOrders.map(order => ({
     ...order,
     timestamp: order.timestamp instanceof Date ? order.timestamp : new Date(order.timestamp)
   }));
   
-  // Filter orders by restaurant and status
-  const restaurantOrders = processedOrders;
-  const pendingOrders = restaurantOrders.filter(order => order.status === 'pending');
-  const preparingOrders = restaurantOrders.filter(order => order.status === 'preparing');
-  const readyOrders = restaurantOrders.filter(order => order.status === 'ready');
-  const completedOrders = restaurantOrders.filter(order => order.status === 'completed');
+  const pendingOrders = processedOrders.filter(order => order.status === 'pending');
+  const preparingOrders = processedOrders.filter(order => order.status === 'preparing');
+  const readyOrders = processedOrders.filter(order => order.status === 'ready');
+  const completedOrders = processedOrders.filter(order => order.status === 'completed');
   
-  console.log('Pending orders:', pendingOrders);
-  console.log('Preparing orders:', preparingOrders);
-  console.log('Ready orders:', readyOrders);
-  console.log('Completed orders:', completedOrders);
-  
-  const handleUpdateOrderStatus = (orderId: string, newStatus: Order['status']) => {
-    updateOrderStatus(orderId, newStatus);
-    const statusMessages = {
-      'preparing': 'Order is now being prepared',
-      'ready': 'Order is ready for pickup',
-      'completed': 'Order has been completed'
-    };
-    
-    toast.success(statusMessages[newStatus] || 'Order status updated');
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
+    try {
+      const success = await updateOrderStatusService(orderId, newStatus);
+      
+      if (success) {
+        updateOrderStatus(orderId, newStatus);
+        setLocalOrders(prevOrders => 
+          prevOrders.map(order => 
+            order.id === orderId ? { ...order, status: newStatus } : order
+          )
+        );
+      } 
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast.error('Failed to update order status');
+    }
   };
   
   const OrderCard = ({ order }: { order: Order }) => (
@@ -106,7 +156,6 @@ const RestaurantDashboard: React.FC = () => {
     </Card>
   );
 
-  // Mobile menu for small screens
   const MobileNav = () => (
     <Sheet>
       <SheetTrigger asChild>
@@ -121,6 +170,21 @@ const RestaurantDashboard: React.FC = () => {
       </SheetContent>
     </Sheet>
   );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen w-full bg-gray-50 flex flex-col md:flex-row">
+        <div className="hidden md:block md:w-64">
+          <RestaurantSidebar activePage="dashboard" />
+        </div>
+        <main className="flex-1 p-6 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-500">Loading orders...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex flex-col md:flex-row">

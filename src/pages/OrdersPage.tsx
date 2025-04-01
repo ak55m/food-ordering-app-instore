@@ -9,17 +9,38 @@ import { Progress } from '@/components/ui/progress';
 import BottomNavigation from '@/components/BottomNavigation';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { supabase } from '@/lib/supabase';
+import { getOrders } from '@/services';
 
 const OrdersPage: React.FC = () => {
-  const { orders, user } = useAppContext();
+  const { user } = useAppContext();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [localOrders, setLocalOrders] = useState(orders);
+  const [localOrders, setLocalOrders] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
+  // Fetch orders on component mount
   useEffect(() => {
-    setLocalOrders(orders);
-    
-    // Set up real-time listener for all user orders if user is authenticated
+    if (user) {
+      fetchOrders();
+    }
+  }, [user]);
+  
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      if (user) {
+        const orders = await getOrders(user.id, 'customer');
+        setLocalOrders(orders);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  // Set up real-time listener for all user orders if user is authenticated
+  useEffect(() => {
     if (user && user.id) {
       const subscription = supabase
         .channel('orders-updates')
@@ -47,7 +68,7 @@ const OrdersPage: React.FC = () => {
         subscription.unsubscribe();
       };
     }
-  }, [orders, user]);
+  }, [user]);
   
   const getStatusText = (status: OrderStatus) => {
     switch (status) {
@@ -92,6 +113,22 @@ const OrdersPage: React.FC = () => {
     return timeB - timeA;
   }) : [];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white pb-20">
+        <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
+          <div className={`${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} mx-auto py-4 flex items-center`}>
+            <h1 className="text-xl font-semibold">Your Orders</h1>
+          </div>
+        </header>
+        <main className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container px-4'} py-6 flex items-center justify-center`}>
+          <p>Loading orders...</p>
+        </main>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
@@ -110,7 +147,7 @@ const OrdersPage: React.FC = () => {
                     <div>
                       <h3 className="font-medium">{order.restaurantName}</h3>
                       <p className="text-sm text-gray-500">
-                        Order #{order.id.split('-')[1].slice(-4)} · 
+                        Order #{order.id.slice(-4)} · 
                         {new Intl.DateTimeFormat('en-US', { 
                           month: 'short', 
                           day: 'numeric', 
