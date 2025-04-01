@@ -5,8 +5,10 @@ import {
   OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia 
 } from '@/types';
 import { mockRestaurants, mockMenuItems, mockCategories } from '@/data/mockData';
-import { supabase } from '@/lib/supabase';
-import { signIn, signUp, signOut, getCurrentUser } from '@/services/supabaseService';
+import { 
+  signIn, signOut, getCurrentUser, 
+  getRestaurants as fetchRestaurantsFromDB
+} from '@/services';
 import { toast } from 'sonner';
 
 interface AppContextType {
