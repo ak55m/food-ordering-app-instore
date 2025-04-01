@@ -62,7 +62,7 @@ const LandingPage = () => {
       </div>
 
       {/* How It Works with Cartoon Style */}
-      <div className="py-16 bg-amber-50">
+      <div className="py-16 bg-brand-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
             <h2 className="text-base text-brand-orange font-semibold tracking-wide uppercase font-omnes">How It Works</h2>
@@ -146,7 +146,7 @@ const LandingPage = () => {
             <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
               {/* Benefit 1 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Reduce Labor Costs</h3>
                   <p className="text-base text-gray-500">
                     Less reliance on cashiers & servers means more efficient staffing and reduced costs.
@@ -156,7 +156,7 @@ const LandingPage = () => {
               
               {/* Benefit 2 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Faster Order Processing</h3>
                   <p className="text-base text-gray-500">
                     Orders go straight to the kitchen, reducing wait times and increasing table turnover.
@@ -166,7 +166,7 @@ const LandingPage = () => {
               
               {/* Benefit 3 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Increase Revenue</h3>
                   <p className="text-base text-gray-500">
                     Customers can order more conveniently, leading to higher average order values.
@@ -176,7 +176,7 @@ const LandingPage = () => {
               
               {/* Benefit 4 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Improve Customer Experience</h3>
                   <p className="text-base text-gray-500">
                     Shorter wait times & no manual errors create a better dining experience for customers.
@@ -189,7 +189,7 @@ const LandingPage = () => {
       </div>
 
       {/* Customer Reviews with Cartoon Style */}
-      <div className="py-16 bg-amber-50">
+      <div className="py-16 bg-brand-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="lg:text-center">
             <h2 className="text-base text-brand-orange font-semibold tracking-wide uppercase font-omnes">Customer Reviews</h2>
@@ -257,7 +257,7 @@ const LandingPage = () => {
             <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
               {/* Feature 1 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Skip the Line</h3>
                   <p className="text-base text-gray-500">
                     Order directly from your phone, no waiting in queues.
@@ -267,7 +267,7 @@ const LandingPage = () => {
               
               {/* Feature 2 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Customize Your Meal</h3>
                   <p className="text-base text-gray-500">
                     Add special requests and preferences easily through the app.
@@ -277,7 +277,7 @@ const LandingPage = () => {
               
               {/* Feature 3 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Track Your Order in Real Time</h3>
                   <p className="text-base text-gray-500">
                     Get updates from the kitchen as your food is being prepared.
@@ -287,7 +287,7 @@ const LandingPage = () => {
               
               {/* Feature 4 */}
               <div className="relative">
-                <div className="p-6 rounded-lg bg-amber-50 border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
+                <div className="p-6 rounded-lg bg-brand-light border-2 border-gray-800 transform -rotate-1 shadow-lg hover:shadow-xl transition duration-300">
                   <h3 className="text-lg font-medium text-gray-900 mb-3 font-omnes">Seamless Payment</h3>
                   <p className="text-base text-gray-500">
                     Pay directly in the app, no need for cash or cards.
