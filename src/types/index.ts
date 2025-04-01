@@ -25,6 +25,7 @@ export type Restaurant = {
   };
   distance?: string;
   isOpen?: boolean;
+  isNew?: boolean;
   // Additional properties needed by RestaurantSettings
   latitude: number;
   longitude: number;

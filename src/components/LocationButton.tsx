@@ -15,7 +15,8 @@ const LocationButton: React.FC = () => {
       await requestLocation();
       toast.success("Location found successfully!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not access your location");
+      console.error("Location error:", error);
+      toast.error(error instanceof Error ? error.message : "Could not access your location. Please check your browser permissions.");
     } finally {
       setIsLoading(false);
     }
