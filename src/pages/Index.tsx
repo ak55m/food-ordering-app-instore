@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '@/context/AppContext';
@@ -58,7 +59,7 @@ const Index: React.FC = () => {
     <div className="min-h-screen bg-white pb-20">
       <header className="bg-white shadow-sm sticky top-0 z-10 safe-top">
         <div className={`mx-auto ${isMobile ? 'px-4 max-w-[430px]' : 'container max-w-[1600px] px-8'} py-4 flex justify-between items-center`}>
-          <h1 className="text-xl font-bold text-brand-cyan font-omnes">MunchMap</h1>
+          <h1 className="text-xl font-bold text-brand-cyan font-omnes">OrderU</h1>
           <div>
             <LocationButton />
           </div>

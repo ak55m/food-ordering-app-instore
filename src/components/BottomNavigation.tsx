@@ -37,7 +37,7 @@ const BottomNavigation = () => {
           className={`flex flex-col items-center ${isActive('/home') || isActive('/') ? 'text-brand-cyan' : 'text-gray-500'} font-arial`}
         >
           <Home className="h-6 w-6" />
-          <span className="text-xs mt-1">OrderU</span>
+          <span className="text-xs mt-1">Explore</span>
         </button>
         
         {isAuthenticated ? (
