@@ -22,15 +22,8 @@ const LandingPage = () => {
               In house food ordering process automated.
             </p>
             <div className="mt-8 max-w-md mx-auto sm:flex sm:justify-center">
-              <div className="rounded-md shadow-lg transform rotate-1">
-                <Button 
-                  onClick={() => navigate('/login')}
-                  className="w-full flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-brand-light hover:bg-brand-cyan/10 md:py-4 md:text-lg md:px-10"
-                >
-                  Get Started <ArrowRight className="ml-2" />
-                </Button>
-              </div>
-              <div className="mt-3 rounded-md shadow-lg transform -rotate-1 sm:mt-0 sm:ml-3">
+              {/* Removed the "Get Started" button from here */}
+              <div className="rounded-md shadow-lg transform -rotate-1">
                 <Button 
                   variant="outline"
                   onClick={() => navigate('/home')}
@@ -185,6 +178,18 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
+          
+          {/* Added Get Started button for restaurant owners */}
+          <div className="mt-10 flex justify-center">
+            <div className="rounded-md shadow-lg transform rotate-2">
+              <Button 
+                onClick={() => navigate('/restaurant/login')}
+                className="flex items-center justify-center px-8 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-brand-light hover:bg-brand-cyan/10 md:py-4 md:text-lg md:px-10"
+              >
+                Get Started as a Restaurant <ArrowRight className="ml-2" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -309,7 +314,7 @@ const LandingPage = () => {
             <div className="mt-8 flex justify-center">
               <div className="rounded-md shadow-lg transform rotate-2">
                 <Button 
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/restaurant/login')}
                   className="px-5 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-8"
                 >
                   Get Started
