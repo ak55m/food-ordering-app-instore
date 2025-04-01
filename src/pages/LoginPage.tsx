@@ -89,8 +89,8 @@ const LoginPage = () => {
   }, []);
 
   return (
-    <>
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4 pb-20">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <div className="flex-grow flex items-center justify-center p-4 pb-20">
         <Card className="w-full max-w-md shadow-md border border-gray-200">
           <CardHeader className="space-y-1 text-center">
             <CardTitle className="text-2xl font-bold text-gray-800">Welcome Back</CardTitle>
@@ -182,7 +182,7 @@ const LoginPage = () => {
         </Card>
       </div>
       <BottomNavigation />
-    </>
+    </div>
   );
 };
 
