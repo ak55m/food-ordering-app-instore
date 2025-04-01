@@ -47,7 +47,7 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className="pb-20 min-h-screen bg-white">
-      <div className="p-4 bg-gradient-to-b from-cyan-500 to-cyan-400 text-white">
+      <div className="p-4 bg-[#ebf7fd] text-gray-800">
         <h1 className="text-2xl font-bold mb-6">My Profile</h1>
         
         <Card className="mb-6 border-0 shadow-lg">
@@ -56,9 +56,9 @@ const ProfilePage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-4">
-              <Avatar className="h-16 w-16 border-2 border-cyan-200">
+              <Avatar className="h-16 w-16 border-2 border-[#ebf7fd]">
                 <AvatarImage src="" alt="Profile" />
-                <AvatarFallback className="bg-cyan-100 text-cyan-600 text-lg">
+                <AvatarFallback className="bg-[#ebf7fd] text-cyan-600 text-lg">
                   {user?.name?.charAt(0) || 'U'}
                 </AvatarFallback>
               </Avatar>
@@ -78,7 +78,7 @@ const ProfilePage: React.FC = () => {
               <button
                 key={index}
                 onClick={option.onClick}
-                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 border-b last:border-b-0 border-gray-100"
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-[#ebf7fd]/30 border-b last:border-b-0 border-gray-100"
               >
                 <div className="flex items-center space-x-3">
                   <div className="text-cyan-500">{option.icon}</div>
