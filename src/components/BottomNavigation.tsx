@@ -51,7 +51,7 @@ const BottomNavigation = () => {
             </button>
             <button 
               onClick={() => handleNavigation('/cart')} 
-              className={`flex flex-col items-center ${isActive('/cart') ? 'text-brand-cyan' : 'text-gray-500'} relative font-arial`}
+              className={`flex flex-col items-center ${isActive('/cart') ? 'text-brand-cyan' : 'text-gray-500'} relative font-arial cursor-pointer`}
             >
               <ShoppingCart className="h-6 w-6" />
               {cartItemCount > 0 && (

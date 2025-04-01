@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -70,15 +71,13 @@ const AppRoutes = () => {
       <Route path="/home" element={<Index />} />
       <Route path="/restaurant/:id" element={<RestaurantDetail />} />
       
+      {/* Cart is accessible to everyone */}
+      <Route path="/cart" element={<CartPage />} />
+      
       {/* Customer Routes - Authentication required for personal data and orders */}
       <Route path="/orders" element={
         <CustomerAuthRoute>
           <OrdersPage />
-        </CustomerAuthRoute>
-      } />
-      <Route path="/cart" element={
-        <CustomerAuthRoute>
-          <CartPage />
         </CustomerAuthRoute>
       } />
       <Route path="/profile" element={
