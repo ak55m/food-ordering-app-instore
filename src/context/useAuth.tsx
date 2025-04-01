@@ -26,9 +26,8 @@ export function useAuth() {
         }
         
         toast.success('Login successful!');
-      } else {
-        toast.error('Invalid email or password');
-      }
+      } 
+      // The error toast is now handled in the signIn function
     } catch (error) {
       console.error('Login error:', error);
       toast.error('Login failed. Please try again.');
@@ -44,12 +43,11 @@ export function useAuth() {
       const newUser = await signUp(email, password, userData);
       
       if (newUser) {
-        toast.success('Account created successfully! Please log in.');
+        // Don't set the user or authenticate here - they need to confirm email first
         return newUser;
-      } else {
-        toast.error('Failed to create account');
-        return null;
       }
+      
+      return null;
     } catch (error) {
       console.error('Registration error:', error);
       toast.error('Registration failed. Please try again.');
