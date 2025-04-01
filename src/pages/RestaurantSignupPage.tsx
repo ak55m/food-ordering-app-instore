@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -66,7 +65,6 @@ const RestaurantSignupPage = () => {
     setIsLoading(true);
 
     try {
-      // Check if database is ready, if not, create tables
       if (!isDbReady) {
         setDbSetupMessage("Setting up database tables. This may take a moment...");
         const tablesCreated = await createDatabaseTables();
@@ -80,7 +78,6 @@ const RestaurantSignupPage = () => {
         toast.success("Database tables created successfully!");
       }
 
-      // Create restaurant
       const { data: restaurantData, error: restaurantError } = await supabase
         .from('restaurants')
         .insert([
@@ -121,9 +118,19 @@ const RestaurantSignupPage = () => {
 
   const setupRealRestaurantData = async () => {
     setIsSettingUpData(true);
-    setDbSetupMessage("Setting up database tables and your restaurant data. This may take a moment...");
+    setDbSetupMessage("Setting up your restaurant data. This may take a moment...");
     
     try {
+      const tablesExist = await checkDatabaseSetup();
+      
+      if (!tablesExist) {
+        setDbSetupMessage(`Database tables do not exist. You need to configure your Supabase database first.
+        Please contact an administrator or see the documentation for setup instructions.`);
+        toast.error("Database tables don't exist. See console for details.");
+        console.error("Database tables don't exist - they must be created in the Supabase dashboard first");
+        return;
+      }
+      
       const result = await setupRealData();
       
       if (result.success) {
@@ -289,6 +296,11 @@ const RestaurantSignupPage = () => {
               </Button>
               {isSettingUpData && (
                 <p className="text-xs text-gray-500 mt-1">This might take a few moments...</p>
+              )}
+              {!isDbReady && !dbSetupMessage && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Note: You'll need properly configured database tables in your Supabase project.
+                </p>
               )}
             </div>
           </CardFooter>

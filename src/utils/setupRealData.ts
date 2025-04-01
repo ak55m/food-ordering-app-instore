@@ -2,156 +2,17 @@
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
-// Create database tables using Supabase RPC
-export async function createDatabaseTables() {
-  try {
-    console.log("Creating database tables...");
-    
-    // Create restaurants table
-    const { error: restaurantsError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS restaurants (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          image TEXT,
-          categories TEXT[],
-          rating FLOAT DEFAULT 0,
-          address TEXT,
-          latitude FLOAT,
-          longitude FLOAT,
-          phone TEXT,
-          email TEXT,
-          logo TEXT,
-          cover_image TEXT,
-          is_open BOOLEAN DEFAULT true,
-          is_new BOOLEAN DEFAULT false,
-          is_active BOOLEAN DEFAULT true,
-          accepts_online_orders BOOLEAN DEFAULT true,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          owner_id UUID
-        )
-      `
-    });
-    
-    if (restaurantsError) {
-      console.error('Error creating restaurants table:', restaurantsError);
-      return false;
-    }
-
-    // Create restaurant_opening_hours table
-    const { error: hoursError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS restaurant_opening_hours (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID REFERENCES restaurants(id) ON DELETE CASCADE,
-          day TEXT NOT NULL,
-          is_open BOOLEAN DEFAULT true,
-          open_time TEXT,
-          close_time TEXT
-        )
-      `
-    });
-    
-    if (hoursError) {
-      console.error('Error creating restaurant_opening_hours table:', hoursError);
-      return false;
-    }
-
-    // Create restaurant_social_media table
-    const { error: socialMediaError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS restaurant_social_media (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID REFERENCES restaurants(id) ON DELETE CASCADE,
-          platform TEXT NOT NULL,
-          url TEXT NOT NULL
-        )
-      `
-    });
-    
-    if (socialMediaError) {
-      console.error('Error creating restaurant_social_media table:', socialMediaError);
-      return false;
-    }
-
-    // Create categories table
-    const { error: categoriesError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS categories (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          restaurant_id UUID REFERENCES restaurants(id) ON DELETE CASCADE
-        )
-      `
-    });
-    
-    if (categoriesError) {
-      console.error('Error creating categories table:', categoriesError);
-      return false;
-    }
-
-    // Create menu_items table
-    const { error: menuItemsError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS menu_items (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          price FLOAT NOT NULL,
-          image TEXT,
-          category_id UUID REFERENCES categories(id) ON DELETE CASCADE,
-          restaurant_id UUID REFERENCES restaurants(id) ON DELETE CASCADE
-        )
-      `
-    });
-    
-    if (menuItemsError) {
-      console.error('Error creating menu_items table:', menuItemsError);
-      return false;
-    }
-
-    console.log("Database tables created successfully!");
-    return true;
-  } catch (error) {
-    console.error('Error creating database tables:', error);
-    return false;
-  }
-}
-
-// Function to check if Supabase tables are ready
+// Check if tables exist by attempting to query them
 export async function checkDatabaseSetup() {
   try {
-    // Try to query restaurants table
+    // Try to check if restaurants table exists by querying with a limit
     const { error: restaurantsError } = await supabase
       .from('restaurants')
-      .select('count')
+      .select('id')
       .limit(1);
     
-    if (restaurantsError) {
+    if (restaurantsError && restaurantsError.message.includes('does not exist')) {
       console.error('Restaurants table not ready:', restaurantsError);
-      return false;
-    }
-    
-    // Try to query categories table
-    const { error: categoriesError } = await supabase
-      .from('categories')
-      .select('count')
-      .limit(1);
-    
-    if (categoriesError) {
-      console.error('Categories table not ready:', categoriesError);
-      return false;
-    }
-    
-    // Try to query menu_items table
-    const { error: menuItemsError } = await supabase
-      .from('menu_items')
-      .select('count')
-      .limit(1);
-    
-    if (menuItemsError) {
-      console.error('Menu items table not ready:', menuItemsError);
       return false;
     }
     
@@ -162,13 +23,23 @@ export async function checkDatabaseSetup() {
   }
 }
 
+// Create tables directly using Supabase with predefined permissions
+export async function createDatabaseTables() {
+  // We cannot create tables directly with anon key, 
+  // so we'll assume tables already exist or return false
+  toast.error("Tables must be created by an admin in the Supabase dashboard");
+  console.warn("Cannot create tables with anonymous key - tables must be created by an admin");
+  return false;
+}
+
 export async function setupRealData() {
   try {
-    // First ensure tables exist
-    const tablesCreated = await createDatabaseTables();
+    // Check if tables exist
+    const tablesExist = await checkDatabaseSetup();
     
-    if (!tablesCreated) {
-      return { success: false, error: "Could not create database tables" };
+    if (!tablesExist) {
+      toast.error('Database tables do not exist. Please contact an administrator to set up the database.');
+      return { success: false, error: "Database tables don't exist" };
     }
 
     // Check if the restaurant already exists
@@ -213,6 +84,11 @@ export async function setupRealData() {
 
     if (restaurantError) {
       console.error('Error creating restaurant:', restaurantError);
+      if (restaurantError.message.includes('does not exist')) {
+        toast.error('The restaurants table does not exist. Please contact an administrator.');
+      } else {
+        toast.error(`Failed to create restaurant: ${restaurantError.message}`);
+      }
       return { success: false, error: restaurantError.message };
     }
 
