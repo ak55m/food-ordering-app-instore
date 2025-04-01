@@ -59,21 +59,11 @@ const CustomerLoginPage = () => {
 
   // Check for remembered user on component mount
   React.useEffect(() => {
-    const rememberedUser = localStorage.getItem('user');
-    if (rememberedUser && localStorage.getItem('rememberUser') === 'true') {
-      try {
-        const parsedUser = JSON.parse(rememberedUser);
-        setUser(parsedUser);
-        
-        if (parsedUser.role === 'customer') {
-          navigate('/home');
-        } else if (parsedUser.role === 'restaurant_owner') {
-          navigate('/restaurant');
-        }
-      } catch (error) {
-        console.error("Error parsing remembered user:", error);
-        localStorage.removeItem('user');
-      }
+    const rememberedUser = localStorage.getItem('rememberUser');
+    if (rememberedUser === 'true') {
+      // The actual user state is handled by AppContext's initialization
+      // No need to manually set the user here
+      console.log("User remembered from previous session");
     }
   }, []);
 
