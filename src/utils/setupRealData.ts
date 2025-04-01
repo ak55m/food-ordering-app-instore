@@ -33,118 +33,131 @@ export async function createDatabaseTables() {
       return true;
     }
 
-    // If the tables don't exist, we need to create them directly
-    // First, try to create the uuid-ossp extension if it doesn't exist
-    const { error: extensionError } = await supabase.rpc('create_tables_direct', {});
-    
-    if (extensionError) {
-      console.error('Error creating tables:', extensionError);
+    // Define the SQL script to create the tables directly
+    const sqlScript = `
+    -- Enable UUID extension if not already enabled
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+    -- Create restaurants table
+    CREATE TABLE IF NOT EXISTS restaurants (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name TEXT NOT NULL,
+        description TEXT,
+        address TEXT,
+        latitude NUMERIC,
+        longitude NUMERIC,
+        phone TEXT,
+        email TEXT,
+        image TEXT,
+        logo TEXT,
+        cover_image TEXT,
+        is_open BOOLEAN DEFAULT true,
+        is_new BOOLEAN DEFAULT true,
+        is_active BOOLEAN DEFAULT true,
+        accepts_online_orders BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        categories TEXT[] DEFAULT ARRAY[]::TEXT[]
+    );
+
+    -- Create restaurant_opening_hours table
+    CREATE TABLE IF NOT EXISTS restaurant_opening_hours (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+        day TEXT NOT NULL,
+        is_open BOOLEAN DEFAULT true,
+        open_time TEXT,
+        close_time TEXT
+    );
+
+    -- Create restaurant_social_media table
+    CREATE TABLE IF NOT EXISTS restaurant_social_media (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+        platform TEXT NOT NULL,
+        url TEXT NOT NULL
+    );
+
+    -- Create categories table
+    CREATE TABLE IF NOT EXISTS categories (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name TEXT NOT NULL,
+        restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
+    );
+
+    -- Create menu_items table
+    CREATE TABLE IF NOT EXISTS menu_items (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        name TEXT NOT NULL,
+        description TEXT,
+        price NUMERIC NOT NULL,
+        image TEXT,
+        category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+        restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
+    );
+
+    -- Create orders table
+    CREATE TABLE IF NOT EXISTS orders (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL,
+        restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
+        status TEXT NOT NULL DEFAULT 'pending',
+        timestamp TIMESTAMPTZ DEFAULT NOW(),
+        total NUMERIC NOT NULL DEFAULT 0,
+        payment_method TEXT,
+        payment_status TEXT DEFAULT 'pending',
+        payment_method_id UUID
+    );
+
+    -- Create order_items table
+    CREATE TABLE IF NOT EXISTS order_items (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+        menu_item_id UUID NOT NULL REFERENCES menu_items(id) ON DELETE CASCADE,
+        quantity INTEGER NOT NULL DEFAULT 1,
+        price NUMERIC NOT NULL
+    );
+
+    -- Create payment_methods table
+    CREATE TABLE IF NOT EXISTS payment_methods (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        user_id UUID NOT NULL,
+        type TEXT NOT NULL,
+        last_four TEXT NOT NULL,
+        expiry_date TEXT,
+        cardholder_name TEXT,
+        is_default BOOLEAN DEFAULT false,
+        brand TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+    );
+    `;
+
+    // Execute the SQL as a single transaction
+    const { error } = await supabase.rpc('exec_sql', { sql: sqlScript });
+
+    if (error) {
+      // If there's an error with the RPC call, try creating each table individually
+      console.error('Error creating tables with RPC call:', error);
       
-      // Try direct SQL approach as a fallback
-      const sqlScript = `
-      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      // Try to create a function to execute SQL first
+      await supabase.rpc('exec_sql', { 
+        sql: `
+        CREATE OR REPLACE FUNCTION exec_sql(sql text) RETURNS void AS $$
+        BEGIN
+          EXECUTE sql;
+        END;
+        $$ LANGUAGE plpgsql;
+        `
+      });
       
-      -- Create restaurants table
-      CREATE TABLE IF NOT EXISTS restaurants (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          address TEXT,
-          latitude NUMERIC,
-          longitude NUMERIC,
-          phone TEXT,
-          email TEXT,
-          image TEXT,
-          logo TEXT,
-          cover_image TEXT,
-          is_open BOOLEAN DEFAULT true,
-          is_new BOOLEAN DEFAULT true,
-          is_active BOOLEAN DEFAULT true,
-          accepts_online_orders BOOLEAN DEFAULT true,
-          created_at TIMESTAMPTZ DEFAULT NOW(),
-          categories TEXT[] DEFAULT ARRAY[]::TEXT[]
-      );
-
-      -- Create restaurant_opening_hours table
-      CREATE TABLE IF NOT EXISTS restaurant_opening_hours (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-          day TEXT NOT NULL,
-          is_open BOOLEAN DEFAULT true,
-          open_time TEXT,
-          close_time TEXT
-      );
-
-      -- Create restaurant_social_media table
-      CREATE TABLE IF NOT EXISTS restaurant_social_media (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-          platform TEXT NOT NULL,
-          url TEXT NOT NULL
-      );
-
-      -- Create categories table
-      CREATE TABLE IF NOT EXISTS categories (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
-      );
-
-      -- Create menu_items table
-      CREATE TABLE IF NOT EXISTS menu_items (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          price NUMERIC NOT NULL,
-          image TEXT,
-          category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
-          restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE
-      );
-
-      -- Create orders table
-      CREATE TABLE IF NOT EXISTS orders (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          user_id UUID NOT NULL,
-          restaurant_id UUID NOT NULL REFERENCES restaurants(id) ON DELETE CASCADE,
-          status TEXT NOT NULL DEFAULT 'pending',
-          timestamp TIMESTAMPTZ DEFAULT NOW(),
-          total NUMERIC NOT NULL DEFAULT 0,
-          payment_method TEXT,
-          payment_status TEXT DEFAULT 'pending',
-          payment_method_id UUID
-      );
-
-      -- Create order_items table
-      CREATE TABLE IF NOT EXISTS order_items (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-          menu_item_id UUID NOT NULL REFERENCES menu_items(id) ON DELETE CASCADE,
-          quantity INTEGER NOT NULL DEFAULT 1,
-          price NUMERIC NOT NULL
-      );
-
-      -- Create payment_methods table
-      CREATE TABLE IF NOT EXISTS payment_methods (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          user_id UUID NOT NULL,
-          type TEXT NOT NULL,
-          last_four TEXT NOT NULL,
-          expiry_date TEXT,
-          cardholder_name TEXT,
-          is_default BOOLEAN DEFAULT false,
-          brand TEXT,
-          created_at TIMESTAMPTZ DEFAULT NOW()
-      );`;
+      // Create tables one by one
+      const tableCreationStatements = sqlScript.split(';').filter(stmt => stmt.trim().length > 0);
       
-      // Execute the SQL script
-      const { error: sqlError } = await supabase.rpc('exec_sql', { sql: sqlScript });
-      
-      if (sqlError) {
-        console.error('Error executing direct SQL:', sqlError);
-        
-        // One more fallback - notify user to run SQL in Supabase dashboard
-        toast.error("Couldn't create database tables automatically. Please run the SQL script from create_tables.sql in your Supabase SQL Editor.");
-        return false;
+      for (const statement of tableCreationStatements) {
+        const { error: stmtError } = await supabase.rpc('exec_sql', { sql: statement });
+        if (stmtError && !stmtError.message.includes("already exists")) {
+          console.error('Error executing SQL statement:', stmtError);
+          throw new Error(`Failed to create database tables: ${stmtError.message}`);
+        }
       }
     }
 
@@ -159,7 +172,7 @@ export async function createDatabaseTables() {
     }
   } catch (error) {
     console.error('Error creating database tables:', error);
-    toast.error("Failed to create database tables.");
+    toast.error("Failed to create database tables. You may need to create them manually in your Supabase SQL Editor.");
     return false;
   }
 }
