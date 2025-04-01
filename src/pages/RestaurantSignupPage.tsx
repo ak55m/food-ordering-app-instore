@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
+import { signUp } from "@/services/supabaseService";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 const RestaurantSignupPage = () => {
   const [restaurantName, setRestaurantName] = useState("");
@@ -49,14 +51,41 @@ const RestaurantSignupPage = () => {
     setIsLoading(true);
 
     try {
-      // Here you would typically call an API to create a new restaurant
-      // For now we'll just simulate a delay and navigate to login
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // First create the restaurant
+      const { data: restaurantData, error: restaurantError } = await supabase
+        .from('restaurants')
+        .insert([
+          { 
+            name: restaurantName,
+            description: `Welcome to ${restaurantName}`,
+            address: 'Please update your address',
+            is_active: true,
+            accepts_online_orders: true
+          }
+        ])
+        .select()
+        .single();
+        
+      if (restaurantError) {
+        throw new Error(`Restaurant creation failed: ${restaurantError.message}`);
+      }
       
-      // Demo signup success - navigate to login
-      navigate('/restaurant/login');
+      // Now create the user with the restaurant ID
+      const userData = {
+        name: ownerName,
+        role: 'restaurant_owner' as const,
+        restaurantId: restaurantData.id
+      };
+      
+      const newUser = await signUp(email, password, userData);
+      
+      if (newUser) {
+        toast.success('Restaurant account created successfully! Please log in.');
+        navigate('/restaurant/login');
+      }
     } catch (error) {
       console.error("Signup error:", error);
+      toast.error('Failed to create restaurant account. Please try again.');
     } finally {
       setIsLoading(false);
     }

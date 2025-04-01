@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import BottomNavigation from "@/components/BottomNavigation";
+import { signUp } from "@/services/supabaseService";
+import { toast } from "sonner";
 
 const CustomerSignupPage = () => {
   const [name, setName] = useState("");
@@ -49,14 +50,20 @@ const CustomerSignupPage = () => {
     setIsLoading(true);
 
     try {
-      // Here you would typically call an API to create a new user
-      // For now we'll just simulate a delay and navigate to login
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const userData = {
+        name: name,
+        role: 'customer' as const
+      };
       
-      // Demo signup success - navigate to login
-      navigate('/customer/login');
+      const newUser = await signUp(email, password, userData);
+      
+      if (newUser) {
+        toast.success('Account created successfully! Please log in.');
+        navigate('/customer/login');
+      }
     } catch (error) {
       console.error("Signup error:", error);
+      toast.error('Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }

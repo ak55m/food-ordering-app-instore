@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import BottomNavigation from "@/components/BottomNavigation";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 const CustomerLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -16,7 +16,7 @@ const CustomerLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  const { user, setUser, isAuthenticated, login } = useAppContext();
+  const { user, isAuthenticated, login } = useAppContext();
 
   // Test user credentials
   const testCustomer = {
@@ -40,13 +40,13 @@ const CustomerLoginPage = () => {
     setIsLoading(true);
 
     try {
-      // Use the login function from context
       await login(email, password);
       if (rememberMe) {
         localStorage.setItem('rememberUser', 'true');
       }
     } catch (error) {
       console.error("Login error:", error);
+      toast.error("Failed to login. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }

@@ -5,6 +5,9 @@ import {
   OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia 
 } from '@/types';
 import { mockRestaurants, mockMenuItems, mockCategories } from '@/data/mockData';
+import { supabase } from '@/lib/supabase';
+import { signIn, signUp, signOut, getCurrentUser } from '@/services/supabaseService';
+import { toast } from 'sonner';
 
 interface AppContextType {
   user: User | null;
@@ -101,41 +104,44 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   
   const login = async (email: string, password: string): Promise<void> => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      setIsLoading(prev => ({ ...prev, auth: true }));
       
-      if (email === 'customer@example.com' && password === 'password123') {
-        const user: User = {
-          id: 'cust-123',
-          email: 'customer@example.com',
-          name: 'Test Customer',
-          role: 'customer',
-        };
-        setUser(user);
+      // Use the real Supabase authentication
+      const loggedInUser = await signIn(email, password);
+      
+      if (loggedInUser) {
+        setUser(loggedInUser);
         setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(user));
-      } else if (email === 'owner@example.com' && password === 'password123') {
-        const user: User = {
-          id: 'owner-123',
-          email: 'owner@example.com',
-          name: 'Test Restaurant Owner',
-          role: 'restaurant_owner',
-          restaurantId: 'rest1',
-        };
-        setUser(user);
-        setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(user));
+        
+        if (loggedInUser.role === 'restaurant_owner' && loggedInUser.restaurantId) {
+          // Load restaurant data if the user is a restaurant owner
+          // This would be done in a real implementation
+        }
+        
+        toast.success('Login successful!');
+      } else {
+        toast.error('Invalid email or password');
       }
     } catch (error) {
       console.error('Login error:', error);
-      throw error;
+      toast.error('Login failed. Please try again.');
+    } finally {
+      setIsLoading(prev => ({ ...prev, auth: false }));
     }
   };
   
-  const logout = (): void => {
-    setUser(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('user');
-    setCart([]);
+  const logout = async (): void => {
+    try {
+      await signOut();
+      setUser(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('rememberUser');
+      setCart([]);
+      toast.success('Logged out successfully');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Logout failed');
+    }
   };
   
   const requestLocation = async (): Promise<void> => {
@@ -380,17 +386,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
   
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    async function initUser() {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          setUser(currentUser);
+          setIsAuthenticated(true);
+          
+          // Load orders for the current user
+          if (currentUser.id) {
+            // This would be implemented in a real app
+          }
+        }
       } catch (error) {
-        console.error('Error parsing stored user:', error);
-        localStorage.removeItem('user');
+        console.error('Error initializing user:', error);
       }
     }
+
+    initUser();
 
     const storedLocation = localStorage.getItem(USER_LOCATION_KEY);
     if (storedLocation) {

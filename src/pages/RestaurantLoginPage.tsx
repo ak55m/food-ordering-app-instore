@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
+import { toast } from "sonner";
 
 const RestaurantLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -14,7 +14,7 @@ const RestaurantLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
-  const { user, setUser, isAuthenticated, login } = useAppContext();
+  const { user, isAuthenticated, login } = useAppContext();
 
   // Test user credentials
   const testRestaurantOwner = {
@@ -40,11 +40,14 @@ const RestaurantLoginPage = () => {
     try {
       // Use the login function from context
       await login(email, password);
+      
+      // Check if the logged in user is a restaurant owner
       if (rememberMe) {
         localStorage.setItem('rememberUser', 'true');
       }
     } catch (error) {
       console.error("Login error:", error);
+      toast.error("Failed to login. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }
