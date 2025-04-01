@@ -10,6 +10,7 @@ import CustomerLoginPage from "./pages/CustomerLoginPage";
 import CustomerSignupPage from "./pages/CustomerSignupPage";
 import RestaurantLoginPage from "./pages/RestaurantLoginPage";
 import RestaurantSignupPage from "./pages/RestaurantSignupPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import LandingPage from "./pages/LandingPage";
 
 // Pages - Customer View
@@ -76,6 +77,7 @@ const AppRoutes = () => {
           (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/home" />) 
           : <CustomerSignupPage />
       } />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       
       {/* Restaurant Auth Routes */}
       <Route path="/restaurant/login" element={

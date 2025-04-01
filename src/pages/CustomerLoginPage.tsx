@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,12 +10,21 @@ import { useAppContext } from "@/context/AppContext";
 import BottomNavigation from "@/components/BottomNavigation";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  rememberMe: z.boolean().default(false)
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const CustomerLoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const navigate = useNavigate();
   const { user, isAuthenticated, login } = useAppContext();
 
@@ -23,6 +33,15 @@ const CustomerLoginPage = () => {
     email: "customer@example.com",
     password: "password123"
   };
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      rememberMe: false
+    }
+  });
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -35,15 +54,18 @@ const CustomerLoginPage = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: LoginFormValues) => {
     setIsLoading(true);
 
     try {
-      await login(email, password);
-      if (rememberMe) {
+      // Save remember me preference to localStorage
+      if (values.rememberMe) {
         localStorage.setItem('rememberUser', 'true');
+      } else {
+        localStorage.removeItem('rememberUser');
       }
+      
+      await login(values.email, values.password);
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Failed to login. Please check your credentials.");
@@ -53,19 +75,9 @@ const CustomerLoginPage = () => {
   };
 
   const handleTestCustomerLogin = () => {
-    setEmail(testCustomer.email);
-    setPassword(testCustomer.password);
+    form.setValue("email", testCustomer.email);
+    form.setValue("password", testCustomer.password);
   };
-
-  // Check for remembered user on component mount
-  React.useEffect(() => {
-    const rememberedUser = localStorage.getItem('rememberUser');
-    if (rememberedUser === 'true') {
-      // The actual user state is handled by AppContext's initialization
-      // No need to manually set the user here
-      console.log("User remembered from previous session");
-    }
-  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
@@ -79,60 +91,80 @@ const CustomerLoginPage = () => {
           </CardHeader>
           
           <CardContent>
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="name@example.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                  required
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="name@example.com" 
+                          className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-gray-700">Password</Label>
-                  <a href="#" className="text-sm text-gray-600 hover:text-gray-800">
-                    Forgot password?
-                  </a>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <FormLabel className="text-gray-700">Password</FormLabel>
+                    <Link to="/forgot-password" className="text-sm text-gray-600 hover:text-gray-800">
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input 
+                            type="password"
+                            className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                 </div>
-                <Input 
-                  id="password" 
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                  required
-                />
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="remember" 
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked === true)}
-                  className="text-gray-600 border-gray-400"
+                <FormField
+                  control={form.control}
+                  name="rememberMe"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <Checkbox 
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="text-gray-600 border-gray-400"
+                        />
+                      </FormControl>
+                      <Label
+                        htmlFor="rememberMe"
+                        className="text-sm font-medium leading-none text-gray-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Remember me
+                      </Label>
+                    </FormItem>
+                  )}
                 />
-                <label
-                  htmlFor="remember"
-                  className="text-sm font-medium leading-none text-gray-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
+                  disabled={isLoading}
                 >
-                  Remember me
-                </label>
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
-                disabled={isLoading}
-              >
-                {isLoading ? "Logging in..." : "Login"}
-              </Button>
-            </form>
+                  {isLoading ? "Logging in..." : "Login"}
+                </Button>
+              </form>
+            </Form>
 
             <div className="mt-4 text-center text-sm">
               <p className="text-gray-600">

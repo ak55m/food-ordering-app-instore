@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from '@/types';
 import { signIn, signOut, getCurrentUser } from '@/services';
 import { toast } from 'sonner';
@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   
   const login = async (email: string, password: string): Promise<void> => {
     try {
@@ -51,14 +51,19 @@ export function useAuth() {
   };
 
   const initUser = async (): Promise<void> => {
+    setIsLoading(true);
     try {
+      // Check if there's an active session
       const currentUser = await getCurrentUser();
+      
       if (currentUser) {
         setUser(currentUser);
         setIsAuthenticated(true);
       }
     } catch (error) {
       console.error('Error initializing user:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -66,7 +71,7 @@ export function useAuth() {
     user,
     setUser,
     isAuthenticated,
-    isLoading: isLoading,
+    isLoading,
     login,
     logout,
     initUser

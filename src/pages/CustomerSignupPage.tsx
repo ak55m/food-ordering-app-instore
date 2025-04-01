@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -9,17 +10,41 @@ import { useAppContext } from "@/context/AppContext";
 import BottomNavigation from "@/components/BottomNavigation";
 import { signUp } from '@/services';
 import { toast } from "sonner";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const signupSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+  agreeTerms: z.boolean().refine((val) => val === true, {
+    message: "You must agree to the terms and conditions"
+  })
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"]
+});
+
+type SignupFormValues = z.infer<typeof signupSchema>;
 
 const CustomerSignupPage = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
-  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAppContext();
+
+  const form = useForm<SignupFormValues>({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agreeTerms: false
+    }
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -31,29 +56,16 @@ const CustomerSignupPage = () => {
     }
   }, [isAuthenticated, user, navigate]);
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      setPasswordError("Passwords do not match");
-      return;
-    }
-    
-    if (password.length < 6) {
-      setPasswordError("Password must be at least 6 characters");
-      return;
-    }
-
-    setPasswordError("");
+  const onSubmit = async (values: SignupFormValues) => {
     setIsLoading(true);
 
     try {
       const userData = {
-        name: name,
+        name: values.name,
         role: 'customer' as const
       };
       
-      const newUser = await signUp(email, password, userData);
+      const newUser = await signUp(values.email, values.password, userData);
       
       if (newUser) {
         toast.success('Account created successfully! Please log in.');
@@ -79,84 +91,112 @@ const CustomerSignupPage = () => {
           </CardHeader>
           
           <CardContent>
-            <form onSubmit={handleSignup} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-gray-700">Full Name</Label>
-                <Input 
-                  id="name" 
-                  type="text" 
-                  placeholder="John Doe" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                  required
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Full Name</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="John Doe" 
+                          className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="name@example.com" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                  required
+                
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Email</FormLabel>
+                      <FormControl>
+                        <Input 
+                          placeholder="name@example.com" 
+                          className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700">Password</Label>
-                <Input 
-                  id="password" 
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                  required
+                
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Password</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="password"
+                          className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-gray-700">Confirm Password</Label>
-                <Input 
-                  id="confirmPassword" 
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
-                  required
+                
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-gray-700">Confirm Password</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="password"
+                          className="border-gray-300 focus:border-gray-400 focus:ring-gray-400"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                {passwordError && (
-                  <p className="text-sm text-red-500">{passwordError}</p>
-                )}
-              </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="terms" 
-                  checked={agreeTerms}
-                  onCheckedChange={(checked) => setAgreeTerms(checked === true)}
-                  className="text-gray-600 border-gray-400"
-                  required
+                <FormField
+                  control={form.control}
+                  name="agreeTerms"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <Checkbox 
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          className="text-gray-600 border-gray-400"
+                        />
+                      </FormControl>
+                      <Label
+                        htmlFor="agreeTerms"
+                        className="text-sm font-medium leading-none text-gray-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        I agree to the terms and conditions
+                      </Label>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none text-gray-600 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
+                  disabled={isLoading}
                 >
-                  I agree to the terms and conditions
-                </label>
-              </div>
-
-              <Button 
-                type="submit" 
-                className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
-                disabled={isLoading || !agreeTerms}
-              >
-                {isLoading ? "Creating Account..." : "Sign Up"}
-              </Button>
-            </form>
+                  {isLoading ? "Creating Account..." : "Sign Up"}
+                </Button>
+              </form>
+            </Form>
 
             <div className="mt-4 text-center text-sm">
               <p className="text-gray-600">

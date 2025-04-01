@@ -71,13 +71,21 @@ export async function signIn(email: string, password: string) {
         return null;
       }
 
-      return {
+      const user = {
         id: profile.id,
         email: profile.email,
         name: profile.name,
         role: profile.role,
         restaurantId: profile.restaurant_id,
       };
+
+      // If remember me is set, store the session info
+      const rememberUser = localStorage.getItem('rememberUser');
+      if (rememberUser === 'true') {
+        localStorage.setItem('sessionActive', 'true');
+      }
+
+      return user;
     }
 
     return null;
@@ -95,6 +103,7 @@ export async function signOut() {
       toast.error(error.message);
       return false;
     }
+    localStorage.removeItem('sessionActive');
     toast.success('Signed out successfully');
     return true;
   } catch (error) {
@@ -132,5 +141,25 @@ export async function getCurrentUser() {
   } catch (error) {
     console.error('Error getting current user:', error);
     return null;
+  }
+}
+
+export async function resetPassword(email: string) {
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    
+    if (error) {
+      toast.error(error.message);
+      return false;
+    }
+    
+    toast.success('Password reset link sent to your email');
+    return true;
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    toast.error('Failed to send reset password link');
+    return false;
   }
 }
