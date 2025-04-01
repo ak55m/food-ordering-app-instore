@@ -1,3 +1,4 @@
+
 import { Restaurant, MenuItem, Category } from '@/types';
 
 // Mock Restaurant Data
@@ -15,6 +16,7 @@ export const mockRestaurants: Restaurant[] = [
       longitude: -74.005974
     },
     isOpen: true,
+    isNew: true,
     latitude: 40.712776,
     longitude: -74.005974,
     phone: '(555) 123-4567',
