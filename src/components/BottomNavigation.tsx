@@ -15,6 +15,12 @@ const BottomNavigation = () => {
   };
 
   const isActive = (path: string) => {
+    if (path === '/login') {
+      // Check if the current path is any login-related path
+      return location.pathname === '/login' || 
+             location.pathname === '/customer/login' || 
+             location.pathname === '/restaurant/login';
+    }
     return location.pathname === path;
   };
 
@@ -70,7 +76,7 @@ const BottomNavigation = () => {
               icon={<LogIn className="h-6 w-6" />}
               label="Login"
               active={isActive('/login')}
-              onClick={() => handleNavigation('/login')}
+              onClick={() => handleNavigation('/customer/login')}
             />
           </>
         )}
