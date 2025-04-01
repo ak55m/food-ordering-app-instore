@@ -1,381 +1,312 @@
 
 import React from 'react';
+import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, QrCode, Clock, UtensilsCrossed, DollarSign, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
-const LandingPage: React.FC = () => {
+const LandingPage = () => {
   const navigate = useNavigate();
-
+  
   return (
-    <div className="min-h-screen bg-brand-light">
-      {/* Hero Section with Cartoon Style */}
-      <header className="relative overflow-hidden bg-gradient-to-b from-brand-cyan to-brand-light pt-8">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-300 rounded-full -mr-10 -mt-10"></div>
-          <div className="absolute bottom-0 left-0 w-40 h-40 bg-brand-orange rounded-full -ml-10 -mb-10"></div>
-        </div>
-        <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            <div className="md:w-1/2 space-y-6">
-              <div className="inline-block bg-white/30 px-4 py-1 rounded-full backdrop-blur-sm">
-                <span className="text-brand-cyan font-bold text-sm">Self-Service Ordering</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-omnes tracking-tight text-gray-900">
-                <span className="text-brand-cyan">Order</span>U
-              </h1>
-              <p className="text-xl text-gray-700 max-w-lg">
-                Seamless Self-Service Ordering for Restaurants & Bars. Eliminate expensive kiosks & long wait times, making food ordering faster and smarter.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 pt-2">
+    <div className="min-h-screen bg-gradient-to-b from-cyan-50 to-white overflow-hidden">
+      {/* Hero Section */}
+      <div className="relative pt-10 pb-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl">
+              <span className="block">Seamless Self-Service</span>
+              <span className="block text-cyan-600">Ordering for Restaurants & Bars</span>
+            </h1>
+            <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+              OrderU eliminates expensive kiosks & long wait times, making food ordering faster and smarter.
+            </p>
+            <div className="mt-5 max-w-md mx-auto sm:flex sm:justify-center md:mt-8">
+              <div className="rounded-md shadow">
                 <Button 
-                  onClick={() => navigate('/home')} 
-                  className="bg-brand-cyan hover:bg-brand-cyan/90 text-white font-medium px-6 py-3 rounded-full text-lg shadow-lg shadow-brand-cyan/30"
-                  size="lg"
+                  onClick={() => navigate('/login')}
+                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-cyan-600 hover:bg-cyan-700 md:py-4 md:text-lg md:px-10"
                 >
-                  Get Started Today <ArrowRight className="ml-2 h-5 w-5" />
+                  Get Started Today
                 </Button>
+              </div>
+              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3">
                 <Button 
                   variant="outline"
-                  onClick={() => {
-                    const featuresSection = document.getElementById('features');
-                    featuresSection?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="border-brand-cyan text-brand-cyan font-medium px-6 py-3 rounded-full text-lg"
-                  size="lg"
+                  onClick={() => navigate('/home')}
+                  className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-cyan-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10"
                 >
-                  Learn More
+                  Browse Menu
                 </Button>
               </div>
             </div>
-            <div className="md:w-1/2 flex justify-center md:justify-end">
+          </div>
+        </div>
+        <div className="mt-10 max-w-2xl mx-auto">
+          <div className="relative h-64 sm:h-72 md:h-96 bg-cyan-100 rounded-xl overflow-hidden">
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img 
+                src="/placeholder.svg" 
+                alt="App mockup"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-2xl font-bold text-gray-800">App Mockup</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* How It Works */}
+      <div className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center">
+            <h2 className="text-base text-cyan-600 font-semibold tracking-wide uppercase">How It Works</h2>
+            <p className="mt-2 text-3xl leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Simple 3-Step Process
+            </p>
+          </div>
+
+          <div className="mt-10">
+            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
+              {/* Step 1 */}
               <div className="relative">
-                {/* Cartoon App Mockup Image with Speech Bubble */}
-                <div className="absolute -right-6 -top-10 transform rotate-12 bg-white p-3 rounded-xl shadow-lg">
-                  <div className="text-brand-orange font-bold">Order Now!</div>
-                  <div className="absolute -bottom-2 right-4 w-4 h-4 bg-white transform rotate-45"></div>
+                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-cyan-500 text-white">
+                  <span className="text-xl font-bold">1</span>
                 </div>
-                
-                <div className="bg-white p-4 rounded-3xl shadow-xl border-4 border-brand-cyan relative">
-                  <img 
-                    src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&auto=format&fit=crop" 
-                    alt="App Mockup" 
-                    className="rounded-2xl h-[300px] w-[250px] md:h-[350px] md:w-[300px] object-cover"
-                  />
-                  <div className="absolute -bottom-4 -right-4 w-16 h-16 bg-brand-orange rounded-full flex items-center justify-center text-white text-xl font-bold shadow-lg">
-                    <span>📱</span>
-                  </div>
+                <div className="ml-16">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Scan & Order</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Customers scan a QR code or use the app to place orders directly from their table.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 2 */}
+              <div className="relative">
+                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-cyan-500 text-white">
+                  <span className="text-xl font-bold">2</span>
+                </div>
+                <div className="ml-16">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Real-Time Kitchen Updates</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Orders go directly to the kitchen for faster processing and preparation.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Step 3 */}
+              <div className="relative">
+                <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-cyan-500 text-white">
+                  <span className="text-xl font-bold">3</span>
+                </div>
+                <div className="ml-16">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Enjoy & Pay with Ease</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Customers receive updates and check out seamlessly when they're ready to pay.
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        
-        {/* Cartoon Wave Divider */}
-        <div className="absolute bottom-0 left-0 w-full">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full">
-            <path fill="#ebf7fd" fillOpacity="1" d="M0,96L48,122.7C96,149,192,203,288,208C384,213,480,171,576,144C672,117,768,107,864,128C960,149,1056,203,1152,213.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-          </svg>
-        </div>
-      </header>
+      </div>
 
-      {/* How It Works Section */}
-      <section id="features" className="py-16 md:py-24 bg-brand-light relative">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-omnes text-brand-cyan">
-              How OrderU Works
-            </h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-              Three simple steps to revolutionize your ordering experience
+      {/* Benefits for Restaurants */}
+      <div className="py-12 bg-cyan-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center">
+            <h2 className="text-base text-cyan-600 font-semibold tracking-wide uppercase">Benefits for Restaurants</h2>
+            <p className="mt-2 text-3xl leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Transform Your Business
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Step 1 */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-brand-cyan/20 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-light text-brand-cyan mb-5">
-                <QrCode className="h-8 w-8" />
+          <div className="mt-10">
+            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
+              {/* Benefit 1 */}
+              <div className="relative">
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Reduce Labor Costs</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Less reliance on cashiers & servers means more efficient staffing and reduced costs.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold font-omnes mb-3 text-gray-800">Scan & Order</h3>
-              <p className="text-gray-600">
-                Customers scan a QR code or use the app to place orders directly from their table.
-              </p>
-            </div>
-            
-            {/* Step 2 */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-brand-cyan/20 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-light text-brand-cyan mb-5">
-                <UtensilsCrossed className="h-8 w-8" />
+              
+              {/* Benefit 2 */}
+              <div className="relative">
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Faster Order Processing</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Orders go straight to the kitchen, reducing wait times and increasing table turnover.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold font-omnes mb-3 text-gray-800">Real-Time Kitchen Updates</h3>
-              <p className="text-gray-600">
-                Orders go directly to the kitchen for faster processing, no server required.
-              </p>
-            </div>
-            
-            {/* Step 3 */}
-            <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-brand-cyan/20 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-light text-brand-cyan mb-5">
-                <DollarSign className="h-8 w-8" />
+              
+              {/* Benefit 3 */}
+              <div className="relative">
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Increase Revenue</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Customers can order more conveniently, leading to higher average order values.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold font-omnes mb-3 text-gray-800">Enjoy & Pay with Ease</h3>
-              <p className="text-gray-600">
-                Customers receive updates and check out seamlessly without waiting for the bill.
-              </p>
+              
+              {/* Benefit 4 */}
+              <div className="relative">
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Improve Customer Experience</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Shorter wait times & no manual errors create a better dining experience for customers.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Benefits for Restaurants Section */}
-      <section className="py-16 md:py-24 bg-white relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" className="w-full rotate-180">
-            <path fill="#ebf7fd" fillOpacity="1" d="M0,96L48,122.7C96,149,192,203,288,208C384,213,480,171,576,144C672,117,768,107,864,128C960,149,1056,203,1152,213.3C1248,224,1344,192,1392,176L1440,160L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
-          </svg>
-        </div>
-        
-        <div className="container mx-auto px-4 relative z-10 pt-12">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-omnes text-brand-cyan">
-              Benefits for Restaurants
-            </h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-              Optimize your operation and enhance customer experience
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Benefit 1 */}
-            <div className="bg-brand-light p-8 rounded-3xl shadow-lg hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-brand-cyan">Reduce Labor Costs</h3>
-              <p className="text-gray-600">
-                Less reliance on cashiers & servers means optimized staffing and lower operational costs.
-              </p>
-            </div>
-            
-            {/* Benefit 2 */}
-            <div className="bg-brand-light p-8 rounded-3xl shadow-lg hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-brand-cyan">Faster Order Processing</h3>
-              <p className="text-gray-600">
-                Orders go straight to the kitchen, reducing wait times and increasing table turnover.
-              </p>
-            </div>
-            
-            {/* Benefit 3 */}
-            <div className="bg-brand-light p-8 rounded-3xl shadow-lg hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-brand-cyan">Increase Revenue</h3>
-              <p className="text-gray-600">
-                Customers order more conveniently, leading to higher check averages and repeat business.
-              </p>
-            </div>
-            
-            {/* Benefit 4 */}
-            <div className="bg-brand-light p-8 rounded-3xl shadow-lg hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-brand-cyan">Improve Experience</h3>
-              <p className="text-gray-600">
-                Shorter wait times & no manual errors create happier customers who return more often.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Customer Section */}
-      <section className="py-16 md:py-24 bg-brand-light">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-omnes text-brand-cyan">
-              For Customers: A Faster, Easier Way to Order
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-brand-cyan/20 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-gray-800">Skip the Line</h3>
-              <p className="text-gray-600">
-                Order directly from your phone, no waiting in queues or for service.
-              </p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-brand-cyan/20 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-gray-800">Customize Your Meal</h3>
-              <p className="text-gray-600">
-                Add special requests and preferences easily with our user-friendly interface.
-              </p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-brand-cyan/20 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-gray-800">Track Your Order</h3>
-              <p className="text-gray-600">
-                Get real-time updates from the kitchen on the status of your food.
-              </p>
-            </div>
-            
-            <div className="bg-white p-8 rounded-3xl shadow-lg border-2 border-brand-cyan/20 hover:transform hover:-translate-y-2 transition-all duration-300">
-              <h3 className="text-xl font-bold font-omnes mb-3 text-gray-800">Seamless Payment</h3>
-              <p className="text-gray-600">
-                Pay directly in the app, no need for cash or cards or waiting for the bill.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section with Cartoon Avatars */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-omnes text-brand-cyan">
-              What our users say
-            </h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">
-              See how OrderU is transforming restaurant operations
+      {/* Customer Reviews */}
+      <div className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center">
+            <h2 className="text-base text-cyan-600 font-semibold tracking-wide uppercase">Customer Reviews</h2>
+            <p className="mt-2 text-3xl leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl">
+              People Love OrderU
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                name: "David R.",
-                role: "Restaurant Owner",
-                quote: "Game changer for our restaurant! Our staff can now focus on service, and customers love the seamless ordering.",
-                emoji: "🍽️"
-              },
-              {
-                name: "Samantha L.",
-                role: "Customer",
-                quote: "I placed my order in seconds and didn't have to wait in line. Super convenient!",
-                emoji: "😊"
-              },
-              {
-                name: "Michael T.",
-                role: "Bar Manager",
-                quote: "OrderU helped us handle high volumes efficiently. We've cut down wait times significantly!",
-                emoji: "🍹"
-              }
-            ].map((testimonial, index) => (
-              <div key={index} className="bg-brand-light p-8 rounded-3xl shadow-lg">
-                <div className="flex items-center mb-6">
-                  <div className="w-14 h-14 bg-brand-cyan rounded-full flex items-center justify-center text-white text-2xl shadow-md">
-                    {testimonial.emoji}
-                  </div>
-                  <div className="ml-4">
-                    <h4 className="font-bold text-lg">{testimonial.name}</h4>
-                    <p className="text-brand-cyan">{testimonial.role}</p>
+          <div className="mt-10">
+            <div className="space-y-8 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8">
+              {/* Review 1 */}
+              <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <div className="text-amber-500 flex">
+                    {"★★★★★"}
                   </div>
                 </div>
-                <p className="text-gray-600 italic">"{testimonial.quote}"</p>
-                <div className="flex mt-4">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section with Cartoon Elements */}
-      <section className="py-16 md:py-24 bg-brand-light relative overflow-hidden">
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="bg-gradient-to-r from-brand-cyan to-brand-cyan/80 rounded-3xl p-8 md:p-12 shadow-xl">
-            <div className="flex flex-col md:flex-row items-center justify-between">
-              <div className="md:w-2/3 mb-8 md:mb-0">
-                <h2 className="text-3xl md:text-4xl font-bold font-omnes text-white mb-4">
-                  Ready to Revolutionize Your Ordering System?
-                </h2>
-                <p className="text-xl text-white/90">
-                  Join thousands of restaurants that use OrderU to streamline operations and enhance customer experience.
+                <p className="text-gray-600 mb-4">
+                  "Game changer for our restaurant! Our staff can now focus on service, and customers love the seamless ordering."
                 </p>
+                <p className="font-semibold">— David R., Restaurant Owner</p>
               </div>
+
+              {/* Review 2 */}
+              <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <div className="text-amber-500 flex">
+                    {"★★★★★"}
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "I placed my order in seconds and didn't have to wait in line. Super convenient!"
+                </p>
+                <p className="font-semibold">— Samantha L., Customer</p>
+              </div>
+
+              {/* Review 3 */}
+              <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <div className="text-amber-500 flex">
+                    {"★★★★★"}
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "OrderU helped us handle high volumes efficiently. We've cut down wait times significantly!"
+                </p>
+                <p className="font-semibold">— Michael T., Bar Manager</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* For Customers Section */}
+      <div className="py-12 bg-cyan-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="lg:text-center">
+            <h2 className="text-base text-cyan-600 font-semibold tracking-wide uppercase">For Customers</h2>
+            <p className="mt-2 text-3xl leading-8 font-bold tracking-tight text-gray-900 sm:text-4xl">
+              A Faster, Easier Way to Order
+            </p>
+          </div>
+
+          <div className="mt-10">
+            <div className="space-y-10 md:space-y-0 md:grid md:grid-cols-2 md:gap-x-8 md:gap-y-10">
+              {/* Feature 1 */}
               <div className="relative">
-                <div className="absolute -top-2 -left-2 w-6 h-6 bg-yellow-300 rounded-full animate-bounce"></div>
-                <Button
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Skip the Line</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Order directly from your phone, no waiting in queues.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Feature 2 */}
+              <div className="relative">
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Customize Your Meal</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Add special requests and preferences easily through the app.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Feature 3 */}
+              <div className="relative">
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Track Your Order in Real Time</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Get updates from the kitchen as your food is being prepared.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Feature 4 */}
+              <div className="relative">
+                <div className="mt-2 mb-4">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Seamless Payment</h3>
+                  <p className="mt-2 text-base text-gray-500">
+                    Pay directly in the app, no need for cash or cards.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Final CTA */}
+      <div className="py-16 bg-gradient-to-r from-cyan-600 to-cyan-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+              <span className="block">Ready to Revolutionize Your Ordering System?</span>
+            </h2>
+            <div className="mt-8 flex justify-center">
+              <div className="rounded-md shadow">
+                <Button 
+                  onClick={() => navigate('/login')}
+                  className="px-5 py-3 border border-transparent text-base font-medium rounded-md text-cyan-600 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-8"
+                >
+                  Get Started
+                </Button>
+              </div>
+              <div className="ml-3 rounded-md shadow">
+                <Button 
+                  variant="outline"
                   onClick={() => navigate('/home')}
-                  className="bg-white hover:bg-white/90 text-brand-cyan font-bold px-8 py-4 rounded-full text-lg shadow-lg"
-                  size="lg"
+                  className="px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-cyan-700 hover:bg-cyan-800 md:py-4 md:text-lg md:px-8"
                 >
                   Schedule a Demo
                 </Button>
-                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-brand-orange rounded-full animate-bounce"></div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-
-      {/* Footer with Cartoon Style */}
-      <footer className="bg-brand-cyan text-white py-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-400 rounded-full opacity-30 -mr-10 -mt-10"></div>
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-400 rounded-full opacity-30 -ml-10 -mb-10"></div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row justify-between">
-            <div className="mb-8 md:mb-0">
-              <h3 className="text-2xl font-bold font-omnes mb-4">OrderU</h3>
-              <p className="text-white/80 max-w-xs">
-                Revolutionizing restaurant self-service since 2024.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Company</h4>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-white/80 hover:text-white transition-colors">About Us</a></li>
-                  <li><a href="#" className="text-white/80 hover:text-white transition-colors">Careers</a></li>
-                  <li><a href="#" className="text-white/80 hover:text-white transition-colors">Contact</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Legal</h4>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-white/80 hover:text-white transition-colors">Terms of Service</a></li>
-                  <li><a href="#" className="text-white/80 hover:text-white transition-colors">Privacy Policy</a></li>
-                </ul>
-              </div>
-              
-              <div>
-                <h4 className="text-lg font-semibold mb-4">Resources</h4>
-                <ul className="space-y-2">
-                  <li><a href="#" className="text-white/80 hover:text-white transition-colors">Help Center</a></li>
-                  <li><a href="#" className="text-white/80 hover:text-white transition-colors">Blog</a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-white/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-white/80">&copy; 2024 OrderU. All rights reserved.</p>
-            <div className="mt-4 md:mt-0 flex space-x-4">
-              <a href="#" className="text-white/80 hover:text-white transition-colors">
-                <span className="sr-only">Facebook</span>
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fillRule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clipRule="evenodd" />
-                </svg>
-              </a>
-              <a href="#" className="text-white/80 hover:text-white transition-colors">
-                <span className="sr-only">Instagram</span>
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-                </svg>
-              </a>
-              <a href="#" className="text-white/80 hover:text-white transition-colors">
-                <span className="sr-only">Twitter</span>
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      </div>
     </div>
   );
 };
