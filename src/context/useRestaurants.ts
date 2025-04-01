@@ -2,35 +2,109 @@
 import { useState, useEffect } from 'react';
 import { Restaurant, Category } from '@/types';
 import { mockRestaurants, mockCategories } from '@/data/mockData';
-import { getRestaurants as fetchRestaurantsFromDB } from '@/services';
+import { getRestaurants as fetchRestaurantsFromDB, getRestaurantById } from '@/services';
+import { calculateDistance, formatDistance } from '@/lib/geocoding';
+import { toast } from 'sonner';
 
 export function useRestaurants() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>(mockRestaurants);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [nearbyRestaurants, setNearbyRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [usingMockData, setUsingMockData] = useState<boolean>(false);
+
+  // Load restaurants on mount
+  useEffect(() => {
+    const loadRestaurants = async () => {
+      setIsLoading(true);
+      const fetchedRestaurants = await fetchRestaurantsFromDB();
+      
+      if (fetchedRestaurants && fetchedRestaurants.length > 0) {
+        setRestaurants(fetchedRestaurants);
+        setNearbyRestaurants(fetchedRestaurants);
+        setUsingMockData(false);
+      } else {
+        console.info('Using fallback restaurants');
+        setRestaurants(mockRestaurants);
+        setNearbyRestaurants(mockRestaurants);
+        setUsingMockData(true);
+        toast.warning('Using demo restaurant data. Connect to your database for real data.');
+      }
+      setIsLoading(false);
+    };
+    
+    loadRestaurants();
+  }, []);
 
   const fetchNearbyRestaurants = async (latitude: number, longitude: number): Promise<void> => {
     setIsLoading(true);
     
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      let restaurantsToUse = restaurants;
       
-      // Always show restaurants, even if using default location
-      setNearbyRestaurants(mockRestaurants);
+      // Add distance to each restaurant
+      const restaurantsWithDistance = restaurantsToUse.map(restaurant => {
+        const distance = calculateDistance(
+          latitude,
+          longitude,
+          restaurant.coordinates.latitude,
+          restaurant.coordinates.longitude
+        );
+        
+        return {
+          ...restaurant,
+          distance: formatDistance(distance)
+        };
+      });
+      
+      // Sort by distance
+      restaurantsWithDistance.sort((a, b) => {
+        const distA = parseFloat(a.distance?.replace('km', '').replace('m', '') || '0');
+        const distB = parseFloat(b.distance?.replace('km', '').replace('m', '') || '0');
+        return distA - distB;
+      });
+      
+      setNearbyRestaurants(restaurantsWithDistance);
     } catch (error) {
       console.error('Error fetching restaurants:', error);
       // Ensure we still have restaurants even on error
-      setNearbyRestaurants(mockRestaurants);
+      if (restaurants.length === 0) {
+        setNearbyRestaurants(mockRestaurants);
+        setUsingMockData(true);
+        toast.error('Failed to load restaurants. Using demo data instead.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const selectRestaurant = (id: string): void => {
-    const restaurant = restaurants.find(r => r.id === id) || null;
-    setSelectedRestaurant(restaurant);
+  const selectRestaurant = async (id: string): Promise<void> => {
+    setIsLoading(true);
+    
+    try {
+      // Try to get detailed restaurant data from database
+      const restaurant = await getRestaurantById(id);
+      
+      if (restaurant) {
+        setSelectedRestaurant(restaurant);
+      } else {
+        // Fall back to local state if database fetch fails
+        const localRestaurant = restaurants.find(r => r.id === id) || null;
+        setSelectedRestaurant(localRestaurant);
+        
+        if (!localRestaurant) {
+          toast.error("Restaurant not found");
+        }
+      }
+    } catch (error) {
+      console.error("Error selecting restaurant:", error);
+      // Fall back to local state
+      const localRestaurant = restaurants.find(r => r.id === id) || null;
+      setSelectedRestaurant(localRestaurant);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const getRestaurantById = (id: string): Restaurant | null => {
@@ -42,6 +116,11 @@ export function useRestaurants() {
       r.id === restaurant.id ? restaurant : r
     );
     setRestaurants(updatedRestaurants);
+    
+    // If the selected restaurant was updated, update it as well
+    if (selectedRestaurant && selectedRestaurant.id === restaurant.id) {
+      setSelectedRestaurant(restaurant);
+    }
   };
 
   const getRestaurantCategories = (restaurantId: string): Category[] => {
@@ -77,6 +156,7 @@ export function useRestaurants() {
     categories,
     setCategories,
     isLoading,
+    usingMockData,
     fetchNearbyRestaurants,
     selectRestaurant,
     getRestaurantById,

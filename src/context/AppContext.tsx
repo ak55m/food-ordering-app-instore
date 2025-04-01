@@ -9,6 +9,8 @@ import { useCart } from './useCart';
 import { useOrders } from './useOrders';
 import { Restaurant, MenuItem, CartItem, Order, User, Category, 
          OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia } from '@/types';
+import { setupRainbowTeashop } from '@/utils/setupRealData';
+import { toast } from 'sonner';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
@@ -53,6 +55,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       orderData.fetchOrders(auth.user.id, auth.user.role);
     }
   }, [auth.isAuthenticated, auth.user]);
+
+  // Display warning if using mock data
+  useEffect(() => {
+    if (restaurantData.usingMockData) {
+      // This is handled in the useRestaurants hook now
+    }
+  }, [restaurantData.usingMockData]);
   
   const placeOrder = async (restaurantId: string, paymentMethod: 'credit_card' | 'cash'): Promise<void> => {
     const restaurant = restaurantData.getRestaurantById(restaurantId);

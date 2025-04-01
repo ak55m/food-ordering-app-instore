@@ -2,13 +2,15 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
+import { setupRainbowTeashop, checkDatabaseSetup } from "@/utils/setupRealData";
+import { Loader2 } from "lucide-react";
 
 const RestaurantSignupPage = () => {
   const [restaurantName, setRestaurantName] = useState("");
@@ -19,6 +21,8 @@ const RestaurantSignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [isDbReady, setIsDbReady] = useState<boolean | null>(null);
+  const [isSettingUpDemo, setIsSettingUpDemo] = useState(false);
   const navigate = useNavigate();
   const { user, isAuthenticated, register } = useAppContext();
 
@@ -31,6 +35,15 @@ const RestaurantSignupPage = () => {
       }
     }
   }, [isAuthenticated, user, navigate]);
+
+  useEffect(() => {
+    const checkDb = async () => {
+      const isReady = await checkDatabaseSetup();
+      setIsDbReady(isReady);
+    };
+    
+    checkDb();
+  }, []);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +97,24 @@ const RestaurantSignupPage = () => {
       toast.error('Failed to create restaurant account. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const setupDemoRestaurant = async () => {
+    setIsSettingUpDemo(true);
+    try {
+      const result = await setupRainbowTeashop();
+      
+      if (result.success) {
+        toast.success('Rainbow Teashop demo data was set up successfully!');
+        toast.info('You can now log in with restaurant@rainbowteashop.com / password123');
+      } else {
+        toast.error(`Failed to set up demo restaurant: ${result.error}`);
+      }
+    } catch (error: any) {
+      toast.error(`Error setting up demo restaurant: ${error.message}`);
+    } finally {
+      setIsSettingUpDemo(false);
     }
   };
 
@@ -200,6 +231,31 @@ const RestaurantSignupPage = () => {
               </p>
             </div>
           </CardContent>
+          
+          <CardFooter className="flex flex-col">
+            <div className="w-full border-t border-gray-200 my-2"></div>
+            <div className="text-center w-full">
+              <p className="text-sm text-gray-600 mb-2">Want to try with demo data?</p>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                disabled={isSettingUpDemo}
+                onClick={setupDemoRestaurant}
+              >
+                {isSettingUpDemo ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Setting up demo data...
+                  </>
+                ) : (
+                  "Create Rainbow Teashop demo"
+                )}
+              </Button>
+              {isSettingUpDemo && (
+                <p className="text-xs text-gray-500 mt-1">This might take a few moments...</p>
+              )}
+            </div>
+          </CardFooter>
         </Card>
       </div>
     </div>
