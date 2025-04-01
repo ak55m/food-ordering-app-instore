@@ -16,7 +16,7 @@ const LandingPage = () => {
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-800 sm:text-5xl md:text-6xl lg:max-w-3xl mx-auto font-omnes">
               <span className="block">Seamless Self-Service</span>
-              <span className="block">Ordering for Restaurants & Bars</span>
+              <span className="block">Ordering for Restaurants</span>
             </h1>
             <p className="mt-3 max-w-md mx-auto text-base text-gray-600 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
               In house food ordering process automated.
@@ -241,7 +241,7 @@ const LandingPage = () => {
                 <p className="text-gray-700 mb-4">
                   "OrderU helped us handle high volumes efficiently. We've cut down wait times significantly!"
                 </p>
-                <p className="font-semibold">— Michael T., Bar Manager</p>
+                <p className="font-semibold">— Michael T., Restaurant Manager</p>
               </div>
             </div>
           </div>
@@ -317,13 +317,13 @@ const LandingPage = () => {
                   onClick={() => navigate('/restaurant/login')}
                   className="px-5 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-8"
                 >
-                  Get Started
+                  Get Started as a Restaurant
                 </Button>
               </div>
               <div className="ml-3 rounded-md shadow-lg transform -rotate-2">
                 <Button 
                   variant="outline"
-                  onClick={() => navigate('/home')}
+                  onClick={() => window.open('https://calendly.com/orderu/demo', '_blank')}
                   className="px-5 py-3 border-2 border-white text-base font-medium rounded-md text-gray-800 bg-transparent hover:bg-brand-cyan/10 md:py-4 md:text-lg md:px-8"
                 >
                   Schedule a Demo
