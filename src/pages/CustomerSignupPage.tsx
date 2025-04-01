@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import BottomNavigation from "@/components/BottomNavigation";
-import { signUp } from "@/services/supabaseService";
+import { signUp } from '@/services';
 import { toast } from "sonner";
 
 const CustomerSignupPage = () => {
@@ -21,7 +21,6 @@ const CustomerSignupPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAppContext();
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       if (user?.role === 'customer') {
@@ -35,7 +34,6 @@ const CustomerSignupPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
       return;

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
-import { signUp } from "@/services/supabaseService";
+import { signUp } from "@/services";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 
@@ -22,7 +22,6 @@ const RestaurantSignupPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAppContext();
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       if (user?.role === 'restaurant_owner') {
@@ -36,7 +35,6 @@ const RestaurantSignupPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
     if (password !== confirmPassword) {
       setPasswordError("Passwords do not match");
       return;
@@ -51,7 +49,6 @@ const RestaurantSignupPage = () => {
     setIsLoading(true);
 
     try {
-      // First create the restaurant
       const { data: restaurantData, error: restaurantError } = await supabase
         .from('restaurants')
         .insert([
@@ -70,7 +67,6 @@ const RestaurantSignupPage = () => {
         throw new Error(`Restaurant creation failed: ${restaurantError.message}`);
       }
       
-      // Now create the user with the restaurant ID
       const userData = {
         name: ownerName,
         role: 'restaurant_owner' as const,
