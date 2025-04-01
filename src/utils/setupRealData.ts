@@ -1,4 +1,3 @@
-
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
@@ -31,6 +30,22 @@ export async function createDatabaseTables() {
     if (tablesExist) {
       toast.info("Tables already exist");
       return true;
+    }
+
+    // First try to create the exec_sql function if it doesn't exist
+    try {
+      await supabase.rpc('exec_sql', { 
+        sql: `
+        CREATE OR REPLACE FUNCTION exec_sql(sql text) RETURNS void AS $$
+        BEGIN
+          EXECUTE sql;
+        END;
+        $$ LANGUAGE plpgsql;
+        `
+      });
+    } catch (error) {
+      console.log('Creating exec_sql function:', error);
+      // If we can't create the function, we'll try direct SQL execution later
     }
 
     // Define the SQL script to create the tables directly
@@ -131,32 +146,47 @@ export async function createDatabaseTables() {
     );
     `;
 
-    // Execute the SQL as a single transaction
-    const { error } = await supabase.rpc('exec_sql', { sql: sqlScript });
-
-    if (error) {
-      // If there's an error with the RPC call, try creating each table individually
-      console.error('Error creating tables with RPC call:', error);
+    // Try to create tables using different approaches
+    // Method 1: Try with our SQL function directly
+    try {
+      // Try to create a function to execute SQL first if it doesn't exist
+      const { error } = await supabase.rpc('exec_sql', { sql: sqlScript });
       
-      // Try to create a function to execute SQL first
-      await supabase.rpc('exec_sql', { 
-        sql: `
-        CREATE OR REPLACE FUNCTION exec_sql(sql text) RETURNS void AS $$
-        BEGIN
-          EXECUTE sql;
-        END;
-        $$ LANGUAGE plpgsql;
-        `
-      });
+      if (error) {
+        console.log("Error using exec_sql function:", error);
+        throw error; // Move to next approach
+      }
+    } catch (error) {
+      console.log("Method 1 failed:", error);
       
-      // Create tables one by one
-      const tableCreationStatements = sqlScript.split(';').filter(stmt => stmt.trim().length > 0);
-      
-      for (const statement of tableCreationStatements) {
-        const { error: stmtError } = await supabase.rpc('exec_sql', { sql: statement });
-        if (stmtError && !stmtError.message.includes("already exists")) {
-          console.error('Error executing SQL statement:', stmtError);
-          throw new Error(`Failed to create database tables: ${stmtError.message}`);
+      // Method 2: Try executing individual statements
+      try {
+        const tableCreationStatements = sqlScript.split(';').filter(stmt => stmt.trim().length > 0);
+        
+        for (const statement of tableCreationStatements) {
+          const { error: stmtError } = await supabase.rpc('exec_sql', { sql: statement });
+          if (stmtError && !stmtError.message.includes("already exists")) {
+            console.error('Error executing SQL statement:', stmtError);
+            throw stmtError;
+          }
+        }
+      } catch (error) {
+        console.log("Method 2 failed:", error);
+        
+        // Method 3: Try using the create_tables_direct function from the SQL script
+        try {
+          const { error: directError } = await supabase.rpc('create_tables_direct');
+          
+          if (directError) {
+            console.error('Error using create_tables_direct function:', directError);
+            throw new Error(`Failed to create database tables: ${directError.message}`);
+          }
+        } catch (error) {
+          console.log("Method 3 failed:", error);
+          
+          // Final fallback: Notify user that manual setup is needed
+          toast.error("Automated table creation failed. Please run the SQL script from the database setup page.");
+          throw new Error("Could not automatically create database tables.");
         }
       }
     }
