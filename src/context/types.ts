@@ -1,4 +1,3 @@
-
 import { 
   Restaurant, MenuItem, CartItem, Order, User, Category,
   OrderStatus, UserRole, RestaurantOpeningHours, SocialMedia 
@@ -10,6 +9,17 @@ export interface AppContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  register: (email: string, password: string, userData: Partial<User>) => Promise<User | null>;
+  auth: {
+    user: User | null;
+    setUser: (user: User | null) => void;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+    login: (email: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
+    register: (email: string, password: string, userData: Partial<User>) => Promise<User | null>;
+    initUser: () => Promise<void>;
+  };
   
   locationEnabled: boolean;
   userLocation: {

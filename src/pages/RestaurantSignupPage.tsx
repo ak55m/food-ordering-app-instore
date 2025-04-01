@@ -20,7 +20,7 @@ const RestaurantSignupPage = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
-  const { user, isAuthenticated, auth } = useAppContext();
+  const { user, isAuthenticated, register } = useAppContext();
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -73,7 +73,7 @@ const RestaurantSignupPage = () => {
         restaurantId: restaurantData.id
       };
       
-      const newUser = await auth.register(email, password, userData);
+      const newUser = await register(email, password, userData);
       
       if (newUser) {
         toast.success('Restaurant account created successfully! Please log in.');

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { AppContextType } from './types';
 import { useAuth } from './useAuth';
@@ -67,6 +66,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     isAuthenticated: auth.isAuthenticated,
     login: auth.login,
     logout: auth.logout,
+    register: auth.register,
+    auth, // Expose the entire auth object
     
     // Location
     locationEnabled: location.locationEnabled,
