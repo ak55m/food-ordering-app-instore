@@ -9,7 +9,7 @@ import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { createDatabaseTables, checkDatabaseSetup, setupRealData } from "@/utils/setupRealData";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Info, Alert, AlertDescription } from "lucide-react";
 
 const RestaurantSignupPage = () => {
   const [restaurantName, setRestaurantName] = useState("");
@@ -41,7 +41,7 @@ const RestaurantSignupPage = () => {
       const isReady = await checkDatabaseSetup();
       setIsDbReady(isReady);
       if (!isReady) {
-        setDbSetupMessage("Database tables not found. Tables will be automatically created when you register.");
+        setDbSetupMessage("Database tables not found. You'll need to create them in the Supabase dashboard.");
       }
     };
     
@@ -65,17 +65,13 @@ const RestaurantSignupPage = () => {
     setIsLoading(true);
 
     try {
-      if (!isDbReady) {
-        setDbSetupMessage("Setting up database tables. This may take a moment...");
-        const tablesCreated = await createDatabaseTables();
-        
-        if (!tablesCreated) {
-          throw new Error("Failed to set up database tables");
-        }
-        
-        setIsDbReady(true);
-        setDbSetupMessage(null);
-        toast.success("Database tables created successfully!");
+      const tablesExist = await checkDatabaseSetup();
+      
+      if (!tablesExist) {
+        toast.error("Database tables don't exist. Please create them in your Supabase project first.");
+        setDbSetupMessage("Tables not found. Please click 'Create Restaurant Data' below to set up the tables or check your Supabase dashboard.");
+        setIsLoading(false);
+        return;
       }
 
       const { data: restaurantData, error: restaurantError } = await supabase
@@ -121,15 +117,7 @@ const RestaurantSignupPage = () => {
     setDbSetupMessage("Setting up your restaurant data. This may take a moment...");
     
     try {
-      const tablesExist = await checkDatabaseSetup();
-      
-      if (!tablesExist) {
-        setDbSetupMessage(`Database tables do not exist. You need to configure your Supabase database first.
-        Please contact an administrator or see the documentation for setup instructions.`);
-        toast.error("Database tables don't exist. See console for details.");
-        console.error("Database tables don't exist - they must be created in the Supabase dashboard first");
-        return;
-      }
+      const tablesCreated = await createDatabaseTables();
       
       const result = await setupRealData();
       
@@ -146,7 +134,7 @@ const RestaurantSignupPage = () => {
       }
     } catch (error: any) {
       toast.error(`Error setting up restaurant data: ${error.message}`);
-      setDbSetupMessage(`Database setup error: ${error.message}`);
+      setDbSetupMessage(`Database setup error: ${error.message}. Make sure your Supabase database has the required tables.`);
     } finally {
       setIsSettingUpData(false);
     }
@@ -163,10 +151,21 @@ const RestaurantSignupPage = () => {
             </CardDescription>
             
             {dbSetupMessage && (
-              <div className="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-md flex items-start mt-2 text-sm">
-                <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0" />
-                <p className="text-left">{dbSetupMessage}</p>
-              </div>
+              <Alert variant="warning" className="mt-2">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {dbSetupMessage}
+                </AlertDescription>
+              </Alert>
+            )}
+            
+            {!isDbReady && (
+              <Alert className="mt-2 bg-blue-50 text-blue-800 border-blue-200">
+                <Info className="h-4 w-4 text-blue-800" />
+                <AlertDescription className="text-blue-800">
+                  To get started quickly, click the "Create Restaurant Data" button at the bottom to set up a demo restaurant.
+                </AlertDescription>
+              </Alert>
             )}
           </CardHeader>
           
@@ -257,10 +256,16 @@ const RestaurantSignupPage = () => {
               <Button 
                 type="submit" 
                 className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
-                disabled={isLoading || !agreeTerms}
+                disabled={isLoading || !agreeTerms || !isDbReady}
               >
                 {isLoading ? "Creating Account..." : "Register Restaurant"}
               </Button>
+              
+              {!isDbReady && (
+                <p className="text-xs text-center text-amber-600">
+                  Demo database setup required before registration
+                </p>
+              )}
             </form>
 
             <div className="mt-4 text-center text-sm">
@@ -276,13 +281,13 @@ const RestaurantSignupPage = () => {
           <CardFooter className="flex flex-col">
             <div className="w-full border-t border-gray-200 my-2"></div>
             <div className="text-center w-full">
-              <p className="text-sm text-gray-600 mb-2">
-                Set up database with ready-to-use data:
+              <p className="text-sm text-gray-600 mb-2 font-semibold">
+                Quick Start: Set up database with demo restaurant
               </p>
               <Button
                 type="button"
-                variant="outline"
-                className="w-full"
+                variant="default"
+                className="w-full bg-green-600 hover:bg-green-700"
                 disabled={isSettingUpData}
                 onClick={setupRealRestaurantData}
               >
@@ -297,11 +302,9 @@ const RestaurantSignupPage = () => {
               {isSettingUpData && (
                 <p className="text-xs text-gray-500 mt-1">This might take a few moments...</p>
               )}
-              {!isDbReady && !dbSetupMessage && (
-                <p className="text-xs text-gray-500 mt-2">
-                  Note: You'll need properly configured database tables in your Supabase project.
-                </p>
-              )}
+              <p className="text-xs text-gray-500 mt-2">
+                This will create a demo restaurant called "Rainbow Teashop" with menu items and user credentials.
+              </p>
             </div>
           </CardFooter>
         </Card>
