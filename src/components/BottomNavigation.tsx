@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Home, ShoppingBag, User, ShoppingCart, LogIn } from 'lucide-react';
 import { useAppContext } from '@/context/AppContext';
+import { motion } from 'framer-motion';
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
@@ -11,11 +12,6 @@ const BottomNavigation = () => {
 
   const handleNavigation = (path: string) => {
     navigate(path);
-  };
-
-  const handleLogout = () => {
-    logout();
-    navigate('/home');
   };
 
   const isActive = (path: string) => {
@@ -32,68 +28,90 @@ const BottomNavigation = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white z-10 safe-bottom">
       <div className="flex justify-around items-center p-3">
-        <button 
-          onClick={() => handleNavigation('/home')} 
-          className={`flex flex-col items-center ${isActive('/home') || isActive('/') ? 'text-brand-cyan' : 'text-gray-500'} font-arial`}
-        >
-          <Home className="h-6 w-6" />
-          <span className="text-xs mt-1">Explore</span>
-        </button>
+        <NavButton 
+          icon={<Home className="h-6 w-6" />} 
+          label="Explore"
+          active={isActive('/home') || isActive('/')}
+          onClick={() => handleNavigation('/home')}
+        />
         
         {isAuthenticated ? (
           <>
-            <button 
-              onClick={() => handleNavigation('/orders')} 
-              className={`flex flex-col items-center ${isActive('/orders') ? 'text-brand-cyan' : 'text-gray-500'} font-arial`}
-            >
-              <ShoppingBag className="h-6 w-6" />
-              <span className="text-xs mt-1">Orders</span>
-            </button>
-            <button 
-              onClick={() => handleNavigation('/cart')} 
-              className={`flex flex-col items-center ${isActive('/cart') ? 'text-brand-cyan' : 'text-gray-500'} relative font-arial cursor-pointer`}
-            >
-              <ShoppingCart className="h-6 w-6" />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand-cyan text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-              <span className="text-xs mt-1">Cart</span>
-            </button>
-            <button 
-              onClick={() => handleNavigation('/profile')} 
-              className={`flex flex-col items-center ${isActive('/profile') ? 'text-brand-cyan' : 'text-gray-500'} font-arial`}
-            >
-              <User className="h-6 w-6" />
-              <span className="text-xs mt-1">Profile</span>
-            </button>
+            <NavButton 
+              icon={<ShoppingBag className="h-6 w-6" />}
+              label="Orders"
+              active={isActive('/orders')}
+              onClick={() => handleNavigation('/orders')}
+            />
+            <NavButton 
+              icon={<ShoppingCart className="h-6 w-6" />}
+              label="Cart"
+              active={isActive('/cart')}
+              onClick={() => handleNavigation('/cart')}
+              badge={cartItemCount > 0 ? cartItemCount : undefined}
+            />
+            <NavButton 
+              icon={<User className="h-6 w-6" />}
+              label="Profile"
+              active={isActive('/profile')}
+              onClick={() => handleNavigation('/profile')}
+            />
           </>
         ) : (
           <>
-            <button 
-              onClick={() => handleNavigation('/cart')} 
-              className={`flex flex-col items-center ${isActive('/cart') ? 'text-brand-cyan' : 'text-gray-500'} relative font-arial cursor-pointer`}
-            >
-              <ShoppingCart className="h-6 w-6" />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand-cyan text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-              <span className="text-xs mt-1">Cart</span>
-            </button>
-            <button 
-              onClick={() => handleNavigation('/login')} 
-              className={`flex flex-col items-center ${isActive('/login') ? 'text-brand-cyan' : 'text-gray-500'} font-arial`}
-            >
-              <LogIn className="h-6 w-6" />
-              <span className="text-xs mt-1">Login</span>
-            </button>
+            <NavButton 
+              icon={<ShoppingCart className="h-6 w-6" />}
+              label="Cart"
+              active={isActive('/cart')}
+              onClick={() => handleNavigation('/cart')}
+              badge={cartItemCount > 0 ? cartItemCount : undefined}
+            />
+            <NavButton 
+              icon={<LogIn className="h-6 w-6" />}
+              label="Login"
+              active={isActive('/login')}
+              onClick={() => handleNavigation('/login')}
+            />
           </>
         )}
       </div>
     </div>
+  );
+};
+
+interface NavButtonProps {
+  icon: React.ReactNode;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  badge?: number;
+}
+
+const NavButton: React.FC<NavButtonProps> = ({ icon, label, active, onClick, badge }) => {
+  return (
+    <button 
+      onClick={onClick} 
+      className="flex flex-col items-center relative w-16"
+    >
+      <div className="relative">
+        {active ? (
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute -inset-1 rounded-full bg-brand-cyan/10"
+          />
+        ) : null}
+        <div className={`${active ? 'text-brand-cyan' : 'text-gray-500'} font-arial relative`}>
+          {icon}
+          {badge !== undefined && (
+            <span className="absolute -top-1 -right-1 bg-brand-cyan text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              {badge}
+            </span>
+          )}
+        </div>
+      </div>
+      <span className={`text-xs mt-1 ${active ? 'text-brand-cyan font-medium' : 'text-gray-500'} font-arial`}>{label}</span>
+    </button>
   );
 };
 

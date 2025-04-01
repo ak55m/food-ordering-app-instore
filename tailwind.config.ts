@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -68,6 +69,7 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				"brand-cyan": "#00c2e8",
+				"brand-cyan-dark": "#0099b8", 
 				"brand-light": "#ebf7fd",
 				"brand-white": "#ffffff",
                 "brand-gray": {
@@ -82,6 +84,9 @@ export default {
                     800: "#1f2937",
                     900: "#111827"
                 },
+                "brand-orange": "#ff7a45",
+                "brand-yellow": "#ffc53d",
+                "brand-green": "#52c41a",
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -117,14 +122,24 @@ export default {
 				'bounce': {
 					'0%, 100%': { transform: 'translateY(-15%)' },
 					'50%': { transform: 'translateY(0)' },
-				}
+				},
+                'float': {
+                    '0%, 100%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-10px)' },
+                }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'pulse-slow': 'pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 				'bounce': 'bounce 2s ease-in-out infinite',
-			}
+                'float': 'float 3s ease-in-out infinite',
+			},
+            boxShadow: {
+                'soft': '0 4px 20px 0 rgba(0, 0, 0, 0.05)',
+                'card': '0 10px 20px rgba(0, 0, 0, 0.08)',
+                'hover': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+            }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
