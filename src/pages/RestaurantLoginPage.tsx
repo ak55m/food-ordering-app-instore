@@ -16,9 +16,9 @@ const RestaurantLoginPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, login } = useAppContext();
 
-  // Test user credentials
+  // Rainbow Teashop test credentials
   const testRestaurantOwner = {
-    email: "owner@example.com",
+    email: "restaurant@rainbowteashop.com",
     password: "password123"
   };
 
@@ -146,13 +146,13 @@ const RestaurantLoginPage = () => {
           </CardContent>
 
           <CardFooter className="flex flex-col space-y-2 border-t border-gray-100 pt-4">
-            <p className="text-sm text-center text-gray-500">Test account for demo:</p>
+            <p className="text-sm text-center text-gray-500">Rainbow Teashop demo account:</p>
             <Button
               variant="outline" 
               className="w-full text-xs border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
               onClick={handleTestRestaurantLogin}
             >
-              Use Test Restaurant Account
+              Use Rainbow Teashop Account
             </Button>
           </CardFooter>
         </Card>

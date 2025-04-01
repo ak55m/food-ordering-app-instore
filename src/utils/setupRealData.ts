@@ -30,15 +30,15 @@ export async function setupRainbowTeashop() {
           name: 'Rainbow Teashop',
           description: 'Delicious milk teas and specialty drinks',
           address: '750 Synergy Park drive Richardson Texas, 75080',
-          latitude: 32.9899,  // Approximate coordinates for Richardson, TX
+          latitude: 32.9899,  // Coordinates for Richardson, TX
           longitude: -96.7501,
           phone: '972-555-1234',
           email: 'contact@rainbowteashop.com',
-          logo: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_logo.png',
-          cover_image: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_cover.jpg',
+          logo: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_logo.png',
+          cover_image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_cover.jpg',
           is_active: true,
           accepts_online_orders: true,
-          image: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop.jpg'
+          image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop.jpg'
         }
       ])
       .select()
@@ -100,11 +100,11 @@ export async function setupRainbowTeashop() {
 
     // 5. Add menu items
     const menuItems = [
-      { name: 'Dreamy Matcha', description: 'Refreshing matcha with milk and boba', price: 6.75, image: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/menu_items/matcha.jpg' },
-      { name: 'Tiger Sugar Milk Tea', description: 'Brown sugar milk tea with boba', price: 5.25, image: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/menu_items/tiger_sugar.jpg' },
-      { name: 'Barbie\'s Drink', description: 'Pink strawberry milk tea with pearls', price: 5.25, image: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/menu_items/barbie.jpg' },
-      { name: 'Taro Milk Tea', description: 'Creamy taro milk tea with boba', price: 5.25, image: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/menu_items/taro.jpg' },
-      { name: 'Mango Tea', description: 'Sweet mango fruit tea with jellies', price: 5.75, image: 'https://tbtsmykqauzàbvmuvomo.supabase.co/storage/v1/object/public/menu_items/mango.jpg' },
+      { name: 'Dreamy Matcha', description: 'Refreshing matcha with milk and boba', price: 6.75, image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/menu_items/matcha.jpg' },
+      { name: 'Tiger Sugar Milk Tea', description: 'Brown sugar milk tea with boba', price: 5.25, image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/menu_items/tiger_sugar.jpg' },
+      { name: 'Barbie\'s Drink', description: 'Pink strawberry milk tea with pearls', price: 5.25, image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/menu_items/barbie.jpg' },
+      { name: 'Taro Milk Tea', description: 'Creamy taro milk tea with boba', price: 5.25, image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/menu_items/taro.jpg' },
+      { name: 'Mango Tea', description: 'Sweet mango fruit tea with jellies', price: 5.75, image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/menu_items/mango.jpg' },
     ];
 
     const menuItemsPromises = menuItems.map(item => {
@@ -120,32 +120,29 @@ export async function setupRainbowTeashop() {
 
     await Promise.all(menuItemsPromises);
 
-    // 6. Create or update the restaurant owner user - Fix for the getUserByEmail error
-    try {
-      // Try to sign up with the restaurant owner credentials
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: 'restaurant@rainbowteashop.com',
-        password: 'password123',
-        options: {
-          data: {
-            name: 'Vy Nguyen',
-            role: 'restaurant_owner',
-            restaurant_id: restaurantId
-          }
+    // 6. Create the restaurant owner user account using the credentials
+    const { data: authData, error: signUpError } = await supabase.auth.signUp({
+      email: 'restaurant@rainbowteashop.com',
+      password: 'password123',
+      options: {
+        data: {
+          name: 'Vy Nguyen',
+          role: 'restaurant_owner',
+          restaurant_id: restaurantId
         }
-      });
-
-      if (signUpError && !signUpError.message.includes('already registered')) {
-        console.error('Error creating user:', signUpError);
-        return { success: true, restaurantId, warning: 'Restaurant created, but user creation failed' };
       }
-      
-      console.log('Restaurant owner account created or already exists');
-    } catch (error) {
-      console.error('Error with user creation:', error);
-      // Return success for the restaurant even if user creation fails
+    });
+
+    if (signUpError) {
+      console.error('Error creating user account:', signUpError);
+      toast.error(`Failed to create user account: ${signUpError.message}`);
       return { success: true, restaurantId, warning: 'Restaurant created, but user creation failed' };
     }
+    
+    // If successful, log a success message
+    console.log('Restaurant owner account created successfully');
+    toast.success('Rainbow Teashop and owner account created successfully!');
+    toast.info('You can now log in with restaurant@rainbowteashop.com / password123');
 
     return { success: true, restaurantId };
   } catch (error: any) {
