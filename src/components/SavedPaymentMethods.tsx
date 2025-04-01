@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PaymentMethod } from '@/types';
-import { getPaymentMethods, deletePaymentMethod, updatePaymentMethod } from '@/services/databaseService';
+import { getPaymentMethods, deletePaymentMethod, updatePaymentMethod } from '@/services/supabaseService';
 import { CreditCard, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 

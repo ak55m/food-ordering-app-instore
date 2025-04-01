@@ -1,17 +1,9 @@
 
-// This file is kept for compatibility with existing code
-// But we're not actually using Supabase anymore
+import { createClient } from '@supabase/supabase-js';
+import { type Database } from '@/types/supabase';
 
-export const supabase = {
-  // Mock Supabase client methods (not used but kept for structure)
-  from: () => ({
-    select: () => ({
-      eq: () => ({
-        single: () => Promise.resolve({ data: null, error: null }),
-      }),
-      insert: () => Promise.resolve({ data: null, error: null }),
-      update: () => Promise.resolve({ data: null, error: null }),
-      delete: () => Promise.resolve({ data: null, error: null }),
-    }),
-  }),
-};
+// Initialize the Supabase client
+export const supabase = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL as string,
+  import.meta.env.VITE_SUPABASE_ANON_KEY as string
+);
