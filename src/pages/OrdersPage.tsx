@@ -37,7 +37,7 @@ const OrdersPage: React.FC = () => {
   const getStatusColor = (status: OrderStatus) => {
     switch (status) {
       case 'pending': return 'bg-yellow-400';
-      case 'preparing': return 'bg-brand-light';
+      case 'preparing': return 'bg-orange-400';
       case 'ready': return 'bg-green-500';
       case 'completed': return 'bg-gray-400';
       default: return 'bg-primary';
@@ -125,7 +125,7 @@ const OrdersPage: React.FC = () => {
             <p className="text-gray-500 mb-6">
               Your order history will appear here once you place an order
             </p>
-            <Button onClick={() => navigate('/')} className="bg-brand-light text-brand-gray-800 hover:bg-brand-light/80">
+            <Button onClick={() => navigate('/')} className="btn-primary">
               Browse Restaurants
             </Button>
           </div>

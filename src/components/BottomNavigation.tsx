@@ -34,7 +34,7 @@ const BottomNavigation = () => {
       <div className="flex justify-around items-center p-3">
         <button 
           onClick={() => handleNavigation('/home')} 
-          className={`flex flex-col items-center ${isActive('/home') || isActive('/') ? 'text-brand-light' : 'text-gray-500'}`}
+          className={`flex flex-col items-center ${isActive('/home') || isActive('/') ? 'text-[#ebf7fd]' : 'text-gray-500'}`}
         >
           <Home className="h-6 w-6" />
           <span className="text-xs mt-1">Explore</span>
@@ -44,18 +44,18 @@ const BottomNavigation = () => {
           <>
             <button 
               onClick={() => handleNavigation('/orders')} 
-              className={`flex flex-col items-center ${isActive('/orders') ? 'text-brand-light' : 'text-gray-500'}`}
+              className={`flex flex-col items-center ${isActive('/orders') ? 'text-[#ebf7fd]' : 'text-gray-500'}`}
             >
               <ShoppingBag className="h-6 w-6" />
               <span className="text-xs mt-1">Orders</span>
             </button>
             <button 
               onClick={() => handleNavigation('/cart')} 
-              className={`flex flex-col items-center ${isActive('/cart') ? 'text-brand-light' : 'text-gray-500'} relative`}
+              className={`flex flex-col items-center ${isActive('/cart') ? 'text-[#ebf7fd]' : 'text-gray-500'} relative`}
             >
               <ShoppingCart className="h-6 w-6" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand-light text-brand-gray-800 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-[#ebf7fd] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartItemCount}
                 </span>
               )}
@@ -63,7 +63,7 @@ const BottomNavigation = () => {
             </button>
             <button 
               onClick={() => handleNavigation('/profile')} 
-              className={`flex flex-col items-center ${isActive('/profile') ? 'text-brand-light' : 'text-gray-500'}`}
+              className={`flex flex-col items-center ${isActive('/profile') ? 'text-[#ebf7fd]' : 'text-gray-500'}`}
             >
               <User className="h-6 w-6" />
               <span className="text-xs mt-1">Profile</span>
@@ -73,11 +73,11 @@ const BottomNavigation = () => {
           <>
             <button 
               onClick={() => handleNavigation('/cart')} 
-              className={`flex flex-col items-center ${isActive('/cart') ? 'text-brand-light' : 'text-gray-500'} relative`}
+              className={`flex flex-col items-center ${isActive('/cart') ? 'text-[#ebf7fd]' : 'text-gray-500'} relative`}
             >
               <ShoppingCart className="h-6 w-6" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-brand-light text-brand-gray-800 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-[#ebf7fd] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartItemCount}
                 </span>
               )}
@@ -85,7 +85,7 @@ const BottomNavigation = () => {
             </button>
             <button 
               onClick={() => handleNavigation('/login')} 
-              className={`flex flex-col items-center ${isActive('/login') ? 'text-brand-light' : 'text-gray-500'}`}
+              className={`flex flex-col items-center ${isActive('/login') ? 'text-[#ebf7fd]' : 'text-gray-500'}`}
             >
               <LogIn className="h-6 w-6" />
               <span className="text-xs mt-1">Login</span>
