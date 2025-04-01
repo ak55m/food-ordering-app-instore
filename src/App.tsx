@@ -6,7 +6,10 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AppProvider, useAppContext } from "./context/AppContext";
 
 // Pages - Authentication
-import LoginPage from "./pages/LoginPage";
+import CustomerLoginPage from "./pages/CustomerLoginPage";
+import CustomerSignupPage from "./pages/CustomerSignupPage";
+import RestaurantLoginPage from "./pages/RestaurantLoginPage";
+import RestaurantSignupPage from "./pages/RestaurantSignupPage";
 import LandingPage from "./pages/LandingPage";
 
 // Pages - Customer View
@@ -37,7 +40,7 @@ const CustomerAuthRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated } = useAppContext();
   
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/customer/login" />;
   }
   
   return <>{children}</>;
@@ -48,7 +51,7 @@ const RestaurantRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated } = useAppContext();
   
   if (!isAuthenticated || user?.role !== "restaurant_owner") {
-    return <Navigate to="/login" />;
+    return <Navigate to="/restaurant/login" />;
   }
   
   return <>{children}</>;
@@ -61,11 +64,33 @@ const AppRoutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<LandingPage />} />
-      <Route path="/login" element={
+      
+      {/* Customer Auth Routes */}
+      <Route path="/customer/login" element={
         isAuthenticated ? 
           (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/home" />) 
-          : <LoginPage />
+          : <CustomerLoginPage />
       } />
+      <Route path="/customer/signup" element={
+        isAuthenticated ? 
+          (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/home" />) 
+          : <CustomerSignupPage />
+      } />
+      
+      {/* Restaurant Auth Routes */}
+      <Route path="/restaurant/login" element={
+        isAuthenticated ? 
+          (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/home" />) 
+          : <RestaurantLoginPage />
+      } />
+      <Route path="/restaurant/signup" element={
+        isAuthenticated ? 
+          (user?.role === 'restaurant_owner' ? <Navigate to="/restaurant" /> : <Navigate to="/home" />) 
+          : <RestaurantSignupPage />
+      } />
+      
+      {/* Legacy login route - redirect to customer login */}
+      <Route path="/login" element={<Navigate to="/customer/login" />} />
       
       {/* Customer Routes - No authentication required for browsing */}
       <Route path="/home" element={<Index />} />
