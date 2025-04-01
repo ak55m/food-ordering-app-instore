@@ -1,5 +1,5 @@
 
-import { supabase } from '@/lib/supabase';
+import { supabase, supabaseUrl, supabaseAnonKey } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 // Check if tables exist by attempting to query them
@@ -38,13 +38,13 @@ export async function createDatabaseTables() {
     try {
       // Create all tables in one operation using SQL
       const rawResponse = await fetch(
-        `${supabase.supabaseUrl}/rest/v1/`,
+        `${supabaseUrl}/rest/v1/`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${supabase.supabaseKey}`,
-            'apikey': `${supabase.supabaseKey}`,
+            'Authorization': `Bearer ${supabaseAnonKey}`,
+            'apikey': `${supabaseAnonKey}`,
             'Prefer': 'resolution=ignore-duplicates'
           },
           body: JSON.stringify({
@@ -160,13 +160,13 @@ export async function createDatabaseTables() {
       try {
         // First try to create the exec_sql function if it doesn't exist
         const createFnResult = await fetch(
-          `${supabase.supabaseUrl}/rest/v1/rpc/exec_sql`,
+          `${supabaseUrl}/rest/v1/rpc/exec_sql`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${supabase.supabaseKey}`,
-              'apikey': `${supabase.supabaseKey}`
+              'Authorization': `Bearer ${supabaseAnonKey}`,
+              'apikey': `${supabaseAnonKey}`
             },
             body: JSON.stringify({
               sql: `
@@ -186,13 +186,13 @@ export async function createDatabaseTables() {
         
         // Use the function to create tables (from create_tables.sql)
         const execResult = await fetch(
-          `${supabase.supabaseUrl}/rest/v1/rpc/exec_sql`,
+          `${supabaseUrl}/rest/v1/rpc/exec_sql`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${supabase.supabaseKey}`,
-              'apikey': `${supabase.supabaseKey}`
+              'Authorization': `Bearer ${supabaseAnonKey}`,
+              'apikey': `${supabaseAnonKey}`
             },
             body: JSON.stringify({
               sql: `
@@ -293,13 +293,13 @@ export async function createDatabaseTables() {
         // Create each table one by one
         for (const tableSql of remainingTables) {
           await fetch(
-            `${supabase.supabaseUrl}/rest/v1/rpc/exec_sql`,
+            `${supabaseUrl}/rest/v1/rpc/exec_sql`,
             {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${supabase.supabaseKey}`,
-                'apikey': `${supabase.supabaseKey}`
+                'Authorization': `Bearer ${supabaseAnonKey}`,
+                'apikey': `${supabaseAnonKey}`
               },
               body: JSON.stringify({
                 sql: tableSql
