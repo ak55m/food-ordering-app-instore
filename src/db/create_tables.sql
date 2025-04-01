@@ -1,4 +1,14 @@
 
+-- First, create a function that can execute arbitrary SQL
+CREATE OR REPLACE FUNCTION exec_sql(sql text) RETURNS void AS $$
+BEGIN
+  EXECUTE sql;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Enable UUID extension if not already enabled
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 -- Function to create all necessary tables for the restaurant app
 CREATE OR REPLACE FUNCTION create_tables()
 RETURNS void AS $$
@@ -94,29 +104,6 @@ BEGIN
         brand TEXT,
         created_at TIMESTAMPTZ DEFAULT NOW()
     );
-END;
-$$ LANGUAGE plpgsql;
-
--- Function to check if setup is complete and run setup if needed
-CREATE OR REPLACE FUNCTION setup_database() 
-RETURNS json AS $$
-DECLARE
-  tables_exist boolean;
-BEGIN
-  -- Check if restaurants table exists
-  SELECT EXISTS (
-    SELECT FROM information_schema.tables 
-    WHERE table_schema = 'public'
-    AND table_name = 'restaurants'
-  ) INTO tables_exist;
-  
-  -- If tables don't exist, create them
-  IF NOT tables_exist THEN
-    PERFORM create_tables();
-    RETURN json_build_object('success', true, 'message', 'Tables created successfully');
-  END IF;
-  
-  RETURN json_build_object('success', true, 'message', 'Tables already exist');
 END;
 $$ LANGUAGE plpgsql;
 
