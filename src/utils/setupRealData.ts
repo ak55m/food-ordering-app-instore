@@ -3,51 +3,172 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 // Create database tables if they don't exist
-async function initializeDatabase() {
+export async function createDatabaseTables() {
   try {
+    console.log("Creating database tables...");
+    
     // Create restaurants table
-    await supabase.rpc('create_restaurants_table_if_not_exists', {});
+    const { error: restaurantsError } = await supabase.rpc('exec_sql', {
+      sql_query: `
+        CREATE TABLE IF NOT EXISTS public.restaurants (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          name TEXT NOT NULL,
+          description TEXT,
+          image TEXT,
+          categories TEXT[],
+          rating FLOAT DEFAULT 0,
+          address TEXT,
+          latitude FLOAT,
+          longitude FLOAT,
+          phone TEXT,
+          email TEXT,
+          logo TEXT,
+          cover_image TEXT,
+          is_open BOOLEAN DEFAULT true,
+          is_new BOOLEAN DEFAULT false,
+          is_active BOOLEAN DEFAULT true,
+          accepts_online_orders BOOLEAN DEFAULT true,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+          owner_id UUID
+        );
+      `
+    });
     
+    if (restaurantsError) {
+      console.error('Error creating restaurants table:', restaurantsError);
+      return false;
+    }
+
     // Create restaurant_opening_hours table
-    await supabase.rpc('create_restaurant_opening_hours_table_if_not_exists', {});
+    const { error: hoursError } = await supabase.rpc('exec_sql', {
+      sql_query: `
+        CREATE TABLE IF NOT EXISTS public.restaurant_opening_hours (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
+          day TEXT NOT NULL,
+          is_open BOOLEAN DEFAULT true,
+          open_time TEXT,
+          close_time TEXT
+        );
+      `
+    });
     
+    if (hoursError) {
+      console.error('Error creating restaurant_opening_hours table:', hoursError);
+      return false;
+    }
+
     // Create restaurant_social_media table
-    await supabase.rpc('create_restaurant_social_media_table_if_not_exists', {});
+    const { error: socialMediaError } = await supabase.rpc('exec_sql', {
+      sql_query: `
+        CREATE TABLE IF NOT EXISTS public.restaurant_social_media (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
+          platform TEXT NOT NULL,
+          url TEXT NOT NULL
+        );
+      `
+    });
     
+    if (socialMediaError) {
+      console.error('Error creating restaurant_social_media table:', socialMediaError);
+      return false;
+    }
+
     // Create categories table
-    await supabase.rpc('create_categories_table_if_not_exists', {});
+    const { error: categoriesError } = await supabase.rpc('exec_sql', {
+      sql_query: `
+        CREATE TABLE IF NOT EXISTS public.categories (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          name TEXT NOT NULL,
+          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
+        );
+      `
+    });
     
+    if (categoriesError) {
+      console.error('Error creating categories table:', categoriesError);
+      return false;
+    }
+
     // Create menu_items table
-    await supabase.rpc('create_menu_items_table_if_not_exists', {});
+    const { error: menuItemsError } = await supabase.rpc('exec_sql', {
+      sql_query: `
+        CREATE TABLE IF NOT EXISTS public.menu_items (
+          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+          name TEXT NOT NULL,
+          description TEXT,
+          price FLOAT NOT NULL,
+          image TEXT,
+          category_id UUID REFERENCES public.categories(id) ON DELETE CASCADE,
+          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
+        );
+      `
+    });
+    
+    if (menuItemsError) {
+      console.error('Error creating menu_items table:', menuItemsError);
+      return false;
+    }
+
+    console.log("Database tables created successfully!");
+    return true;
+  } catch (error) {
+    console.error('Error creating database tables:', error);
+    return false;
+  }
+}
+
+// Function to check if Supabase tables are ready
+export async function checkDatabaseSetup() {
+  try {
+    // Try to query restaurants table
+    const { error: restaurantsError } = await supabase
+      .from('restaurants')
+      .select('count')
+      .limit(1);
+    
+    if (restaurantsError) {
+      console.error('Restaurants table not ready:', restaurantsError);
+      return false;
+    }
+    
+    // Try to query categories table
+    const { error: categoriesError } = await supabase
+      .from('categories')
+      .select('count')
+      .limit(1);
+    
+    if (categoriesError) {
+      console.error('Categories table not ready:', categoriesError);
+      return false;
+    }
+    
+    // Try to query menu_items table
+    const { error: menuItemsError } = await supabase
+      .from('menu_items')
+      .select('count')
+      .limit(1);
+    
+    if (menuItemsError) {
+      console.error('Menu items table not ready:', menuItemsError);
+      return false;
+    }
     
     return true;
   } catch (error) {
-    console.error('Error initializing database:', error);
+    console.error('Error checking database setup:', error);
     return false;
   }
 }
 
 export async function setupRainbowTeashop() {
   try {
-    // Before doing anything, check if tables exist
-    const tablesExist = await checkDatabaseSetup();
+    // First ensure tables exist
+    const tablesCreated = await createDatabaseTables();
     
-    if (!tablesExist) {
-      // Show message to the user
-      toast.info("Database tables don't exist. Creating them now...");
-      
-      // Use SQL queries to create the tables directly instead of RPC calls
-      await createDatabaseTables();
-      
-      // Wait a moment for tables to be ready
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Check if tables were created successfully
-      const tablesCreated = await checkDatabaseSetup();
-      if (!tablesCreated) {
-        toast.error("Failed to create database tables. Please check your Supabase configuration.");
-        return { success: false, error: "Could not create database tables" };
-      }
+    if (!tablesCreated) {
+      return { success: false, error: "Could not create database tables" };
     }
 
     // Check if the restaurant already exists
@@ -194,147 +315,5 @@ export async function setupRainbowTeashop() {
   } catch (error: any) {
     console.error('Error setting up Rainbow Teashop:', error);
     return { success: false, error: error.message };
-  }
-}
-
-// Function to create database tables directly using SQL
-async function createDatabaseTables() {
-  try {
-    // Create restaurants table
-    const { error: restaurantsError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.restaurants (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          image TEXT,
-          categories TEXT[],
-          rating FLOAT DEFAULT 0,
-          address TEXT,
-          latitude FLOAT,
-          longitude FLOAT,
-          phone TEXT,
-          email TEXT,
-          logo TEXT,
-          cover_image TEXT,
-          is_open BOOLEAN DEFAULT true,
-          is_new BOOLEAN DEFAULT false,
-          is_active BOOLEAN DEFAULT true,
-          accepts_online_orders BOOLEAN DEFAULT true,
-          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-          owner_id UUID
-        );
-      `
-    });
-    
-    if (restaurantsError) console.error('Error creating restaurants table:', restaurantsError);
-
-    // Create restaurant_opening_hours table
-    const { error: hoursError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.restaurant_opening_hours (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
-          day TEXT NOT NULL,
-          is_open BOOLEAN DEFAULT true,
-          open_time TEXT,
-          close_time TEXT
-        );
-      `
-    });
-    
-    if (hoursError) console.error('Error creating restaurant_opening_hours table:', hoursError);
-
-    // Create restaurant_social_media table
-    const { error: socialMediaError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.restaurant_social_media (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE,
-          platform TEXT NOT NULL,
-          url TEXT NOT NULL
-        );
-      `
-    });
-    
-    if (socialMediaError) console.error('Error creating restaurant_social_media table:', socialMediaError);
-
-    // Create categories table
-    const { error: categoriesError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.categories (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
-        );
-      `
-    });
-    
-    if (categoriesError) console.error('Error creating categories table:', categoriesError);
-
-    // Create menu_items table
-    const { error: menuItemsError } = await supabase.rpc('exec_sql', {
-      sql_query: `
-        CREATE TABLE IF NOT EXISTS public.menu_items (
-          id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-          name TEXT NOT NULL,
-          description TEXT,
-          price FLOAT NOT NULL,
-          image TEXT,
-          category_id UUID REFERENCES public.categories(id) ON DELETE CASCADE,
-          restaurant_id UUID REFERENCES public.restaurants(id) ON DELETE CASCADE
-        );
-      `
-    });
-    
-    if (menuItemsError) console.error('Error creating menu_items table:', menuItemsError);
-
-    return true;
-  } catch (error) {
-    console.error('Error creating database tables:', error);
-    return false;
-  }
-}
-
-// Function to check if Supabase tables are ready
-export async function checkDatabaseSetup() {
-  try {
-    // Try to query restaurants table
-    const { error: restaurantsError } = await supabase
-      .from('restaurants')
-      .select('count')
-      .limit(1);
-    
-    if (restaurantsError) {
-      console.error('Restaurants table not ready:', restaurantsError);
-      return false;
-    }
-    
-    // Try to query categories table
-    const { error: categoriesError } = await supabase
-      .from('categories')
-      .select('count')
-      .limit(1);
-    
-    if (categoriesError) {
-      console.error('Categories table not ready:', categoriesError);
-      return false;
-    }
-    
-    // Try to query menu_items table
-    const { error: menuItemsError } = await supabase
-      .from('menu_items')
-      .select('count')
-      .limit(1);
-    
-    if (menuItemsError) {
-      console.error('Menu items table not ready:', menuItemsError);
-      return false;
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Error checking database setup:', error);
-    return false;
   }
 }

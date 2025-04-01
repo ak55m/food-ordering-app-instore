@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { setupRainbowTeashop, checkDatabaseSetup } from "@/utils/setupRealData";
+import { createDatabaseTables, checkDatabaseSetup } from "@/utils/setupRealData";
 import { Loader2, AlertCircle } from "lucide-react";
 
 const RestaurantSignupPage = () => {
@@ -41,7 +42,7 @@ const RestaurantSignupPage = () => {
       const isReady = await checkDatabaseSetup();
       setIsDbReady(isReady);
       if (!isReady) {
-        setDbSetupMessage("Database tables not found. Click 'Create Rainbow Teashop demo' to set up database tables.");
+        setDbSetupMessage("Database tables not found. Tables will be automatically created when you register.");
       }
     };
     
@@ -60,16 +61,26 @@ const RestaurantSignupPage = () => {
       setPasswordError("Password must be at least 6 characters");
       return;
     }
-    
-    if (!isDbReady) {
-      toast.warning("Database tables need to be created first. Please set up the demo restaurant to initialize the database.");
-      return;
-    }
 
     setPasswordError("");
     setIsLoading(true);
 
     try {
+      // Check if database is ready, if not, create tables
+      if (!isDbReady) {
+        setDbSetupMessage("Setting up database tables. This may take a moment...");
+        const tablesCreated = await createDatabaseTables();
+        
+        if (!tablesCreated) {
+          throw new Error("Failed to set up database tables");
+        }
+        
+        setIsDbReady(true);
+        setDbSetupMessage(null);
+        toast.success("Database tables created successfully!");
+      }
+
+      // Create restaurant
       const { data: restaurantData, error: restaurantError } = await supabase
         .from('restaurants')
         .insert([
@@ -100,9 +111,9 @@ const RestaurantSignupPage = () => {
         toast.success('Restaurant account created successfully! Please log in.');
         navigate('/restaurant/login');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup error:", error);
-      toast.error('Failed to create restaurant account. Please try again.');
+      toast.error(`Failed to create restaurant account: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -113,17 +124,59 @@ const RestaurantSignupPage = () => {
     setDbSetupMessage("Setting up database tables and demo data. This may take a moment...");
     
     try {
-      const result = await setupRainbowTeashop();
+      // First create tables if they don't exist
+      await createDatabaseTables();
       
-      if (result.success) {
-        setIsDbReady(true);
-        setDbSetupMessage(null);
-        toast.success('Rainbow Teashop demo data was set up successfully!');
-        toast.info('You can now log in with restaurant@rainbowteashop.com / password123');
-      } else {
-        toast.error(`Failed to set up demo restaurant: ${result.error}`);
-        setDbSetupMessage(`Database setup failed: ${result.error}`);
+      // Now create the restaurant and user
+      const { data: restaurantData, error: restaurantError } = await supabase
+        .from('restaurants')
+        .insert([
+          {
+            name: 'Rainbow Teashop',
+            description: 'Delicious milk teas and specialty drinks',
+            address: '750 Synergy Park drive Richardson Texas, 75080',
+            latitude: 32.9899,
+            longitude: -96.7501,
+            phone: '972-555-1234',
+            email: 'contact@rainbowteashop.com',
+            logo: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_logo.png',
+            cover_image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop_cover.jpg',
+            is_active: true,
+            accepts_online_orders: true,
+            image: 'https://jurgzlaiespprlrwkpxk.supabase.co/storage/v1/object/public/restaurant_images/rainbow_teashop.jpg'
+          }
+        ])
+        .select()
+        .single();
+      
+      if (restaurantError) {
+        throw new Error(`Restaurant creation failed: ${restaurantError.message}`);
       }
+      
+      const restaurantId = restaurantData.id;
+      
+      // Create test user account
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: 'restaurant@rainbowteashop.com',
+        password: 'password123',
+        options: {
+          data: {
+            name: 'Vy Nguyen',
+            role: 'restaurant_owner',
+            restaurant_id: restaurantId
+          }
+        }
+      });
+      
+      if (signUpError) {
+        throw new Error(`User creation failed: ${signUpError.message}`);
+      }
+      
+      setIsDbReady(true);
+      setDbSetupMessage(null);
+      toast.success('Rainbow Teashop demo data was set up successfully!');
+      toast.info('You can now log in with restaurant@rainbowteashop.com / password123');
+      
     } catch (error: any) {
       toast.error(`Error setting up demo restaurant: ${error.message}`);
       setDbSetupMessage(`Database setup error: ${error.message}`);
@@ -237,16 +290,10 @@ const RestaurantSignupPage = () => {
               <Button 
                 type="submit" 
                 className="w-full bg-[#33b1e6] hover:bg-[#33b1e6]/90 text-white" 
-                disabled={isLoading || !agreeTerms || !isDbReady}
+                disabled={isLoading || !agreeTerms}
               >
                 {isLoading ? "Creating Account..." : "Register Restaurant"}
               </Button>
-              
-              {!isDbReady && (
-                <p className="text-xs text-center text-amber-600">
-                  Please set up the database first using the button below
-                </p>
-              )}
             </form>
 
             <div className="mt-4 text-center text-sm">

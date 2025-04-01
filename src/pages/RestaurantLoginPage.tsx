@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/context/AppContext";
 import { toast } from "sonner";
-import { checkDatabaseSetup } from "@/utils/setupRealData";
-import { AlertCircle } from "lucide-react";
+import { checkDatabaseSetup, createDatabaseTables } from "@/utils/setupRealData";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 const RestaurantLoginPage = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +17,7 @@ const RestaurantLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
+  const [isCreatingTables, setIsCreatingTables] = useState(false);
   const navigate = useNavigate();
   const { user, isAuthenticated, login } = useAppContext();
 
@@ -31,7 +32,9 @@ const RestaurantLoginPage = () => {
     const checkDb = async () => {
       const isReady = await checkDatabaseSetup();
       if (!isReady) {
-        setDbError("Database tables not found. Please go to the signup page and click 'Create Rainbow Teashop demo' to set up the database.");
+        setDbError("Database tables not found. Please click 'Create Database Tables' below or go to the signup page.");
+      } else {
+        setDbError(null);
       }
     };
     
@@ -68,8 +71,8 @@ const RestaurantLoginPage = () => {
       if (error.message?.includes('Invalid login credentials')) {
         toast.error("Invalid email or password. Please check your credentials.");
       } else if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-        toast.error("Database not set up. Please go to signup page to create the database.");
-        setDbError("Database tables not found. Please go to the signup page and click 'Create Rainbow Teashop demo' to set up the database.");
+        toast.error("Database not set up. Please create the database tables first.");
+        setDbError("Database tables not found. Please click 'Create Database Tables' below.");
       } else {
         toast.error(`Failed to login: ${error.message || "Unknown error"}`);
       }
@@ -81,6 +84,23 @@ const RestaurantLoginPage = () => {
   const handleTestRestaurantLogin = () => {
     setEmail(testRestaurantOwner.email);
     setPassword(testRestaurantOwner.password);
+  };
+
+  const handleCreateTables = async () => {
+    setIsCreatingTables(true);
+    try {
+      const success = await createDatabaseTables();
+      if (success) {
+        toast.success("Database tables created successfully!");
+        setDbError(null);
+      } else {
+        toast.error("Failed to create database tables.");
+      }
+    } catch (error: any) {
+      toast.error(`Error creating tables: ${error.message}`);
+    } finally {
+      setIsCreatingTables(false);
+    }
   };
 
   // Check for remembered user on component mount
@@ -195,12 +215,28 @@ const RestaurantLoginPage = () => {
             </div>
             
             {dbError && (
-              <p className="text-xs text-center text-amber-600">
-                <Link to="/restaurant/signup" className="font-medium underline">
-                  Go to signup page
-                </Link> 
-                {" "}to set up the database first
-              </p>
+              <>
+                <Button
+                  variant="outline"
+                  className="w-full text-amber-700 border-amber-300 hover:bg-amber-50"
+                  onClick={handleCreateTables}
+                  disabled={isCreatingTables}
+                >
+                  {isCreatingTables ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Creating tables...
+                    </>
+                  ) : (
+                    "Create Database Tables"
+                  )}
+                </Button>
+                <p className="text-xs text-center text-amber-600">
+                  <Link to="/restaurant/signup" className="font-medium underline">
+                    Go to signup page
+                  </Link> 
+                  {" "}to register a new restaurant
+                </p>
+              </>
             )}
           </CardFooter>
         </Card>
